@@ -1,0 +1,13 @@
+.buildpath
+.settings/
+.project
+*.patch
+.idea/
+.git/
+storage/logs
+.phpintel/
+.config.yaml
+.DS_Store
+*.cache
+.github/
+
