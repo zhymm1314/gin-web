@@ -1,0 +1,148 @@
+
+
+[31m2024/12/16 17:12:53 [Recovery] 2024/12/16 - 17:12:53 panic recovered:
+POST /api/auth/login HTTP/1.1
+Host: 127.0.0.1:8888
+Accept: */*
+Accept-Encoding: gzip, deflate, br
+Cache-Control: no-cache
+Connection: keep-alive
+Content-Length: 105
+Content-Type: application/json
+Postman-Token: 3685713d-000e-4ffc-ba9b-2b216e0e91b9
+User-Agent: PostmanRuntime/7.43.0
+
+
+runtime error: invalid memory address or nil pointer dereference
+/usr/local/go/src/runtime/panic.go:261 (0x102fb1607)
+	panicmem: panic(memoryError)
+/usr/local/go/src/runtime/signal_unix.go:881 (0x102fb15d4)
+	sigpanic: panicmem()
+/Users/zhanghaiying/go/pkg/mod/gorm.io/gorm@v1.25.12/gorm.go:406 (0x103308718)
+	(*DB).getInstance: if db.clone > 0 {
+/Users/zhanghaiying/go/pkg/mod/gorm.io/gorm@v1.25.12/chainable_api.go:208 (0x103303fff)
+	(*DB).Where: tx = db.getInstance()
+/Users/zhanghaiying/golang/app/services/user.go:31 (0x10345803f)
+	(*userService).Login: err = global.App.DB.Where("mobile = ?", params.Mobile).First(&user).Error
+/Users/zhanghaiying/golang/app/controllers/auth.go:18 (0x10345899f)
+	Login: if err, user := services.UserService.Login(form); err != nil {
+/Users/zhanghaiying/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/context.go:185 (0x10344a573)
+	(*Context).Next: c.handlers[c.index](c)
+/Users/zhanghaiying/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/recovery.go:102 (0x10344a554)
+	CustomRecoveryWithWriter.func1: c.Next()
+/Users/zhanghaiying/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/context.go:185 (0x1034498d7)
+	(*Context).Next: c.handlers[c.index](c)
+/Users/zhanghaiying/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/logger.go:249 (0x1034498b4)
+	LoggerWithConfig.func1: c.Next()
+/Users/zhanghaiying/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/context.go:185 (0x103448d13)
+	(*Context).Next: c.handlers[c.index](c)
+/Users/zhanghaiying/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/gin.go:633 (0x10344889c)
+	(*Engine).handleHTTPRequest: c.Next()
+/Users/zhanghaiying/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/gin.go:589 (0x1034485e3)
+	(*Engine).ServeHTTP: engine.handleHTTPRequest(c)
+/usr/local/go/src/net/http/server.go:3137 (0x10319689b)
+	serverHandler.ServeHTTP: handler.ServeHTTP(rw, req)
+/usr/local/go/src/net/http/server.go:2039 (0x103192bd7)
+	(*conn).serve: serverHandler{c.server}.ServeHTTP(w, w.req)
+/usr/local/go/src/runtime/asm_arm64.s:1222 (0x102fcf5c3)
+	goexit: MOVD	R0, R0	// NOP
+[0m
+
+
+[31m2024/12/16 17:13:21 [Recovery] 2024/12/16 - 17:13:21 panic recovered:
+POST /api/auth/login HTTP/1.1
+Host: 127.0.0.1:8888
+Accept: */*
+Accept-Encoding: gzip, deflate, br
+Cache-Control: no-cache
+Connection: keep-alive
+Content-Length: 105
+Content-Type: application/json
+Postman-Token: ea561766-58b7-4295-85a7-6a07658892e0
+User-Agent: PostmanRuntime/7.43.0
+
+
+runtime error: invalid memory address or nil pointer dereference
+/usr/local/go/src/runtime/panic.go:261 (0x102fb1607)
+	panicmem: panic(memoryError)
+/usr/local/go/src/runtime/signal_unix.go:881 (0x102fb15d4)
+	sigpanic: panicmem()
+/Users/zhanghaiying/go/pkg/mod/gorm.io/gorm@v1.25.12/gorm.go:406 (0x103308718)
+	(*DB).getInstance: if db.clone > 0 {
+/Users/zhanghaiying/go/pkg/mod/gorm.io/gorm@v1.25.12/chainable_api.go:208 (0x103303fff)
+	(*DB).Where: tx = db.getInstance()
+/Users/zhanghaiying/golang/app/services/user.go:31 (0x10345803f)
+	(*userService).Login: err = global.App.DB.Where("mobile = ?", params.Mobile).First(&user).Error
+/Users/zhanghaiying/golang/app/controllers/auth.go:18 (0x10345899f)
+	Login: if err, user := services.UserService.Login(form); err != nil {
+/Users/zhanghaiying/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/context.go:185 (0x10344a573)
+	(*Context).Next: c.handlers[c.index](c)
+/Users/zhanghaiying/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/recovery.go:102 (0x10344a554)
+	CustomRecoveryWithWriter.func1: c.Next()
+/Users/zhanghaiying/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/context.go:185 (0x1034498d7)
+	(*Context).Next: c.handlers[c.index](c)
+/Users/zhanghaiying/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/logger.go:249 (0x1034498b4)
+	LoggerWithConfig.func1: c.Next()
+/Users/zhanghaiying/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/context.go:185 (0x103448d13)
+	(*Context).Next: c.handlers[c.index](c)
+/Users/zhanghaiying/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/gin.go:633 (0x10344889c)
+	(*Engine).handleHTTPRequest: c.Next()
+/Users/zhanghaiying/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/gin.go:589 (0x1034485e3)
+	(*Engine).ServeHTTP: engine.handleHTTPRequest(c)
+/usr/local/go/src/net/http/server.go:3137 (0x10319689b)
+	serverHandler.ServeHTTP: handler.ServeHTTP(rw, req)
+/usr/local/go/src/net/http/server.go:2039 (0x103192bd7)
+	(*conn).serve: serverHandler{c.server}.ServeHTTP(w, w.req)
+/usr/local/go/src/runtime/asm_arm64.s:1222 (0x102fcf5c3)
+	goexit: MOVD	R0, R0	// NOP
+[0m
+
+
+[31m2024/12/16 17:13:22 [Recovery] 2024/12/16 - 17:13:22 panic recovered:
+POST /api/auth/login HTTP/1.1
+Host: 127.0.0.1:8888
+Accept: */*
+Accept-Encoding: gzip, deflate, br
+Cache-Control: no-cache
+Connection: keep-alive
+Content-Length: 105
+Content-Type: application/json
+Postman-Token: 85f636ed-5afe-4613-93e9-d4bffad55187
+User-Agent: PostmanRuntime/7.43.0
+
+
+runtime error: invalid memory address or nil pointer dereference
+/usr/local/go/src/runtime/panic.go:261 (0x102fb1607)
+	panicmem: panic(memoryError)
+/usr/local/go/src/runtime/signal_unix.go:881 (0x102fb15d4)
+	sigpanic: panicmem()
+/Users/zhanghaiying/go/pkg/mod/gorm.io/gorm@v1.25.12/gorm.go:406 (0x103308718)
+	(*DB).getInstance: if db.clone > 0 {
+/Users/zhanghaiying/go/pkg/mod/gorm.io/gorm@v1.25.12/chainable_api.go:208 (0x103303fff)
+	(*DB).Where: tx = db.getInstance()
+/Users/zhanghaiying/golang/app/services/user.go:31 (0x10345803f)
+	(*userService).Login: err = global.App.DB.Where("mobile = ?", params.Mobile).First(&user).Error
+/Users/zhanghaiying/golang/app/controllers/auth.go:18 (0x10345899f)
+	Login: if err, user := services.UserService.Login(form); err != nil {
+/Users/zhanghaiying/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/context.go:185 (0x10344a573)
+	(*Context).Next: c.handlers[c.index](c)
+/Users/zhanghaiying/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/recovery.go:102 (0x10344a554)
+	CustomRecoveryWithWriter.func1: c.Next()
+/Users/zhanghaiying/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/context.go:185 (0x1034498d7)
+	(*Context).Next: c.handlers[c.index](c)
+/Users/zhanghaiying/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/logger.go:249 (0x1034498b4)
+	LoggerWithConfig.func1: c.Next()
+/Users/zhanghaiying/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/context.go:185 (0x103448d13)
+	(*Context).Next: c.handlers[c.index](c)
+/Users/zhanghaiying/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/gin.go:633 (0x10344889c)
+	(*Engine).handleHTTPRequest: c.Next()
+/Users/zhanghaiying/go/pkg/mod/github.com/gin-gonic/gin@v1.10.0/gin.go:589 (0x1034485e3)
+	(*Engine).ServeHTTP: engine.handleHTTPRequest(c)
+/usr/local/go/src/net/http/server.go:3137 (0x10319689b)
+	serverHandler.ServeHTTP: handler.ServeHTTP(rw, req)
+/usr/local/go/src/net/http/server.go:2039 (0x103192bd7)
+	(*conn).serve: serverHandler{c.server}.ServeHTTP(w, w.req)
+/usr/local/go/src/runtime/asm_arm64.s:1222 (0x102fcf5c3)
+	goexit: MOVD	R0, R0	// NOP
+[0m
+[2024-12-16 17:13:27.388]	local.info	golang/main.go:19	log init success!
