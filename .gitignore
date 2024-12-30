@@ -10,4 +10,4 @@ storage/logs
 .DS_Store
 *.cache
 .github/
-
+password.txt

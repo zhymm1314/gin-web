@@ -18,9 +18,9 @@ log:
 
 database:
   driver: mysql # 数据库驱动
-  host: 10.10.40.150 # 域名
+  host: 127.0.0.1 # 域名
   port: 3306 # 端口号
-  database: db_saas_zhy # 数据库名称
+  database: gin-web # 数据库名称
   username: root # 用户名
   password: 123456 # 密码
   charset: utf8mb4 # 编码格式sss
@@ -29,7 +29,7 @@ database:
   log_mode: info # 日志级别
   enable_file_log_writer: true # 是否启用日志文件
   log_filename: sql.log # 日志文件名称
-  prefix: ws_ #表前缀
+  prefix: gw_ #表前缀
 
 jwt:
   secret: 3Bde3BGEbYqtqyEUzW3ry8jKFcaPH17fRmTmqE7MDr05Lwj95uruRKrrkb44TJ4s
