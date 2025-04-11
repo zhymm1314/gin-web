@@ -667,3 +667,9 @@
 
 2024/12/16 17:13:29 /Users/zhanghaiying/golang/app/services/user.go:31
 [4.158ms] [rows:1] SELECT * FROM `ws_users` WHERE mobile = '15770831159' AND `ws_users`.`deleted_at` IS NULL ORDER BY `ws_users`.`id` LIMIT 1
+
+2025/04/11 13:23:50 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/11 13:24:15 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
