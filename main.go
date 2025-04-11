@@ -1,16 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"gin-web/bootstrap"
 	"gin-web/global"
 )
 
 func main() {
-	a := 1
-	b := 2
-	fmt.Println(a + b)
-
 	// 初始化配置
 	bootstrap.InitializeConfig()
 
