@@ -673,3 +673,129 @@
 
 2025/04/11 13:24:15 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/11 15:17:03 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/11 15:17:50 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/11 15:19:32 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/11 15:20:02 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/11 15:23:53 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/11 15:26:17 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/11 15:26:20 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/11 15:26:54 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/11 15:28:14 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/11 15:28:24 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/11 15:29:30 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/11 15:43:14 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/11 15:45:26 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/11 15:46:14 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/11 15:47:32 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/11 15:47:50 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/11 15:48:47 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/11 15:48:51 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/11 15:49:26 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/11 15:49:42 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/11 15:52:43 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/11 16:07:05 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/11 16:07:38 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/11 16:07:44 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/11 16:07:48 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/11 16:07:55 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/11 16:19:41 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/11 16:24:48 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/11 16:50:01 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/11 16:53:52 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/11 16:58:47 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/11 16:59:53 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/11 17:00:40 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/11 17:54:02 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/11 17:54:19 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/11 17:55:21 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/11 17:56:40 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/11 17:59:16 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/11 18:10:26 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/11 18:13:31 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/11 18:16:34 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/11 18:17:06 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
