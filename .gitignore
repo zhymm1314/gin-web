@@ -12,3 +12,4 @@ storage/logs
 .github/
 password.txt
 config.yaml
+./storage/logs/*
