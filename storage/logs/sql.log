@@ -1,801 +1,228 @@
 
-2024/12/04 09:10:23 /Users/zhanghaiying/golang/bootstrap/db.go:94
-[error] failed to initialize database, got error dial tcp 127.0.0.1:8306: connect: connection refused
-
-2024/12/04 09:38:44 /Users/zhanghaiying/golang/bootstrap/db.go:94
-[error] failed to initialize database, got error dial tcp 127.0.0.1:8306: connect: connection refused
-
-2024/12/04 09:45:27 /Users/zhanghaiying/golang/bootstrap/db.go:94
-[error] failed to initialize database, got error dial tcp 127.0.0.1:8306: connect: connection refused
-
-2024/12/04 09:46:25 /Users/zhanghaiying/golang/bootstrap/db.go:94
-[error] failed to initialize database, got error dial tcp 127.0.0.1:8306: connect: connection refused
-
-2024/12/16 09:16:20 /Users/zhanghaiying/golang/bootstrap/db.go:94
-[error] failed to initialize database, got error dial tcp 127.0.0.1:8306: connect: connection refused
-
-2024/12/16 10:10:07 /Users/zhanghaiying/golang/bootstrap/db.go:94
-[error] failed to initialize database, got error dial tcp 127.0.0.1:8306: connect: connection refused
-
-2024/12/16 10:12:23 /Users/zhanghaiying/golang/bootstrap/db.go:94
-[error] failed to initialize database, got error dial tcp 127.0.0.1:8306: connect: connection refused
-
-2024/12/16 10:36:31 /Users/zhanghaiying/golang/bootstrap/db.go:94
-[error] failed to initialize database, got error dial tcp 127.0.0.1:8306: connect: connection refused
-
-2024/12/16 10:36:48 /Users/zhanghaiying/golang/bootstrap/db.go:94
-[error] failed to initialize database, got error dial tcp 127.0.0.1:8306: connect: connection refused
-
-2024/12/16 10:38:17 /Users/zhanghaiying/golang/bootstrap/db.go:94
-[error] failed to initialize database, got error dial tcp 127.0.0.1:8306: connect: connection refused
-
-2024/12/16 10:38:24 /Users/zhanghaiying/golang/bootstrap/db.go:94
-[error] failed to initialize database, got error dial tcp 127.0.0.1:8306: connect: connection refused
-
-2024/12/16 10:39:01 /Users/zhanghaiying/golang/bootstrap/db.go:94
-[error] failed to initialize database, got error dial tcp 127.0.0.1:8306: connect: connection refused
-
-2024/12/16 10:39:34 /Users/zhanghaiying/golang/bootstrap/db.go:94
-[error] failed to initialize database, got error dial tcp 127.0.0.1:8306: connect: connection refused
-
-2024/12/16 10:40:52 /Users/zhanghaiying/golang/bootstrap/db.go:94
-[error] failed to initialize database, got error dial tcp 127.0.0.1:8306: connect: connection refused
-
-2024/12/16 10:41:12 /Users/zhanghaiying/golang/bootstrap/db.go:94
-[error] failed to initialize database, got error dial tcp 127.0.0.1:8306: connect: connection refused
-
-2024/12/16 10:41:52 /Users/zhanghaiying/golang/bootstrap/db.go:94
-[error] failed to initialize database, got error dial tcp 127.0.0.1:8306: connect: connection refused
-
-2024/12/16 11:10:24 /Users/zhanghaiying/golang/bootstrap/db.go:94
-[error] failed to initialize database, got error dial tcp 127.0.0.1:8306: connect: connection refused
-
-2024/12/16 13:25:47 /Users/zhanghaiying/golang/bootstrap/db.go:94
-[error] failed to initialize database, got error dial tcp 127.0.0.1:8306: connect: connection refused
-
-2024/12/16 13:26:19 /Users/zhanghaiying/golang/bootstrap/db.go:94
-[error] failed to initialize database, got error dial tcp 127.0.0.1:8306: connect: connection refused
-
-2024/12/16 13:32:06 /Users/zhanghaiying/golang/bootstrap/db.go:94
-[error] failed to initialize database, got error dial tcp 127.0.0.1:8306: connect: connection refused
-
-2024/12/16 13:33:53 /Users/zhanghaiying/golang/bootstrap/db.go:94
-[error] failed to initialize database, got error dial tcp 127.0.0.1:8306: connect: connection refused
-
-2024/12/16 13:38:27 /Users/zhanghaiying/golang/bootstrap/db.go:94
-[error] failed to initialize database, got error dial tcp 127.0.0.1:8306: connect: connection refused
-
-2024/12/16 13:47:27 /Users/zhanghaiying/golang/bootstrap/db.go:94
-[error] failed to initialize database, got error dial tcp 127.0.0.1:8306: connect: connection refused
-
-2024/12/16 13:49:35 /Users/zhanghaiying/golang/bootstrap/db.go:94
-[error] failed to initialize database, got error dial tcp 127.0.0.1:8306: connect: connection refused
-
-2024/12/16 13:54:02 /Users/zhanghaiying/golang/bootstrap/db.go:94
-[error] failed to initialize database, got error dial tcp 127.0.0.1:8306: connect: connection refused
-
-2024/12/16 13:55:38 /Users/zhanghaiying/golang/bootstrap/db.go:94
-[error] failed to initialize database, got error dial tcp 127.0.0.1:8306: connect: connection refused
-
-2024/12/16 13:56:50 /Users/zhanghaiying/golang/bootstrap/db.go:94
-[error] failed to initialize database, got error dial tcp 127.0.0.1:8306: connect: connection refused
-
-2024/12/16 13:58:28 /Users/zhanghaiying/golang/bootstrap/db.go:94
-[error] failed to initialize database, got error dial tcp 127.0.0.1:8306: connect: connection refused
-
-2024/12/16 14:06:50 /Users/zhanghaiying/golang/bootstrap/db.go:94
-[error] failed to initialize database, got error dial tcp 127.0.0.1:8306: connect: connection refused
-
-2024/12/16 14:08:24 /Users/zhanghaiying/golang/bootstrap/db.go:94
-[error] failed to initialize database, got error dial tcp 127.0.0.1:8306: connect: connection refused
-
-2024/12/16 14:18:24 /Users/zhanghaiying/golang/bootstrap/db.go:94
-[error] failed to initialize database, got error dial tcp 127.0.0.1:8306: connect: connection refused
-
-2024/12/16 14:21:22 /Users/zhanghaiying/golang/bootstrap/db.go:94
-[error] failed to initialize database, got error dial tcp 127.0.0.1:8306: connect: connection refused
-
-2024/12/16 14:43:09 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[0.857ms] [rows:-] SELECT DATABASE()
-
-2024/12/16 14:43:09 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[2.804ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'db_saas_zhy%' ORDER BY SCHEMA_NAME='db_saas_zhy' DESC,SCHEMA_NAME limit 1
-
-2024/12/16 14:43:09 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[1.931ms] [rows:-] SELECT count(*) FROM information_schema.tables WHERE table_schema = 'db_saas_zhy' AND table_name = 'wsusers' AND table_type = 'BASE TABLE'
-
-2024/12/16 14:43:09 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[18.193ms] [rows:0] CREATE TABLE `wsusers` (`id` bigint unsigned AUTO_INCREMENT,`name` varchar(191) NOT NULL COMMENT '用户名称',`mobile` varchar(191) NOT NULL COMMENT '用户手机号',`password` varchar(191) NOT NULL DEFAULT '' COMMENT '用户密码',`created_at` datetime NULL,`updated_at` datetime NULL,`deleted_at` datetime NULL,PRIMARY KEY (`id`),INDEX `idx_wsusers_mobile` (`mobile`),INDEX `idx_wsusers_deleted_at` (`deleted_at`))
-
-2024/12/16 14:43:13 /Users/zhanghaiying/golang/app/services/user.go:18 record not found
-[3.139ms] [rows:0] SELECT `id` FROM `wsusers` WHERE mobile = '15770831169' AND `wsusers`.`deleted_at` IS NULL ORDER BY `wsusers`.`id` LIMIT 1
-
-2024/12/16 14:43:13 /Users/zhanghaiying/golang/app/services/user.go:24
-[4.681ms] [rows:1] INSERT INTO `wsusers` (`name`,`mobile`,`password`,`created_at`,`updated_at`,`deleted_at`) VALUES ('a','15770831169','$2a$04$qUhSautLUThR5RfANVPuguSdAXz.bP0qFddcmmjjffoFgoyqWRXFC','2024-12-16 14:43:13.509','2024-12-16 14:43:13.509',NULL)
-
-2024/12/16 14:43:35 /Users/zhanghaiying/golang/app/services/user.go:18
-[2.877ms] [rows:1] SELECT `id` FROM `wsusers` WHERE mobile = '15770831169' AND `wsusers`.`deleted_at` IS NULL ORDER BY `wsusers`.`id` LIMIT 1
-
-2024/12/16 14:44:01 /Users/zhanghaiying/golang/app/services/user.go:18
-[2.616ms] [rows:1] SELECT `id` FROM `wsusers` WHERE mobile = '15770831169' AND `wsusers`.`deleted_at` IS NULL ORDER BY `wsusers`.`id` LIMIT 1
-
-2024/12/16 14:44:02 /Users/zhanghaiying/golang/app/services/user.go:18
-[2.075ms] [rows:1] SELECT `id` FROM `wsusers` WHERE mobile = '15770831169' AND `wsusers`.`deleted_at` IS NULL ORDER BY `wsusers`.`id` LIMIT 1
-
-2024/12/16 14:44:12 /Users/zhanghaiying/golang/app/services/user.go:18
-[5.595ms] [rows:1] SELECT `id` FROM `wsusers` WHERE mobile = '15770831169' AND `wsusers`.`deleted_at` IS NULL ORDER BY `wsusers`.`id` LIMIT 1
-
-2024/12/16 14:45:28 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[1.158ms] [rows:-] SELECT DATABASE()
-
-2024/12/16 14:45:28 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[2.753ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'db_saas_zhy%' ORDER BY SCHEMA_NAME='db_saas_zhy' DESC,SCHEMA_NAME limit 1
-
-2024/12/16 14:45:28 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[1.984ms] [rows:-] SELECT count(*) FROM information_schema.tables WHERE table_schema = 'db_saas_zhy' AND table_name = 'ws_users' AND table_type = 'BASE TABLE'
-
-2024/12/16 14:45:28 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[19.319ms] [rows:0] CREATE TABLE `ws_users` (`id` bigint unsigned AUTO_INCREMENT,`name` varchar(191) NOT NULL COMMENT '用户名称',`mobile` varchar(191) NOT NULL COMMENT '用户手机号',`password` varchar(191) NOT NULL DEFAULT '' COMMENT '用户密码',`created_at` datetime NULL,`updated_at` datetime NULL,`deleted_at` datetime NULL,PRIMARY KEY (`id`),INDEX `idx_ws_users_mobile` (`mobile`),INDEX `idx_ws_users_deleted_at` (`deleted_at`))
-
-2024/12/16 14:45:31 /Users/zhanghaiying/golang/app/services/user.go:18 record not found
-[2.778ms] [rows:0] SELECT `id` FROM `ws_users` WHERE mobile = '15770831169' AND `ws_users`.`deleted_at` IS NULL ORDER BY `ws_users`.`id` LIMIT 1
-
-2024/12/16 14:45:31 /Users/zhanghaiying/golang/app/services/user.go:24
-[45.710ms] [rows:1] INSERT INTO `ws_users` (`name`,`mobile`,`password`,`created_at`,`updated_at`,`deleted_at`) VALUES ('a','15770831169','$2a$04$51.9.pvSG9SAs.meLyNUeOrWA0ZHI7kjDHwvPdLyBfAhwknMPTUAa','2024-12-16 14:45:31.723','2024-12-16 14:45:31.723',NULL)
-
-2024/12/16 14:45:32 /Users/zhanghaiying/golang/app/services/user.go:18
-[2.331ms] [rows:1] SELECT `id` FROM `ws_users` WHERE mobile = '15770831169' AND `ws_users`.`deleted_at` IS NULL ORDER BY `ws_users`.`id` LIMIT 1
-
-2024/12/16 14:45:33 /Users/zhanghaiying/golang/app/services/user.go:18
-[3.402ms] [rows:1] SELECT `id` FROM `ws_users` WHERE mobile = '15770831169' AND `ws_users`.`deleted_at` IS NULL ORDER BY `ws_users`.`id` LIMIT 1
-
-2024/12/16 14:46:32 /Users/zhanghaiying/golang/app/services/user.go:18
-[2.197ms] [rows:1] SELECT `id` FROM `ws_users` WHERE mobile = '15770831169' AND `ws_users`.`deleted_at` IS NULL ORDER BY `ws_users`.`id` LIMIT 1
-
-2024/12/16 14:46:33 /Users/zhanghaiying/golang/app/services/user.go:18
-[11.595ms] [rows:1] SELECT `id` FROM `ws_users` WHERE mobile = '15770831169' AND `ws_users`.`deleted_at` IS NULL ORDER BY `ws_users`.`id` LIMIT 1
-
-2024/12/16 14:46:45 /Users/zhanghaiying/golang/app/services/user.go:18
-[5.284ms] [rows:1] SELECT `id` FROM `ws_users` WHERE mobile = '15770831169' AND `ws_users`.`deleted_at` IS NULL ORDER BY `ws_users`.`id` LIMIT 1
-
-2024/12/16 14:47:07 /Users/zhanghaiying/golang/app/services/user.go:18
-[3.082ms] [rows:1] SELECT `id` FROM `ws_users` WHERE mobile = '15770831169' AND `ws_users`.`deleted_at` IS NULL ORDER BY `ws_users`.`id` LIMIT 1
-
-2024/12/16 14:47:49 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[0.627ms] [rows:-] SELECT DATABASE()
-
-2024/12/16 14:47:49 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[2.489ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'db_saas_zhy%' ORDER BY SCHEMA_NAME='db_saas_zhy' DESC,SCHEMA_NAME limit 1
-
-2024/12/16 14:47:49 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[2.283ms] [rows:-] SELECT count(*) FROM information_schema.tables WHERE table_schema = 'db_saas_zhy' AND table_name = 'ws_users' AND table_type = 'BASE TABLE'
-
-2024/12/16 14:47:49 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[1.362ms] [rows:-] SELECT DATABASE()
-
-2024/12/16 14:47:49 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[2.828ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'db_saas_zhy%' ORDER BY SCHEMA_NAME='db_saas_zhy' DESC,SCHEMA_NAME limit 1
-
-2024/12/16 14:47:49 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[2.515ms] [rows:-] SELECT * FROM `ws_users` LIMIT 1
-
-2024/12/16 14:47:49 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[3.664ms] [rows:-] SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale FROM information_schema.columns WHERE table_schema = 'db_saas_zhy' AND table_name = 'ws_users' ORDER BY ORDINAL_POSITION
-
-2024/12/16 14:47:49 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[0.634ms] [rows:-] SELECT DATABASE()
-
-2024/12/16 14:47:49 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[2.970ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'db_saas_zhy%' ORDER BY SCHEMA_NAME='db_saas_zhy' DESC,SCHEMA_NAME limit 1
-
-2024/12/16 14:47:49 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[1.902ms] [rows:-] SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'db_saas_zhy' AND table_name = 'ws_users' AND index_name = 'idx_ws_users_mobile'
-
-2024/12/16 14:47:49 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[0.707ms] [rows:-] SELECT DATABASE()
-
-2024/12/16 14:47:49 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[2.381ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'db_saas_zhy%' ORDER BY SCHEMA_NAME='db_saas_zhy' DESC,SCHEMA_NAME limit 1
-
-2024/12/16 14:47:49 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[1.557ms] [rows:-] SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'db_saas_zhy' AND table_name = 'ws_users' AND index_name = 'idx_ws_users_deleted_at'
-
-2024/12/16 14:47:50 /Users/zhanghaiying/golang/app/services/user.go:18
-[2.431ms] [rows:1] SELECT `id` FROM `ws_users` WHERE mobile = '15770831169' AND `ws_users`.`deleted_at` IS NULL ORDER BY `ws_users`.`id` LIMIT 1
-
-2024/12/16 14:48:06 /Users/zhanghaiying/golang/app/services/user.go:18 Error 1146 (42S02): Table 'db_saas_zhy.ws_users' doesn't exist
-[1.335ms] [rows:0] SELECT `id` FROM `ws_users` WHERE mobile = '15770831169' AND `ws_users`.`deleted_at` IS NULL ORDER BY `ws_users`.`id` LIMIT 1
-
-2024/12/16 14:48:06 /Users/zhanghaiying/golang/app/services/user.go:24 Error 1146 (42S02): Table 'db_saas_zhy.ws_users' doesn't exist
-[3.242ms] [rows:0] INSERT INTO `ws_users` (`name`,`mobile`,`password`,`created_at`,`updated_at`,`deleted_at`) VALUES ('a','15770831169','$2a$04$X2Tho.pl12q1zoNnbvmVye4.05wsk652HKlFazOW7RKwZ0ONs9Q1.','2024-12-16 14:48:06.849','2024-12-16 14:48:06.849',NULL)
-
-2024/12/16 14:48:12 /Users/zhanghaiying/golang/app/services/user.go:18 Error 1146 (42S02): Table 'db_saas_zhy.ws_users' doesn't exist
-[1.498ms] [rows:0] SELECT `id` FROM `ws_users` WHERE mobile = '15770831169' AND `ws_users`.`deleted_at` IS NULL ORDER BY `ws_users`.`id` LIMIT 1
-
-2024/12/16 14:48:12 /Users/zhanghaiying/golang/app/services/user.go:24 Error 1146 (42S02): Table 'db_saas_zhy.ws_users' doesn't exist
-[2.897ms] [rows:0] INSERT INTO `ws_users` (`name`,`mobile`,`password`,`created_at`,`updated_at`,`deleted_at`) VALUES ('a','15770831169','$2a$04$BwEj3.Y2IAQ2pzi2sv8VSuR12QybWQHZ6Ou0whYzFonaETjLxdn92','2024-12-16 14:48:12.65','2024-12-16 14:48:12.65',NULL)
-
-2024/12/16 14:48:13 /Users/zhanghaiying/golang/app/services/user.go:18 Error 1146 (42S02): Table 'db_saas_zhy.ws_users' doesn't exist
-[1.229ms] [rows:0] SELECT `id` FROM `ws_users` WHERE mobile = '15770831169' AND `ws_users`.`deleted_at` IS NULL ORDER BY `ws_users`.`id` LIMIT 1
-
-2024/12/16 14:48:13 /Users/zhanghaiying/golang/app/services/user.go:24 Error 1146 (42S02): Table 'db_saas_zhy.ws_users' doesn't exist
-[3.020ms] [rows:0] INSERT INTO `ws_users` (`name`,`mobile`,`password`,`created_at`,`updated_at`,`deleted_at`) VALUES ('a','15770831169','$2a$04$4JvFjUnMwXrydHJiDV8MS.MdllG1VZADcoXchd3jYu1FKPzr9.GAu','2024-12-16 14:48:13.344','2024-12-16 14:48:13.344',NULL)
-
-2024/12/16 14:48:31 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[0.909ms] [rows:-] SELECT DATABASE()
-
-2024/12/16 14:48:31 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[3.042ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'db_saas_zhy%' ORDER BY SCHEMA_NAME='db_saas_zhy' DESC,SCHEMA_NAME limit 1
-
-2024/12/16 14:48:31 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[2.030ms] [rows:-] SELECT count(*) FROM information_schema.tables WHERE table_schema = 'db_saas_zhy' AND table_name = 'ws_users' AND table_type = 'BASE TABLE'
-
-2024/12/16 14:48:31 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[12.952ms] [rows:0] CREATE TABLE `ws_users` (`id` bigint unsigned AUTO_INCREMENT,`name` varchar(191) NOT NULL COMMENT '用户名称',`mobile` varchar(191) NOT NULL COMMENT '用户手机号',`password` varchar(191) NOT NULL DEFAULT '' COMMENT '用户密码',`created_at` datetime NULL,`updated_at` datetime NULL,`deleted_at` datetime NULL,PRIMARY KEY (`id`),INDEX `idx_ws_users_mobile` (`mobile`),INDEX `idx_ws_users_deleted_at` (`deleted_at`))
-
-2024/12/16 14:48:34 /Users/zhanghaiying/golang/app/services/user.go:18 record not found
-[4.526ms] [rows:0] SELECT `id` FROM `ws_users` WHERE mobile = '15770831169' AND `ws_users`.`deleted_at` IS NULL ORDER BY `ws_users`.`id` LIMIT 1
-
-2024/12/16 14:48:34 /Users/zhanghaiying/golang/app/services/user.go:24
-[6.265ms] [rows:1] INSERT INTO `ws_users` (`name`,`mobile`,`password`,`created_at`,`updated_at`,`deleted_at`) VALUES ('a','15770831169','$2a$04$vam23oAk5v15LAiOwVVMt.obk5vC8aTlM4M850F6UHXRY6MPyvInO','2024-12-16 14:48:34.552','2024-12-16 14:48:34.552',NULL)
-
-2024/12/16 14:48:36 /Users/zhanghaiying/golang/app/services/user.go:18
-[1.945ms] [rows:1] SELECT `id` FROM `ws_users` WHERE mobile = '15770831169' AND `ws_users`.`deleted_at` IS NULL ORDER BY `ws_users`.`id` LIMIT 1
-
-2024/12/16 14:51:00 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[1.204ms] [rows:-] SELECT DATABASE()
-
-2024/12/16 14:51:00 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[3.094ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'db_saas_zhy%' ORDER BY SCHEMA_NAME='db_saas_zhy' DESC,SCHEMA_NAME limit 1
-
-2024/12/16 14:51:00 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[1.856ms] [rows:-] SELECT count(*) FROM information_schema.tables WHERE table_schema = 'db_saas_zhy' AND table_name = 'ws_users' AND table_type = 'BASE TABLE'
-
-2024/12/16 14:51:00 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[1.484ms] [rows:-] SELECT DATABASE()
-
-2024/12/16 14:51:00 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[14.915ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'db_saas_zhy%' ORDER BY SCHEMA_NAME='db_saas_zhy' DESC,SCHEMA_NAME limit 1
-
-2024/12/16 14:51:00 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[12.781ms] [rows:-] SELECT * FROM `ws_users` LIMIT 1
-
-2024/12/16 14:51:00 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[11.780ms] [rows:-] SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale FROM information_schema.columns WHERE table_schema = 'db_saas_zhy' AND table_name = 'ws_users' ORDER BY ORDINAL_POSITION
-
-2024/12/16 14:51:00 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[26.960ms] [rows:0] ALTER TABLE `ws_users` ADD `name1` varchar(191) NOT NULL COMMENT '用户名称'
-
-2024/12/16 14:51:00 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[19.013ms] [rows:0] ALTER TABLE `ws_users` ADD `mobile1` varchar(191) NOT NULL COMMENT '用户手机号'
-
-2024/12/16 14:51:00 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[17.509ms] [rows:0] ALTER TABLE `ws_users` ADD `password1` varchar(191) NOT NULL DEFAULT '' COMMENT '用户密码'
-
-2024/12/16 14:51:00 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[3.757ms] [rows:-] SELECT DATABASE()
-
-2024/12/16 14:51:00 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[2.114ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'db_saas_zhy%' ORDER BY SCHEMA_NAME='db_saas_zhy' DESC,SCHEMA_NAME limit 1
-
-2024/12/16 14:51:00 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[2.194ms] [rows:-] SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'db_saas_zhy' AND table_name = 'ws_users' AND index_name = 'idx_ws_users_mobile1'
-
-2024/12/16 14:51:00 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[13.577ms] [rows:0] CREATE INDEX `idx_ws_users_mobile1` ON `ws_users`(`mobile1`)
-
-2024/12/16 14:51:00 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[1.872ms] [rows:-] SELECT DATABASE()
-
-2024/12/16 14:51:00 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[3.677ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'db_saas_zhy%' ORDER BY SCHEMA_NAME='db_saas_zhy' DESC,SCHEMA_NAME limit 1
-
-2024/12/16 14:51:00 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[2.843ms] [rows:-] SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'db_saas_zhy' AND table_name = 'ws_users' AND index_name = 'idx_ws_users_deleted_at'
-
-2024/12/16 14:51:03 /Users/zhanghaiying/golang/app/services/user.go:18 record not found
-[3.291ms] [rows:0] SELECT `id` FROM `ws_users` WHERE mobile = '15770831168' AND `ws_users`.`deleted_at` IS NULL ORDER BY `ws_users`.`id` LIMIT 1
-
-2024/12/16 14:51:03 /Users/zhanghaiying/golang/app/services/user.go:24
-[9.385ms] [rows:1] INSERT INTO `ws_users` (`name1`,`mobile1`,`password1`,`created_at`,`updated_at`,`deleted_at`) VALUES ('a','15770831168','$2a$04$CY9Vn6ZHp66vPS7QS6.1X.6GEg2z73nPdouAqKABp8AqaS8ikk/wW','2024-12-16 14:51:03.541','2024-12-16 14:51:03.541',NULL)
-
-2024/12/16 14:59:44 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[1.283ms] [rows:-] SELECT DATABASE()
-
-2024/12/16 14:59:44 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[2.850ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'db_saas_zhy%' ORDER BY SCHEMA_NAME='db_saas_zhy' DESC,SCHEMA_NAME limit 1
-
-2024/12/16 14:59:44 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[1.839ms] [rows:-] SELECT count(*) FROM information_schema.tables WHERE table_schema = 'db_saas_zhy' AND table_name = 'ws_users' AND table_type = 'BASE TABLE'
-
-2024/12/16 14:59:44 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[0.817ms] [rows:-] SELECT DATABASE()
-
-2024/12/16 14:59:44 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[2.761ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'db_saas_zhy%' ORDER BY SCHEMA_NAME='db_saas_zhy' DESC,SCHEMA_NAME limit 1
-
-2024/12/16 14:59:44 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[4.220ms] [rows:-] SELECT * FROM `ws_users` LIMIT 1
-
-2024/12/16 14:59:44 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[8.008ms] [rows:-] SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale FROM information_schema.columns WHERE table_schema = 'db_saas_zhy' AND table_name = 'ws_users' ORDER BY ORDINAL_POSITION
-
-2024/12/16 14:59:44 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[33.776ms] [rows:0] ALTER TABLE `ws_users` ADD `create_time` datetime NULL
-
-2024/12/16 14:59:44 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[20.259ms] [rows:0] ALTER TABLE `ws_users` ADD `update_time` datetime NULL
-
-2024/12/16 14:59:44 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[1.256ms] [rows:-] SELECT DATABASE()
-
-2024/12/16 14:59:44 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[2.950ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'db_saas_zhy%' ORDER BY SCHEMA_NAME='db_saas_zhy' DESC,SCHEMA_NAME limit 1
-
-2024/12/16 14:59:44 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[2.107ms] [rows:-] SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'db_saas_zhy' AND table_name = 'ws_users' AND index_name = 'idx_ws_users_mobile1'
-
-2024/12/16 14:59:44 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[4.195ms] [rows:-] SELECT DATABASE()
-
-2024/12/16 14:59:44 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[2.755ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'db_saas_zhy%' ORDER BY SCHEMA_NAME='db_saas_zhy' DESC,SCHEMA_NAME limit 1
-
-2024/12/16 14:59:44 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[1.554ms] [rows:-] SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'db_saas_zhy' AND table_name = 'ws_users' AND index_name = 'idx_ws_users_deleted_at'
-
-2024/12/16 14:59:45 /Users/zhanghaiying/golang/app/services/user.go:18 record not found
-[2.167ms] [rows:0] SELECT `id` FROM `ws_users` WHERE mobile = '15770831168' AND `ws_users`.`deleted_at` IS NULL ORDER BY `ws_users`.`id` LIMIT 1
-
-2024/12/16 14:59:45 /Users/zhanghaiying/golang/app/services/user.go:24
-[5.105ms] [rows:1] INSERT INTO `ws_users` (`name1`,`mobile1`,`password1`,`create_time`,`update_time`,`deleted_at`) VALUES ('a','15770831168','$2a$04$1Z6APF.enOBPwrKXS2nTfuf4sXIb5j.1q.CJSr35I./Fnv9Aca9eS','0000-00-00 00:00:00','0000-00-00 00:00:00',NULL)
-
-2024/12/16 14:59:46 /Users/zhanghaiying/golang/app/services/user.go:18 record not found
-[2.503ms] [rows:0] SELECT `id` FROM `ws_users` WHERE mobile = '15770831168' AND `ws_users`.`deleted_at` IS NULL ORDER BY `ws_users`.`id` LIMIT 1
-
-2024/12/16 14:59:46 /Users/zhanghaiying/golang/app/services/user.go:24
-[6.395ms] [rows:1] INSERT INTO `ws_users` (`name1`,`mobile1`,`password1`,`create_time`,`update_time`,`deleted_at`) VALUES ('a','15770831168','$2a$04$XeOJmSRMO7A9eKf9ZTK9P.Taf3CZ3LHDYXilXm7dXU5W8zQM1JbZS','0000-00-00 00:00:00','0000-00-00 00:00:00',NULL)
-
-2024/12/16 14:59:47 /Users/zhanghaiying/golang/app/services/user.go:18 record not found
-[2.888ms] [rows:0] SELECT `id` FROM `ws_users` WHERE mobile = '15770831168' AND `ws_users`.`deleted_at` IS NULL ORDER BY `ws_users`.`id` LIMIT 1
-
-2024/12/16 14:59:47 /Users/zhanghaiying/golang/app/services/user.go:24
-[4.602ms] [rows:1] INSERT INTO `ws_users` (`name1`,`mobile1`,`password1`,`create_time`,`update_time`,`deleted_at`) VALUES ('a','15770831168','$2a$04$fNcduH6eZDeqwYdlh2jlV.xK3J0FFrq9VJvstLf6rc.b0ogeQn11.','0000-00-00 00:00:00','0000-00-00 00:00:00',NULL)
-
-2024/12/16 14:59:48 /Users/zhanghaiying/golang/app/services/user.go:18 record not found
-[2.864ms] [rows:0] SELECT `id` FROM `ws_users` WHERE mobile = '15770831168' AND `ws_users`.`deleted_at` IS NULL ORDER BY `ws_users`.`id` LIMIT 1
-
-2024/12/16 14:59:48 /Users/zhanghaiying/golang/app/services/user.go:24
-[7.805ms] [rows:1] INSERT INTO `ws_users` (`name1`,`mobile1`,`password1`,`create_time`,`update_time`,`deleted_at`) VALUES ('a','15770831168','$2a$04$538.Nfb5JW.rP5Q0AHtfA.Az4AXzap/dbMeMgAYPGb1uNOpk1TItW','0000-00-00 00:00:00','0000-00-00 00:00:00',NULL)
-
-2024/12/16 14:59:49 /Users/zhanghaiying/golang/app/services/user.go:18 record not found
-[4.656ms] [rows:0] SELECT `id` FROM `ws_users` WHERE mobile = '15770831168' AND `ws_users`.`deleted_at` IS NULL ORDER BY `ws_users`.`id` LIMIT 1
-
-2024/12/16 14:59:49 /Users/zhanghaiying/golang/app/services/user.go:24
-[8.400ms] [rows:1] INSERT INTO `ws_users` (`name1`,`mobile1`,`password1`,`create_time`,`update_time`,`deleted_at`) VALUES ('a','15770831168','$2a$04$PWFp4QUJkWHBSIX35rnBn.w7KP7lAMwjF20Ee0DQGim5fVoYGos56','0000-00-00 00:00:00','0000-00-00 00:00:00',NULL)
-
-2024/12/16 14:59:49 /Users/zhanghaiying/golang/app/services/user.go:18 record not found
-[4.013ms] [rows:0] SELECT `id` FROM `ws_users` WHERE mobile = '15770831168' AND `ws_users`.`deleted_at` IS NULL ORDER BY `ws_users`.`id` LIMIT 1
-
-2024/12/16 14:59:49 /Users/zhanghaiying/golang/app/services/user.go:24
-[5.663ms] [rows:1] INSERT INTO `ws_users` (`name1`,`mobile1`,`password1`,`create_time`,`update_time`,`deleted_at`) VALUES ('a','15770831168','$2a$04$BOlgcixQTDLT.DHWvJrsJ.ERvKrIt2ORCbnA0jFdQkI9YSROQUl6y','0000-00-00 00:00:00','0000-00-00 00:00:00',NULL)
-
-2024/12/16 14:59:51 /Users/zhanghaiying/golang/app/services/user.go:18 record not found
-[2.546ms] [rows:0] SELECT `id` FROM `ws_users` WHERE mobile = '15770831168' AND `ws_users`.`deleted_at` IS NULL ORDER BY `ws_users`.`id` LIMIT 1
-
-2024/12/16 14:59:51 /Users/zhanghaiying/golang/app/services/user.go:24
-[5.915ms] [rows:1] INSERT INTO `ws_users` (`name1`,`mobile1`,`password1`,`create_time`,`update_time`,`deleted_at`) VALUES ('a','15770831168','$2a$04$.4a0/Iyaqea4dKkwa.Jr5.f8A0A.7yi593UatDXpDPl.3kUY7pIAS','0000-00-00 00:00:00','0000-00-00 00:00:00',NULL)
-
-2024/12/16 16:15:17 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[1.097ms] [rows:-] SELECT DATABASE()
-
-2024/12/16 16:15:17 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[7.098ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'db_saas_zhy%' ORDER BY SCHEMA_NAME='db_saas_zhy' DESC,SCHEMA_NAME limit 1
-
-2024/12/16 16:15:17 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[2.330ms] [rows:-] SELECT count(*) FROM information_schema.tables WHERE table_schema = 'db_saas_zhy' AND table_name = 'ws_users' AND table_type = 'BASE TABLE'
-
-2024/12/16 16:15:17 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[0.836ms] [rows:-] SELECT DATABASE()
-
-2024/12/16 16:15:17 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[2.713ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'db_saas_zhy%' ORDER BY SCHEMA_NAME='db_saas_zhy' DESC,SCHEMA_NAME limit 1
-
-2024/12/16 16:15:17 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[10.658ms] [rows:-] SELECT * FROM `ws_users` LIMIT 1
-
-2024/12/16 16:15:17 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[5.678ms] [rows:-] SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale FROM information_schema.columns WHERE table_schema = 'db_saas_zhy' AND table_name = 'ws_users' ORDER BY ORDINAL_POSITION
-
-2024/12/16 16:15:17 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[1.060ms] [rows:-] SELECT DATABASE()
-
-2024/12/16 16:15:17 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[2.987ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'db_saas_zhy%' ORDER BY SCHEMA_NAME='db_saas_zhy' DESC,SCHEMA_NAME limit 1
-
-2024/12/16 16:15:17 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[2.302ms] [rows:-] SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'db_saas_zhy' AND table_name = 'ws_users' AND index_name = 'idx_ws_users_mobile'
-
-2024/12/16 16:15:17 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[0.895ms] [rows:-] SELECT DATABASE()
-
-2024/12/16 16:15:17 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[2.486ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'db_saas_zhy%' ORDER BY SCHEMA_NAME='db_saas_zhy' DESC,SCHEMA_NAME limit 1
-
-2024/12/16 16:15:17 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[3.074ms] [rows:-] SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'db_saas_zhy' AND table_name = 'ws_users' AND index_name = 'idx_ws_users_deleted_at'
-
-2024/12/16 16:15:30 /Users/zhanghaiying/golang/app/services/user.go:18 record not found
-[3.004ms] [rows:0] SELECT `id` FROM `ws_users` WHERE mobile = '15770831159' AND `ws_users`.`deleted_at` IS NULL ORDER BY `ws_users`.`id` LIMIT 1
-
-2024/12/16 16:15:30 /Users/zhanghaiying/golang/app/services/user.go:24
-[12.844ms] [rows:1] INSERT INTO `ws_users` (`name`,`mobile`,`password`,`create_time`,`update_time`,`deleted_at`) VALUES ('a','15770831159','$2a$04$D6AOXYE2sB1iWgXNLsK/4.HGnZ8MwE2fayF8kx5D3oipglglXj0Lu','0000-00-00 00:00:00','0000-00-00 00:00:00',NULL)
-
-2024/12/16 16:16:13 /Users/zhanghaiying/golang/app/services/user.go:30
-[4.418ms] [rows:1] SELECT * FROM `ws_users` WHERE mobile = '15770831159' AND `ws_users`.`deleted_at` IS NULL ORDER BY `ws_users`.`id` LIMIT 1
-
-2024/12/16 16:27:54 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[2.107ms] [rows:-] SELECT DATABASE()
-
-2024/12/16 16:27:54 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[4.431ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'db_saas_zhy%' ORDER BY SCHEMA_NAME='db_saas_zhy' DESC,SCHEMA_NAME limit 1
-
-2024/12/16 16:27:54 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[5.538ms] [rows:-] SELECT count(*) FROM information_schema.tables WHERE table_schema = 'db_saas_zhy' AND table_name = 'ws_users' AND table_type = 'BASE TABLE'
-
-2024/12/16 16:27:54 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[0.695ms] [rows:-] SELECT DATABASE()
-
-2024/12/16 16:27:54 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[3.652ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'db_saas_zhy%' ORDER BY SCHEMA_NAME='db_saas_zhy' DESC,SCHEMA_NAME limit 1
-
-2024/12/16 16:27:54 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[2.185ms] [rows:-] SELECT * FROM `ws_users` LIMIT 1
-
-2024/12/16 16:27:54 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[6.083ms] [rows:-] SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale FROM information_schema.columns WHERE table_schema = 'db_saas_zhy' AND table_name = 'ws_users' ORDER BY ORDINAL_POSITION
-
-2024/12/16 16:27:54 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[0.738ms] [rows:-] SELECT DATABASE()
-
-2024/12/16 16:27:54 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[2.757ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'db_saas_zhy%' ORDER BY SCHEMA_NAME='db_saas_zhy' DESC,SCHEMA_NAME limit 1
-
-2024/12/16 16:27:54 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[1.858ms] [rows:-] SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'db_saas_zhy' AND table_name = 'ws_users' AND index_name = 'idx_ws_users_mobile'
-
-2024/12/16 16:27:54 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[0.853ms] [rows:-] SELECT DATABASE()
-
-2024/12/16 16:27:54 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[3.227ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'db_saas_zhy%' ORDER BY SCHEMA_NAME='db_saas_zhy' DESC,SCHEMA_NAME limit 1
-
-2024/12/16 16:27:54 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[1.795ms] [rows:-] SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'db_saas_zhy' AND table_name = 'ws_users' AND index_name = 'idx_ws_users_deleted_at'
-
-2024/12/16 16:29:01 /Users/zhanghaiying/golang/app/services/user.go:31
-[3.352ms] [rows:1] SELECT * FROM `ws_users` WHERE mobile = '15770831159' AND `ws_users`.`deleted_at` IS NULL ORDER BY `ws_users`.`id` LIMIT 1
-
-2024/12/16 16:29:25 /Users/zhanghaiying/golang/app/services/user.go:41
-[2.599ms] [rows:1] SELECT * FROM `ws_users` WHERE `ws_users`.`id` = 10 AND `ws_users`.`deleted_at` IS NULL ORDER BY `ws_users`.`id` LIMIT 1
-
-2024/12/16 16:30:52 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[1.177ms] [rows:-] SELECT DATABASE()
-
-2024/12/16 16:30:52 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[3.000ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'db_saas_zhy%' ORDER BY SCHEMA_NAME='db_saas_zhy' DESC,SCHEMA_NAME limit 1
-
-2024/12/16 16:30:52 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[1.768ms] [rows:-] SELECT count(*) FROM information_schema.tables WHERE table_schema = 'db_saas_zhy' AND table_name = 'ws_users' AND table_type = 'BASE TABLE'
-
-2024/12/16 16:30:52 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[0.717ms] [rows:-] SELECT DATABASE()
-
-2024/12/16 16:30:52 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[2.424ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'db_saas_zhy%' ORDER BY SCHEMA_NAME='db_saas_zhy' DESC,SCHEMA_NAME limit 1
-
-2024/12/16 16:30:52 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[2.147ms] [rows:-] SELECT * FROM `ws_users` LIMIT 1
-
-2024/12/16 16:30:52 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[4.292ms] [rows:-] SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale FROM information_schema.columns WHERE table_schema = 'db_saas_zhy' AND table_name = 'ws_users' ORDER BY ORDINAL_POSITION
-
-2024/12/16 16:30:52 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[0.708ms] [rows:-] SELECT DATABASE()
-
-2024/12/16 16:30:52 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[2.444ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'db_saas_zhy%' ORDER BY SCHEMA_NAME='db_saas_zhy' DESC,SCHEMA_NAME limit 1
-
-2024/12/16 16:30:52 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[1.962ms] [rows:-] SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'db_saas_zhy' AND table_name = 'ws_users' AND index_name = 'idx_ws_users_mobile'
-
-2024/12/16 16:30:52 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[0.864ms] [rows:-] SELECT DATABASE()
-
-2024/12/16 16:30:52 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[2.383ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'db_saas_zhy%' ORDER BY SCHEMA_NAME='db_saas_zhy' DESC,SCHEMA_NAME limit 1
-
-2024/12/16 16:30:52 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[1.751ms] [rows:-] SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'db_saas_zhy' AND table_name = 'ws_users' AND index_name = 'idx_ws_users_deleted_at'
-
-2024/12/16 16:30:54 /Users/zhanghaiying/golang/app/services/user.go:41
-[2.563ms] [rows:1] SELECT * FROM `ws_users` WHERE `ws_users`.`id` = 10 AND `ws_users`.`deleted_at` IS NULL ORDER BY `ws_users`.`id` LIMIT 1
-
-2024/12/16 16:44:55 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[0.787ms] [rows:-] SELECT DATABASE()
-
-2024/12/16 16:44:55 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[2.704ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'db_saas_zhy%' ORDER BY SCHEMA_NAME='db_saas_zhy' DESC,SCHEMA_NAME limit 1
-
-2024/12/16 16:44:55 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[1.755ms] [rows:-] SELECT count(*) FROM information_schema.tables WHERE table_schema = 'db_saas_zhy' AND table_name = 'ws_users' AND table_type = 'BASE TABLE'
-
-2024/12/16 16:44:55 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[0.909ms] [rows:-] SELECT DATABASE()
-
-2024/12/16 16:44:55 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[2.601ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'db_saas_zhy%' ORDER BY SCHEMA_NAME='db_saas_zhy' DESC,SCHEMA_NAME limit 1
-
-2024/12/16 16:44:55 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[1.881ms] [rows:-] SELECT * FROM `ws_users` LIMIT 1
-
-2024/12/16 16:44:55 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[4.143ms] [rows:-] SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale FROM information_schema.columns WHERE table_schema = 'db_saas_zhy' AND table_name = 'ws_users' ORDER BY ORDINAL_POSITION
-
-2024/12/16 16:44:55 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[0.830ms] [rows:-] SELECT DATABASE()
-
-2024/12/16 16:44:55 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[2.303ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'db_saas_zhy%' ORDER BY SCHEMA_NAME='db_saas_zhy' DESC,SCHEMA_NAME limit 1
-
-2024/12/16 16:44:55 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[1.845ms] [rows:-] SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'db_saas_zhy' AND table_name = 'ws_users' AND index_name = 'idx_ws_users_mobile'
-
-2024/12/16 16:44:55 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[0.818ms] [rows:-] SELECT DATABASE()
-
-2024/12/16 16:44:55 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[2.369ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'db_saas_zhy%' ORDER BY SCHEMA_NAME='db_saas_zhy' DESC,SCHEMA_NAME limit 1
-
-2024/12/16 16:44:55 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[3.142ms] [rows:-] SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'db_saas_zhy' AND table_name = 'ws_users' AND index_name = 'idx_ws_users_deleted_at'
-
-2024/12/16 16:45:00 /Users/zhanghaiying/golang/app/services/user.go:41
-[2.163ms] [rows:1] SELECT * FROM `ws_users` WHERE `ws_users`.`id` = 10 AND `ws_users`.`deleted_at` IS NULL ORDER BY `ws_users`.`id` LIMIT 1
-
-2024/12/16 16:45:47 /Users/zhanghaiying/golang/app/services/user.go:41
-[2.554ms] [rows:1] SELECT * FROM `ws_users` WHERE `ws_users`.`id` = 10 AND `ws_users`.`deleted_at` IS NULL ORDER BY `ws_users`.`id` LIMIT 1
-
-2024/12/16 16:46:14 /Users/zhanghaiying/golang/app/services/user.go:31
-[3.532ms] [rows:1] SELECT * FROM `ws_users` WHERE mobile = '15770831159' AND `ws_users`.`deleted_at` IS NULL ORDER BY `ws_users`.`id` LIMIT 1
-
-2024/12/16 16:46:27 /Users/zhanghaiying/golang/app/services/user.go:41
-[5.129ms] [rows:1] SELECT * FROM `ws_users` WHERE `ws_users`.`id` = 10 AND `ws_users`.`deleted_at` IS NULL ORDER BY `ws_users`.`id` LIMIT 1
-
-2024/12/16 16:46:43 /Users/zhanghaiying/golang/app/services/user.go:41
-[2.888ms] [rows:1] SELECT * FROM `ws_users` WHERE `ws_users`.`id` = 10 AND `ws_users`.`deleted_at` IS NULL ORDER BY `ws_users`.`id` LIMIT 1
-
-2024/12/16 16:47:25 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[1.246ms] [rows:-] SELECT DATABASE()
-
-2024/12/16 16:47:25 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[2.597ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'db_saas_zhy%' ORDER BY SCHEMA_NAME='db_saas_zhy' DESC,SCHEMA_NAME limit 1
-
-2024/12/16 16:47:25 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[1.701ms] [rows:-] SELECT count(*) FROM information_schema.tables WHERE table_schema = 'db_saas_zhy' AND table_name = 'ws_users' AND table_type = 'BASE TABLE'
-
-2024/12/16 16:47:25 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[1.192ms] [rows:-] SELECT DATABASE()
-
-2024/12/16 16:47:25 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[2.409ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'db_saas_zhy%' ORDER BY SCHEMA_NAME='db_saas_zhy' DESC,SCHEMA_NAME limit 1
-
-2024/12/16 16:47:25 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[1.799ms] [rows:-] SELECT * FROM `ws_users` LIMIT 1
-
-2024/12/16 16:47:25 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[4.710ms] [rows:-] SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale FROM information_schema.columns WHERE table_schema = 'db_saas_zhy' AND table_name = 'ws_users' ORDER BY ORDINAL_POSITION
-
-2024/12/16 16:47:25 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[0.898ms] [rows:-] SELECT DATABASE()
-
-2024/12/16 16:47:25 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[2.161ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'db_saas_zhy%' ORDER BY SCHEMA_NAME='db_saas_zhy' DESC,SCHEMA_NAME limit 1
-
-2024/12/16 16:47:25 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[2.372ms] [rows:-] SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'db_saas_zhy' AND table_name = 'ws_users' AND index_name = 'idx_ws_users_mobile'
-
-2024/12/16 16:47:25 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[0.738ms] [rows:-] SELECT DATABASE()
-
-2024/12/16 16:47:25 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[2.377ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'db_saas_zhy%' ORDER BY SCHEMA_NAME='db_saas_zhy' DESC,SCHEMA_NAME limit 1
-
-2024/12/16 16:47:25 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[1.896ms] [rows:-] SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'db_saas_zhy' AND table_name = 'ws_users' AND index_name = 'idx_ws_users_deleted_at'
-
-2024/12/16 16:47:33 /Users/zhanghaiying/golang/app/services/user.go:31
-[3.112ms] [rows:1] SELECT * FROM `ws_users` WHERE mobile = '15770831159' AND `ws_users`.`deleted_at` IS NULL ORDER BY `ws_users`.`id` LIMIT 1
-
-2024/12/16 17:08:09 /Users/zhanghaiying/golang/bootstrap/db.go:95
-[error] failed to initialize database, got error driver: bad connection
-
-2024/12/16 17:09:32 /Users/zhanghaiying/golang/bootstrap/db.go:95
-[error] failed to initialize database, got error driver: bad connection
-
-2024/12/16 17:10:48 /Users/zhanghaiying/golang/bootstrap/db.go:95
-[error] failed to initialize database, got error dial tcp 10.10.40.150:33061: connect: connection refused
-
-2024/12/16 17:13:27 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[0.982ms] [rows:-] SELECT DATABASE()
-
-2024/12/16 17:13:27 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[3.199ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'db_saas_zhy%' ORDER BY SCHEMA_NAME='db_saas_zhy' DESC,SCHEMA_NAME limit 1
-
-2024/12/16 17:13:27 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[2.867ms] [rows:-] SELECT count(*) FROM information_schema.tables WHERE table_schema = 'db_saas_zhy' AND table_name = 'ws_users' AND table_type = 'BASE TABLE'
-
-2024/12/16 17:13:27 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[0.831ms] [rows:-] SELECT DATABASE()
-
-2024/12/16 17:13:27 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[2.933ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'db_saas_zhy%' ORDER BY SCHEMA_NAME='db_saas_zhy' DESC,SCHEMA_NAME limit 1
-
-2024/12/16 17:13:27 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[2.500ms] [rows:-] SELECT * FROM `ws_users` LIMIT 1
-
-2024/12/16 17:13:27 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[4.611ms] [rows:-] SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale FROM information_schema.columns WHERE table_schema = 'db_saas_zhy' AND table_name = 'ws_users' ORDER BY ORDINAL_POSITION
-
-2024/12/16 17:13:27 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[0.947ms] [rows:-] SELECT DATABASE()
-
-2024/12/16 17:13:27 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[2.475ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'db_saas_zhy%' ORDER BY SCHEMA_NAME='db_saas_zhy' DESC,SCHEMA_NAME limit 1
-
-2024/12/16 17:13:27 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[1.986ms] [rows:-] SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'db_saas_zhy' AND table_name = 'ws_users' AND index_name = 'idx_ws_users_mobile'
-
-2024/12/16 17:13:27 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[0.902ms] [rows:-] SELECT DATABASE()
-
-2024/12/16 17:13:27 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[2.311ms] [rows:1] SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'db_saas_zhy%' ORDER BY SCHEMA_NAME='db_saas_zhy' DESC,SCHEMA_NAME limit 1
-
-2024/12/16 17:13:27 /Users/zhanghaiying/golang/bootstrap/db.go:126
-[2.307ms] [rows:-] SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'db_saas_zhy' AND table_name = 'ws_users' AND index_name = 'idx_ws_users_deleted_at'
-
-2024/12/16 17:13:29 /Users/zhanghaiying/golang/app/services/user.go:31
-[4.158ms] [rows:1] SELECT * FROM `ws_users` WHERE mobile = '15770831159' AND `ws_users`.`deleted_at` IS NULL ORDER BY `ws_users`.`id` LIMIT 1
-
-2025/04/11 13:23:50 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+2025/04/16 18:23:36 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
 
-2025/04/11 13:24:15 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+2025/04/18 16:28:24 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
 
-2025/04/11 15:17:03 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+2025/04/18 16:28:27 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
 
-2025/04/11 15:17:50 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+2025/04/18 16:28:37 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
 
-2025/04/11 15:19:32 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+2025/04/18 16:29:06 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
 
-2025/04/11 15:20:02 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+2025/04/18 16:29:22 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
 
-2025/04/11 15:23:53 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+2025/04/18 16:29:26 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
 
-2025/04/11 15:26:17 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+2025/04/18 16:29:52 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
 
-2025/04/11 15:26:20 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+2025/04/18 16:30:26 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
 
-2025/04/11 15:26:54 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+2025/04/18 16:31:09 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
 
-2025/04/11 15:28:14 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+2025/04/18 16:33:50 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
 
-2025/04/11 15:28:24 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+2025/04/18 16:38:19 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
 
-2025/04/11 15:29:30 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+2025/04/18 16:38:47 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
 
-2025/04/11 15:43:14 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+2025/04/18 16:39:14 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
 
-2025/04/11 15:45:26 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+2025/04/18 16:40:37 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
 
-2025/04/11 15:46:14 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+2025/04/18 16:41:46 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
 
-2025/04/11 15:47:32 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+2025/04/18 16:42:13 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
 
-2025/04/11 15:47:50 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+2025/04/18 16:43:59 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
 
-2025/04/11 15:48:47 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+2025/04/23 09:43:43 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
 
-2025/04/11 15:48:51 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+2025/04/23 09:44:51 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
 
-2025/04/11 15:49:26 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+2025/04/23 09:45:18 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
 
-2025/04/11 15:49:42 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+2025/04/23 09:52:46 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
 
-2025/04/11 15:52:43 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+2025/04/23 09:53:43 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
 
-2025/04/11 16:07:05 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+2025/04/23 09:55:37 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
 
-2025/04/11 16:07:38 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+2025/04/23 09:57:26 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
 
-2025/04/11 16:07:44 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+2025/04/23 09:59:47 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
 
-2025/04/11 16:07:48 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+2025/04/23 10:00:06 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
 
-2025/04/11 16:07:55 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+2025/04/23 10:07:13 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
 
-2025/04/11 16:19:41 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+2025/04/23 10:09:34 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
 
-2025/04/11 16:24:48 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+2025/04/23 10:10:08 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
 
-2025/04/11 16:50:01 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+2025/04/23 10:11:37 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
 
-2025/04/11 16:53:52 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+2025/04/23 10:28:48 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
 
-2025/04/11 16:58:47 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+2025/04/23 11:20:22 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
 
-2025/04/11 16:59:53 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+2025/04/23 11:20:32 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
 
-2025/04/11 17:00:40 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+2025/04/23 11:20:35 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
 
-2025/04/11 17:54:02 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+2025/04/23 11:20:39 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
 
-2025/04/11 17:54:19 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+2025/04/23 11:21:22 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
 
-2025/04/11 17:55:21 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+2025/04/23 11:21:47 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
 
-2025/04/11 17:56:40 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+2025/04/23 11:22:10 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
 
-2025/04/11 17:59:16 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+2025/04/23 11:22:59 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
 
-2025/04/11 18:10:26 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+2025/04/23 11:23:37 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
 
-2025/04/11 18:13:31 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+2025/04/23 11:25:32 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
 
-2025/04/11 18:16:34 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+2025/04/23 11:25:39 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
 
-2025/04/11 18:17:06 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+2025/04/23 11:26:48 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/23 11:31:27 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/23 11:32:40 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/23 11:33:08 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/23 11:33:41 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/23 13:18:41 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/23 13:37:02 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/23 13:37:45 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/23 13:38:15 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/23 13:38:18 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/23 13:38:23 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/23 13:39:44 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/23 13:39:58 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/23 13:41:06 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/23 13:43:54 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/23 13:47:15 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/23 13:48:34 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/23 13:50:53 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/23 13:51:06 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/23 13:51:19 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/23 13:57:52 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/23 13:58:49 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/23 14:01:39 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/23 14:01:44 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/23 14:03:21 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/23 14:03:27 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/23 14:03:37 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/23 14:05:35 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/23 14:12:25 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/23 14:16:04 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/23 14:30:45 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/23 14:36:06 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
+[error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused
+
+2025/04/23 14:36:18 /Users/zhanghaiying/gin-web/gin-web/bootstrap/db.go:95
 [error] failed to initialize database, got error dial tcp 127.0.0.1:3306: connect: connection refused

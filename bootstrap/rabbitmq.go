@@ -1,7 +1,9 @@
 package bootstrap
 
 import (
+	"fmt"
 	"gin-web/app/ampq/consumer"
+	"gin-web/config"
 	"gin-web/global"
 	"log"
 	"reflect"
@@ -28,11 +30,23 @@ func InitRabbitmq() {
 
 // 注册消费者（通过导入包触发init）
 func registerConsumers() {
+	config, _ := config.LoadQueueConfig()
+	for typeName, queueConfig := range config.Queues {
+		for a := queueConfig.WorkerNum; a > 0; a-- {
+			consumer, err := getConsumerTypes(typeName, queueConfig.Name)
+			fmt.Println(err)
+			consumers = append(consumers, consumer)
+		}
+
+	}
+}
+
+// 中间方法
+func getConsumerTypes(ct string, queueName string) (consumer.Consumer, error) {
 	cfg := global.App.Config.RabbitMQ
-	// 示例消费者
-	if c, err := consumer.NewLogConsumer(cfg); err == nil {
-		consumers = append(consumers, c)
+	if ct == "log" {
+		return consumer.NewLogConsumer(cfg, queueName)
 	}
 
-	// 在此添加其他消费者...
+	return nil, fmt.Errorf("consumer type %s not found", ct)
 }

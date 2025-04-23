@@ -26,7 +26,14 @@ func main() {
 
 	// 初始化Redis
 	global.App.Redis = bootstrap.InitializeRedis()
-
+	//tmpParam := api.Params{
+	//	TableName: "eric_request_logss",
+	//	Data: map[string]interface{}{
+	//		"req_id": "777777",
+	//		"detail": "tes12t",
+	//	},
+	//}
+	//api.SendTableStoreLog(tmpParam)
 	//携程去启动消费者，暂时有点问题后续优化一下
 	go bootstrap.InitRabbitmq()
 	// 启动服务器

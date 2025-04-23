@@ -1,0 +1,5 @@
+queues:
+  log:
+    worker_num: 5        # 订单队列启动5个消费者
+    name: "order_queue"
+    retry_times: 3
