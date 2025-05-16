@@ -1,0 +1,7 @@
+consumers:
+  - queue: "base.log.table_store.zn.tenant"
+    concurrency: 5
+    handler: "LogConsumer"
+#  - queue: "payment_queue"
+#    concurrency: 2
+#    handler: "PaymentConsumer"

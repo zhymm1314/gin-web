@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	//"gin-web/bootstrap"
 	"gin-web/global"
 	"go.uber.org/zap"
 	"net/http"
@@ -18,9 +19,16 @@ type MyAPIResponse struct {
 }
 
 // 主结构体
-type Params struct {
-	TableName string                 `json:"table_name"`
-	Data      map[string]interface{} `json:"data"`
+type LogParams struct {
+	Data struct {
+		ReqID    string `json:"req_id"`
+		Name     string `json:"name"`
+		LogLevel int    `json:"log_level"`
+		Detail   string `json:"detail"`
+		Custom1  string `json:"custom1,omitempty"` // omitempty 表示字段为空时不输出
+		Custom2  string `json:"custom2,omitempty"`
+	} `json:"data"`
+	TableName string `json:"table_name"`
 }
 
 func LogClient(baseURL string) *BaseClient {
@@ -60,10 +68,10 @@ func logRequestID() string {
 	return fmt.Sprintf("%d", time.Now().UnixNano())
 }
 
-func SendTableStoreLog(params Params) {
-	client := LogClient("http://fc.eric-bot.com").
+func SendTableStoreLog(params any) {
+	client := LogClient(GetApiUrl("log_url")).
 		WithMethod(POST).
-		WithURI("/logs/tablestore/v1/insert").
+		WithURI("insert").
 		WithParamType(JSON).
 		WithHeader("Content-Type", "application/json").
 		WithTimeout(5 * time.Second)
@@ -73,7 +81,7 @@ func SendTableStoreLog(params Params) {
 		fmt.Println("Failed to create client")
 		return
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 
 	response, err := client.Exec(ctx, params)
@@ -84,6 +92,7 @@ func SendTableStoreLog(params Params) {
 	}
 	// 处理响应
 	if resp := response; true {
+		fmt.Println(response)
 		global.App.Log.Info("Response Code: %d, Data: %v\n", zap.Any("data", resp))
 		fmt.Printf("Response Code: %d, Data: %v\n")
 	}

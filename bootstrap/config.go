@@ -21,6 +21,9 @@ func InitializeConfig() *viper.Viper {
 	v := viper.New()
 	v.SetConfigFile(config)
 	v.SetConfigType("yaml")
+
+	//env := v.GetString("app.env")
+
 	if err := v.ReadInConfig(); err != nil {
 		panic(fmt.Errorf("read config failed: %s \n", err))
 	}
@@ -38,6 +41,61 @@ func InitializeConfig() *viper.Viper {
 	if err := v.Unmarshal(&global.App.Config); err != nil {
 		fmt.Println(err)
 	}
-
+	//
+	global.App.Config.ApiUrls = v.GetStringMap("api_url")
 	return v
+}
+
+func GetAPIURL(serviceName string) string {
+	env := global.App.Config.App.Env
+	urlMap := global.App.Config.ApiUrls
+
+	rawInnerMap, ok := urlMap[serviceName].(map[string]any)
+	if !ok {
+		panic("配置格式错误：非 map[string]string 类型")
+	}
+	fmt.Println(rawInnerMap)
+	url := rawInnerMap[env].(string)
+	if url == "" {
+		panic("Configuration not found for path: " + serviceName)
+	}
+	return url
+}
+
+// 安全版本，带默认值
+
+const (
+	EnvDev  = "dev"
+	EnvPre  = "pre"
+	EnvProd = "prod"
+)
+
+func GetCurrentEnv() string {
+	env := os.Getenv("APP_ENV")
+	switch env {
+	case EnvPre, EnvProd:
+		return env
+	default:
+		return EnvDev
+	}
+}
+
+// GetURL 根据环境和服务名动态获取配置中的 URL
+// env: 环境参数（dev/pre/prod）
+// service: 服务名称（如 "log_url", "xxx_url"）
+func GetURL(env string, service string) string {
+	// 构建配置路径（例如：api_url.xxx_url.dev）
+	path := "api_url." + service + "." + env
+
+	// 获取配置值，若不存在则返回空字符串
+	url := viper.GetString(path)
+
+	// 可选：添加默认值或错误处理
+	if url == "" {
+		// 可返回默认环境（如 dev）或抛出错误
+		// url = viper.GetString("api_url." + service + ".dev")
+		panic("Configuration not found for path: " + path)
+	}
+
+	return url
 }

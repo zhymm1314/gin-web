@@ -310,3 +310,19 @@ func (c *BaseClient) addQueryParams(req *http.Request, params interface{}) error
 	req.URL.RawQuery = query.Encode()
 	return nil
 }
+
+func GetApiUrl(serviceName string) string {
+
+	env := global.App.Config.App.Env
+	urlMap := global.App.Config.ApiUrls
+
+	rawInnerMap, ok := urlMap[serviceName].(map[string]any)
+	if !ok {
+		panic("配置格式错误：非 map[string]string 类型")
+	}
+	url := rawInnerMap[env].(string)
+	if url == "" {
+		panic("Configuration not found for path: " + serviceName)
+	}
+	return url
+}
