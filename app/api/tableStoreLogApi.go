@@ -61,7 +61,7 @@ func logRequestID() string {
 }
 
 func SendTableStoreLog(params Params) {
-	client := LogClient("http://fc.eric-bot.com").
+	client := LogClient("http://xxxxxxxxx").
 		WithMethod(POST).
 		WithURI("/logs/tablestore/v1/insert").
 		WithParamType(JSON).
