@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	//"gin-web/bootstrap"
 	"gin-web/global"
 	"go.uber.org/zap"
 	"net/http"
