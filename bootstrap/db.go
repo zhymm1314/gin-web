@@ -3,12 +3,13 @@ package bootstrap
 import (
 	"gin-web/app/models"
 	"gin-web/global"
-	"gorm.io/gorm/schema"
 	"io"
 	"log"
 	"os"
 	"strconv"
 	"time"
+
+	"gorm.io/gorm/schema"
 
 	"go.uber.org/zap"
 	"gopkg.in/natefinch/lumberjack.v2"
@@ -125,6 +126,9 @@ func initMySqlGorm() *gorm.DB {
 func initMySqlTables(db *gorm.DB) {
 	err := db.AutoMigrate(
 		models.User{},
+		models.Game{},
+		models.Category{},
+		models.Mod{},
 	)
 	if err != nil {
 		global.App.Log.Error("migrate table failed", zap.Any("err", err))

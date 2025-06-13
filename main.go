@@ -24,7 +24,7 @@ func main() {
 	bootstrap.InitializeValidator()
 	// 初始化Redis
 	global.App.Redis = bootstrap.InitializeRedis()
-	go bootstrap.InitRabbitmq()
+	// go bootstrap.InitRabbitmq() // 临时禁用RabbitMQ
 	bootstrap.RunServer()
 
 }

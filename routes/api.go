@@ -5,9 +5,10 @@ import (
 	app "gin-web/app/controllers"
 	"gin-web/app/middleware"
 	"gin-web/app/services"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 // SetApiGroupRoutes 定义 api 分组路由
@@ -38,6 +39,16 @@ func SetApiGroupRoutes(router *gin.RouterGroup) {
 
 	router.POST("/auth/register", app.Register)
 	router.POST("/auth/login", app.Login)
+
+	// Mod相关路由 - 无需认证
+	modController := &app.ModController{}
+	{
+		router.GET("/mods/search", modController.Search)         // 搜索mod
+		router.GET("/mods/:id", modController.Detail)            // 获取mod详情
+		router.GET("/mods/:id/download", modController.Download) // 下载mod
+		router.GET("/games", modController.Games)                // 获取游戏列表
+		router.GET("/categories", modController.Categories)      // 获取分类列表
+	}
 
 	authRouter := router.Group("").Use(middleware.JWTAuth(services.AppGuardName))
 	{
