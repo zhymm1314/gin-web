@@ -1,4 +1,4 @@
-package app
+package controllers
 
 import (
 	"gin-web/app/common/request"
@@ -15,7 +15,7 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	if err, user := services.UserService.Register(form); err != nil {
+	if err, user := services.UserServiceLegacy.Register(form); err != nil {
 		response.BusinessFail(c, err.Error())
 	} else {
 		response.Success(c, user)
