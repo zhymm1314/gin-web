@@ -5,9 +5,8 @@ import (
 	"gin-web/app/ampq/consumer"
 	"gin-web/config"
 	"gin-web/global"
-	"github.com/streadway/amqp"
+	amqp "github.com/rabbitmq/amqp091-go"
 	"log"
-	//"gin-web"
 )
 
 type Consumer struct {

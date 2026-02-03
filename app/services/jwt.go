@@ -5,7 +5,7 @@ import (
 	"errors"
 	"gin-web/global"
 	"gin-web/utils"
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt/v5"
 	"strconv"
 	"time"
 )
@@ -22,7 +22,7 @@ type JwtUser interface {
 
 // CustomClaims 自定义 Claims
 type CustomClaims struct {
-	jwt.StandardClaims
+	jwt.RegisteredClaims
 }
 
 const (
@@ -41,11 +41,11 @@ func (jwtService *jwtService) CreateToken(GuardName string, user JwtUser) (token
 	token = jwt.NewWithClaims(
 		jwt.SigningMethodHS256,
 		CustomClaims{
-			StandardClaims: jwt.StandardClaims{
-				ExpiresAt: time.Now().Unix() + global.App.Config.Jwt.JwtTtl,
-				Id:        user.GetUid(),
+			RegisteredClaims: jwt.RegisteredClaims{
+				ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(global.App.Config.Jwt.JwtTtl) * time.Second)),
+				ID:        user.GetUid(),
 				Issuer:    GuardName, // 用于在中间件中区分不同客户端颁发的 token，避免 token 跨端使用
-				NotBefore: time.Now().Unix() - 1000,
+				NotBefore: jwt.NewNumericDate(time.Now().Add(-1000 * time.Second)),
 			},
 		},
 	)
@@ -68,7 +68,9 @@ func (jwtService *jwtService) getBlackListKey(tokenStr string) string {
 // JoinBlackList token 加入黑名单
 func (jwtService *jwtService) JoinBlackList(token *jwt.Token) (err error) {
 	nowUnix := time.Now().Unix()
-	timer := time.Duration(token.Claims.(*CustomClaims).ExpiresAt-nowUnix) * time.Second
+	claims := token.Claims.(*CustomClaims)
+	expiresAt := claims.ExpiresAt.Time.Unix()
+	timer := time.Duration(expiresAt-nowUnix) * time.Second
 	// 将 token 剩余时间设置为缓存有效期，并将当前时间作为缓存 value 值
 	err = global.App.Redis.SetNX(context.Background(), jwtService.getBlackListKey(token.Raw), nowUnix, timer).Err()
 	return
@@ -91,9 +93,91 @@ func (jwtService *jwtService) IsInBlacklist(tokenStr string) bool {
 func (jwtService *jwtService) GetUserInfo(GuardName string, id string) (err error, user JwtUser) {
 	switch GuardName {
 	case AppGuardName:
-		return UserService.GetUserInfo(id)
+		return UserServiceLegacy.GetUserInfo(id)
 	default:
 		err = errors.New("guard " + GuardName + " does not exist")
 	}
 	return
+}
+
+// ========== 依赖注入版本的 JWT Service ==========
+
+// JwtServiceDI JWT服务 (依赖注入版本)
+type JwtServiceDI struct {
+	jwtConfig   JwtConfig
+	redisClient RedisClient
+}
+
+// JwtConfig JWT配置接口
+type JwtConfig interface {
+	GetSecret() string
+	GetTtl() int64
+	GetBlacklistGracePeriod() int64
+	GetRefreshGracePeriod() int64
+}
+
+// RedisClient Redis客户端接口
+type RedisClient interface {
+	SetNX(ctx context.Context, key string, value interface{}, expiration time.Duration) error
+	Get(ctx context.Context, key string) (string, error)
+}
+
+// NewJwtServiceDI 创建JWT服务实例
+func NewJwtServiceDI(jwtConfig JwtConfig, redisClient RedisClient) *JwtServiceDI {
+	return &JwtServiceDI{
+		jwtConfig:   jwtConfig,
+		redisClient: redisClient,
+	}
+}
+
+// CreateToken 生成 Token
+func (s *JwtServiceDI) CreateToken(GuardName string, user JwtUser) (tokenData TokenOutPut, err error, token *jwt.Token) {
+	token = jwt.NewWithClaims(
+		jwt.SigningMethodHS256,
+		CustomClaims{
+			RegisteredClaims: jwt.RegisteredClaims{
+				ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(s.jwtConfig.GetTtl()) * time.Second)),
+				ID:        user.GetUid(),
+				Issuer:    GuardName,
+				NotBefore: jwt.NewNumericDate(time.Now().Add(-1000 * time.Second)),
+			},
+		},
+	)
+
+	tokenStr, err := token.SignedString([]byte(s.jwtConfig.GetSecret()))
+
+	tokenData = TokenOutPut{
+		tokenStr,
+		int(s.jwtConfig.GetTtl()),
+		TokenType,
+	}
+	return
+}
+
+// getBlackListKey 获取黑名单缓存 key
+func (s *JwtServiceDI) getBlackListKey(tokenStr string) string {
+	return "jwt_black_list:" + utils.MD5([]byte(tokenStr))
+}
+
+// JoinBlackList token 加入黑名单
+func (s *JwtServiceDI) JoinBlackList(token *jwt.Token) (err error) {
+	nowUnix := time.Now().Unix()
+	claims := token.Claims.(*CustomClaims)
+	expiresAt := claims.ExpiresAt.Time.Unix()
+	timer := time.Duration(expiresAt-nowUnix) * time.Second
+	err = s.redisClient.SetNX(context.Background(), s.getBlackListKey(token.Raw), nowUnix, timer)
+	return
+}
+
+// IsInBlacklist token 是否在黑名单中
+func (s *JwtServiceDI) IsInBlacklist(tokenStr string) bool {
+	joinUnixStr, err := s.redisClient.Get(context.Background(), s.getBlackListKey(tokenStr))
+	joinUnix, err := strconv.ParseInt(joinUnixStr, 10, 64)
+	if joinUnixStr == "" || err != nil {
+		return false
+	}
+	if time.Now().Unix()-joinUnix < s.jwtConfig.GetBlacklistGracePeriod() {
+		return false
+	}
+	return true
 }

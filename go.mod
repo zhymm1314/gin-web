@@ -3,15 +3,14 @@ module gin-web
 go 1.22.3
 
 require (
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fsnotify/fsnotify v1.8.0
 	github.com/gin-contrib/cors v1.7.2
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-playground/validator/v10 v10.23.0
 	github.com/go-redis/redis/v8 v8.11.5
+	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/rabbitmq/amqp091-go v1.10.0
 	github.com/spf13/viper v1.19.0
-	github.com/streadway/amqp v1.1.0
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.30.0
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1

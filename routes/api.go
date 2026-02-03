@@ -2,7 +2,7 @@ package routes
 
 import (
 	"gin-web/app/common/request"
-	app "gin-web/app/controllers"
+	"gin-web/app/controllers"
 	"gin-web/app/middleware"
 	"gin-web/app/services"
 	"net/http"
@@ -11,7 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// SetApiGroupRoutes 定义 api 分组路由
+// SetApiGroupRoutes 定义 api 分组路由 (兼容旧代码)
 func SetApiGroupRoutes(router *gin.RouterGroup) {
 	router.GET("/ping", func(c *gin.Context) {
 		c.String(http.StatusOK, "pong")
@@ -23,7 +23,6 @@ func SetApiGroupRoutes(router *gin.RouterGroup) {
 		c.String(http.StatusOK, "success")
 	})
 
-	//...
 	router.POST("/user/register", func(c *gin.Context) {
 		var form request.Register
 		if err := c.ShouldBindJSON(&form); err != nil {
@@ -37,8 +36,8 @@ func SetApiGroupRoutes(router *gin.RouterGroup) {
 		})
 	})
 
-	router.POST("/auth/register", app.Register)
-	router.POST("/auth/login", app.Login)
+	router.POST("/auth/register", controllers.Register)
+	router.POST("/auth/login", controllers.Login)
 
 	// Mod相关路由 - 无需认证
 	modController := &app.ModController{}
@@ -52,7 +51,25 @@ func SetApiGroupRoutes(router *gin.RouterGroup) {
 
 	authRouter := router.Group("").Use(middleware.JWTAuth(services.AppGuardName))
 	{
-		authRouter.POST("/auth/info", app.Info)
-		authRouter.POST("/auth/logout", app.Logout)
+		authRouter.POST("/auth/info", controllers.Info)
+		authRouter.POST("/auth/logout", controllers.Logout)
+	}
+}
+
+// SetApiGroupRoutesWithDI 使用依赖注入的路由注册
+func SetApiGroupRoutesWithDI(router *gin.RouterGroup, ctrls ...controllers.Controller) {
+	// 基础路由
+	router.GET("/ping", func(c *gin.Context) {
+		c.String(http.StatusOK, "pong")
+	})
+
+	router.GET("/test", func(c *gin.Context) {
+		time.Sleep(5 * time.Second)
+		c.String(http.StatusOK, "success")
+	})
+
+	// 自动注册所有控制器
+	for _, ctrl := range ctrls {
+		controllers.RegisterController(router, ctrl)
 	}
 }

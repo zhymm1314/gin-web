@@ -90,9 +90,7 @@ func SendTableStoreLog(params any) {
 			zap.Any("params", params))
 	}
 	// 处理响应
-	if resp := response; true {
-		fmt.Println(response)
-		global.App.Log.Info("Response Code: %d, Data: %v\n", zap.Any("data", resp))
-		fmt.Printf("Response Code: %d, Data: %v\n")
+	if response != nil {
+		global.App.Log.Info("SendTableStoreLog response", zap.Any("data", response))
 	}
 }

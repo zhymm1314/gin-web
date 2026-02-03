@@ -1,11 +1,11 @@
-package app
+package controllers
 
 import (
 	"gin-web/app/common/request"
 	"gin-web/app/common/response"
 	"gin-web/app/services"
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 func Login(c *gin.Context) {
@@ -15,7 +15,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	if err, user := services.UserService.Login(form); err != nil {
+	if err, user := services.UserServiceLegacy.Login(form); err != nil {
 		response.BusinessFail(c, err.Error())
 	} else {
 		tokenData, err, _ := services.JwtService.CreateToken(services.AppGuardName, user)
@@ -28,7 +28,7 @@ func Login(c *gin.Context) {
 }
 
 func Info(c *gin.Context) {
-	err, user := services.UserService.GetUserInfo(c.Keys["id"].(string))
+	err, user := services.UserServiceLegacy.GetUserInfo(c.Keys["id"].(string))
 	if err != nil {
 		response.BusinessFail(c, err.Error())
 		return
