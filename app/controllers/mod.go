@@ -1,4 +1,4 @@
-package app
+package controllers
 
 import (
 	"gin-web/app/common/request"

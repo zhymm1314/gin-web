@@ -40,7 +40,7 @@ func SetApiGroupRoutes(router *gin.RouterGroup) {
 	router.POST("/auth/login", controllers.Login)
 
 	// Mod相关路由 - 无需认证
-	modController := &app.ModController{}
+	modController := &controllers.ModController{}
 	{
 		router.GET("/mods/search", modController.Search)         // 搜索mod
 		router.GET("/mods/:id", modController.Detail)            // 获取mod详情

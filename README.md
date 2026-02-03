@@ -11,8 +11,10 @@
 ## ✨ 核心特性
 
 ### 🏗️ 架构设计
-- **MVC 架构模式**：清晰的分层设计，Controller-Service-Model 三层架构
-- **依赖注入**：全局应用实例管理，统一的组件初始化
+- **MVC + Repository 架构模式**：清晰的分层设计，Controller-Service-Repository-Model 四层架构
+- **依赖注入容器**：完整的 DI 容器实现，支持接口抽象和依赖反转
+- **控制器自动注册**：类似 Hyperf 的控制器路由自动注册机制
+- **统一错误处理**：标准化的业务错误码和错误包装
 - **中间件支持**：JWT 认证、CORS 跨域、异常恢复等中间件
 - **配置管理**：基于 Viper 的 YAML 配置文件，支持热重载
 
@@ -56,22 +58,24 @@
 | **缓存** | Redis | v8.11.5 | 内存数据库 |
 | **日志** | Zap | v1.27.0 | 高性能结构化日志 |
 | **配置** | Viper | v1.19.0 | 配置文件管理 |
-| **认证** | JWT | v3.2.0 | JSON Web Token |
-| **消息队列** | RabbitMQ | v1.10.0 | 消息中间件 |
+| **认证** | JWT | v5.2.1 | JSON Web Token (golang-jwt) |
+| **消息队列** | RabbitMQ | v1.10.0 | 消息中间件 (amqp091-go) |
 | **密码加密** | bcrypt | - | 密码哈希算法 |
 | **参数验证** | validator | v10.23.0 | 结构体验证 |
 
 ## 📁 项目结构
 
 ```
-backend/
+gin-web/
 ├── app/                          # 应用核心代码
 │   ├── controllers/              # 控制器层
-│   │   ├── auth.go              # 认证控制器
+│   │   ├── controller.go        # 控制器接口定义
+│   │   ├── auth_controller.go   # 认证控制器 (DI版本)
+│   │   ├── auth.go              # 认证控制器 (兼容版本)
 │   │   └── user.go              # 用户控制器
 │   ├── services/                # 服务层
-│   │   ├── user.go              # 用户服务
-│   │   └── jwt.go               # JWT 服务
+│   │   ├── user.go              # 用户服务 (支持DI和兼容模式)
+│   │   └── jwt.go               # JWT 服务 (支持DI和兼容模式)
 │   ├── models/                  # 模型层
 │   │   ├── user.go              # 用户模型
 │   │   └── common.go            # 公共模型
@@ -86,14 +90,25 @@ backend/
 │   │   ├── consumer/            # 消费者
 │   │   └── producer/            # 生产者
 │   └── api/                     # API 客户端
+├── internal/                    # 内部包 (不对外暴露)
+│   ├── container/               # 依赖注入容器
+│   │   └── container.go         # DI 容器实现
+│   └── repository/              # 仓储层
+│       ├── repository.go        # 仓储接口定义
+│       └── user_repository.go   # 用户仓储实现
+├── pkg/                         # 可复用的公共包
+│   └── errors/                  # 统一错误处理
+│       └── errors.go            # 业务错误定义
 ├── bootstrap/                   # 引导程序
 │   ├── config.go                # 配置初始化
 │   ├── db.go                    # 数据库初始化
 │   ├── log.go                   # 日志初始化
 │   ├── redis.go                 # Redis 初始化
-│   ├── router.go                # 路由初始化
+│   ├── router.go                # 路由初始化 (支持DI)
+│   ├── rabbitmq_manager.go      # RabbitMQ 管理器
 │   └── validator.go             # 验证器初始化
 ├── config/                      # 配置结构体
+│   ├── config.go                # 配置汇总
 │   ├── app.go                   # 应用配置
 │   ├── database.go              # 数据库配置
 │   ├── log.go                   # 日志配置
@@ -101,15 +116,24 @@ backend/
 │   ├── redis.go                 # Redis 配置
 │   └── queue.go                 # 队列配置
 ├── routes/                      # 路由定义
-│   └── api.go                   # API 路由
+│   └── api.go                   # API 路由 (支持DI和兼容模式)
 ├── storage/                     # 存储目录
 │   └── logs/                    # 日志文件
 │       ├── app.log              # 应用日志
-│       ├── sql.log              # 数据库日志
-│       └── README.md            # 日志说明
+│       └── sql.log              # 数据库日志
 ├── global/                      # 全局变量
-│   └── app.go                   # 应用实例
+│   ├── app.go                   # 应用实例
+│   ├── error.go                 # 错误定义
+│   └── lock.go                  # 分布式锁
 ├── utils/                       # 工具函数
+├── todo/                        # 开发计划
+│   ├── README.md                # 计划说明
+│   ├── TODO_P0_CRITICAL.md      # P0 紧急修复
+│   ├── TODO_P1_ARCHITECTURE.md  # P1 架构优化
+│   ├── TODO_P2_CODE_STYLE.md    # P2 代码规范
+│   └── TODO_P3_ENHANCEMENT.md   # P3 功能增强
+├── docs/                        # 文档目录
+│   └── OPTIMIZATION_REPORT.md   # 优化报告
 ├── config.yaml                  # 配置文件
 ├── example-config.yaml          # 配置文件模板
 ├── main.go                      # 程序入口
@@ -206,20 +230,80 @@ docker run -d \
 
 ### 开发规范
 
-1. **MVC 分层**
+1. **分层架构**
    - Controller：处理 HTTP 请求和响应
    - Service：业务逻辑处理
+   - Repository：数据访问抽象
    - Model：数据模型定义
 
 2. **错误处理**
-   - 使用统一的响应格式
-   - 区分业务错误和系统错误
-   - 记录详细的错误日志
+   - 使用 `pkg/errors` 统一错误处理
+   - 标准化业务错误码
+   - 支持错误包装和链式追踪
 
 3. **数据验证**
    - 使用结构体标签进行参数验证
    - 统一的验证错误处理
    - 支持自定义验证规则
+
+### 依赖注入使用
+
+项目支持两种模式：传统全局变量模式和依赖注入模式。
+
+#### 传统模式 (兼容)
+```go
+// 使用全局变量
+err, user := services.UserServiceLegacy.Register(form)
+```
+
+#### 依赖注入模式 (推荐)
+```go
+// 创建 DI 容器
+container := container.NewContainer()
+
+// 使用依赖注入的服务
+user, err := container.UserService.Register(form)
+
+// 使用依赖注入的路由
+r := bootstrap.SetupRouterWithDI(container.GetControllers()...)
+```
+
+#### 创建新的控制器
+```go
+// 实现 Controller 接口
+type MyController struct {
+    myService *services.MyService
+}
+
+func (c *MyController) Prefix() string {
+    return "/my"
+}
+
+func (c *MyController) Routes() []controllers.Route {
+    return []controllers.Route{
+        {Method: "GET", Path: "/list", Handler: c.List},
+        {Method: "POST", Path: "/create", Handler: c.Create},
+    }
+}
+```
+
+#### 创建新的 Repository
+```go
+// 定义接口
+type MyRepository interface {
+    Create(entity *models.MyEntity) error
+    FindByID(id uint) (*models.MyEntity, error)
+}
+
+// 实现接口
+type myRepository struct {
+    db *gorm.DB
+}
+
+func NewMyRepository(db *gorm.DB) MyRepository {
+    return &myRepository{db: db}
+}
+```
 
 ### 配置说明
 
@@ -258,29 +342,41 @@ redis:
 ## 🔄 开发路线图
 
 ### ✅ 已完成功能
-- [x] MVC 架构设计
-- [x] JWT 用户认证
+
+#### 基础架构
+- [x] MVC + Repository 架构设计
+- [x] 依赖注入容器 (DI Container)
+- [x] Repository 仓储层抽象
+- [x] 统一错误处理 (BizError)
+- [x] 控制器自动路由注册
+
+#### 核心功能
+- [x] JWT 用户认证 (已升级到 golang-jwt/jwt v5)
 - [x] MySQL 数据库集成
 - [x] Redis 缓存支持
 - [x] 结构化日志系统
 - [x] 配置文件管理
 - [x] 中间件系统
-- [x] RabbitMQ 消息队列
+- [x] RabbitMQ 消息队列 (已统一为 amqp091-go)
 - [x] 参数验证
 - [x] 统一响应格式
 - [x] Docker 支持
+- [x] 优雅关闭 (Graceful Shutdown)
+
+#### 安全修复
+- [x] JWT 库升级修复 CVE-2020-26160
+- [x] RabbitMQ 库统一消除废弃依赖
 
 ### 🚧 开发中功能
-- [ ] 依赖注入容器优化
 - [ ] WebSocket 客户端封装
-- [ ] API 文档自动生成
+- [ ] API 文档自动生成 (Swagger)
 - [ ] 单元测试覆盖
 
 ### 📋 计划功能
 - [ ] 分布式锁
 - [ ] 限流中间件
-- [ ] 监控指标收集
-- [ ] 链路追踪
+- [ ] 监控指标收集 (Prometheus)
+- [ ] 链路追踪 (OpenTelemetry)
 - [ ] 配置中心集成
 - [ ] 微服务支持
 
