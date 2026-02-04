@@ -1,111 +1,16 @@
 package bootstrap
 
 import (
-	"errors"
 	"gin-web/app/amqp/consumer"
 	"gin-web/config"
 	"gin-web/global"
-	amqp "github.com/rabbitmq/amqp091-go"
+	"gin-web/pkg/rabbitmq"
 	"log"
 )
 
-type Consumer struct {
-	queueName string
-	handler   consumer.ConsumerHandler
-	conn      *amqp.Connection
-	done      chan struct{}
-}
-
-func NewConsumer(conn *amqp.Connection, queueName string, handler consumer.ConsumerHandler) *Consumer {
-	return &Consumer{
-		queueName: queueName,
-		handler:   handler,
-		conn:      conn,
-		done:      make(chan struct{}),
-	}
-}
-
-func (c *Consumer) Start() {
-	for {
-		select {
-		case <-c.done:
-			return
-		default:
-			err := c.consume()
-			if err != nil {
-				// 自动重试逻辑
-				continue
-			}
-		}
-	}
-}
-
-func (c *Consumer) consume() error {
-	ch, err := c.conn.Channel()
-	if err != nil {
-		return err
-	}
-	defer ch.Close()
-
-	// 设置预取值为 5（每次最多处理 5 条未确认消息）
-	err = ch.Qos(
-		120,   // prefetchCount（预取值）
-		0,     // prefetchSize（预取大小，通常为 0）
-		false, // global（是否全局应用）
-	)
-	if err != nil {
-		log.Fatalf("设置预取值失败: %v", err)
-	}
-
-	q, err := ch.QueueDeclare(
-		c.queueName,
-		true,  // durable
-		false, // autoDelete
-		false, // exclusive
-		false, // noWait
-		nil,   // args
-	)
-	if err != nil {
-		return err
-	}
-
-	msgs, err := ch.Consume(
-		q.Name,
-		"",    // consumer
-		false, // autoAck
-		false, // exclusive
-		false, // noLocal
-		false, // noWait
-		nil,   // args
-	)
-	if err != nil {
-		return err
-	}
-
-	for {
-		select {
-		case msg, ok := <-msgs:
-			if !ok {
-				return errors.New("message channel closed")
-			}
-			if err := c.handler.HandleMessage(msg); err != nil {
-				msg.Nack(false, true)
-			} else {
-				msg.Ack(false)
-			}
-		case <-c.done:
-			return nil
-		}
-	}
-}
-
-func (c *Consumer) Stop() {
-	close(c.done)
-}
-
 // InitRabbitmq 初始化 RabbitMQ 消费者并返回管理器
-func InitRabbitmq() *ConsumerManager {
-	// 加载配置
+func InitRabbitmq() *rabbitmq.Manager {
+	// 加载消费者配置
 	cfgConsumer, err := config.LoadConfig("./config/yaml/consumer.yaml")
 	if err != nil {
 		log.Printf("Failed to load consumer config: %v", err)
@@ -118,23 +23,29 @@ func InitRabbitmq() *ConsumerManager {
 		// 添加更多消费者处理器...
 	}
 
-	cfg := config.RabbitMQConfig{
+	// 构建 RabbitMQ 配置
+	cfg := &rabbitmq.Config{
 		Host:              global.App.Config.RabbitMQ.Host,
 		Port:              global.App.Config.RabbitMQ.Port,
 		Username:          global.App.Config.RabbitMQ.Username,
 		Password:          global.App.Config.RabbitMQ.Password,
 		Vhost:             global.App.Config.RabbitMQ.Vhost,
-		ReconnectInterval: 5, // 默认 5 秒重连
+		ReconnectInterval: 5,
 	}
 
-	appCfg := &config.AppConfig{
-		Consumers: cfgConsumer.Consumers,
-		RabbitMQ:  cfg,
+	// 转换消费者配置
+	consumers := make([]rabbitmq.ConsumerConfig, len(cfgConsumer.Consumers))
+	for i, c := range cfgConsumer.Consumers {
+		consumers[i] = rabbitmq.ConsumerConfig{
+			Queue:       c.Queue,
+			Handler:     c.Handler,
+			Concurrency: c.Concurrency,
+		}
 	}
 
 	// 创建消费者管理器
-	cm := NewConsumerManager(appCfg, handlers)
-	go cm.Start()
+	manager := rabbitmq.NewManager(cfg, consumers, handlers, global.App.Log)
+	go manager.Start()
 
-	return cm
+	return manager
 }

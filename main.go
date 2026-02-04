@@ -7,6 +7,7 @@ import (
 	"gin-web/global"
 	"gin-web/internal/container"
 	"gin-web/pkg/cron"
+	"gin-web/pkg/rabbitmq"
 	"gin-web/pkg/websocket"
 
 	_ "gin-web/docs" // Swagger docs
@@ -63,7 +64,7 @@ func main() {
 	}
 
 	// 启动 RabbitMQ 消费者 (根据配置)
-	var consumerManager *bootstrap.ConsumerManager
+	var consumerManager *rabbitmq.Manager
 	if global.App.Config.RabbitMQ.Enable {
 		consumerManager = bootstrap.InitRabbitmq()
 		if consumerManager != nil {

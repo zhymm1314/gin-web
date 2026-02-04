@@ -142,6 +142,9 @@ gin-web/
 │   │   └── errors.go            # 业务错误定义
 │   ├── cron/                    # 定时任务管理器
 │   │   └── manager.go           # Cron Manager
+│   ├── rabbitmq/                # RabbitMQ 管理器
+│   │   ├── manager.go           # 消费者管理器
+│   │   └── consumer.go          # 消费者实现
 │   └── websocket/               # WebSocket 管理器
 │       └── manager.go           # WebSocket Manager (基于 Melody)
 ├── bootstrap/                   # 引导程序
