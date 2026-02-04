@@ -103,43 +103,38 @@ func (c *Consumer) Stop() {
 	close(c.done)
 }
 
-func InitRabbitmq() {
-
+// InitRabbitmq 初始化 RabbitMQ 消费者并返回管理器
+func InitRabbitmq() *ConsumerManager {
 	// 加载配置
 	cfgConsumer, err := config.LoadConfig("./config/yaml/consumer.yaml")
 	if err != nil {
-		log.Fatalf("Failed to load config: %v", err)
+		log.Printf("Failed to load consumer config: %v", err)
+		return nil
 	}
 
 	// 注册消费者处理器
 	handlers := map[string]consumer.ConsumerHandler{
 		"LogConsumer": &consumer.LogConsumer{},
-		//"PaymentConsumer": &consumer.PaymentConsumer{},
+		// 添加更多消费者处理器...
 	}
 
 	cfg := config.RabbitMQConfig{
-		Host:     global.App.Config.RabbitMQ.Host,
-		Port:     global.App.Config.RabbitMQ.Port,
-		Username: global.App.Config.RabbitMQ.Username,
-		Password: global.App.Config.RabbitMQ.Password,
-		Vhost:    global.App.Config.RabbitMQ.Vhost,
+		Host:              global.App.Config.RabbitMQ.Host,
+		Port:              global.App.Config.RabbitMQ.Port,
+		Username:          global.App.Config.RabbitMQ.Username,
+		Password:          global.App.Config.RabbitMQ.Password,
+		Vhost:             global.App.Config.RabbitMQ.Vhost,
+		ReconnectInterval: 5, // 默认 5 秒重连
 	}
 
 	appCfg := &config.AppConfig{
 		Consumers: cfgConsumer.Consumers,
 		RabbitMQ:  cfg,
 	}
+
 	// 创建消费者管理器
 	cm := NewConsumerManager(appCfg, handlers)
 	go cm.Start()
 
-	// 初始化Gin路由（可选）
-	// r := gin.Default()
-	// r.GET("/health", func(c *gin.Context) {
-	//     c.JSON(200, gin.H{"status": "ok"})
-	// })
-	// r.Run()
-
-	// 保持主程序运行
-	select {}
+	return cm
 }

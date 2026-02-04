@@ -37,6 +37,14 @@ func main() {
 		global.App.Log.Fatal("Failed to initialize app: " + err.Error())
 	}
 
+	// 启动 RabbitMQ 消费者 (如果配置了)
+	if global.App.Config.RabbitMQ.Host != "" {
+		if cm := bootstrap.InitRabbitmq(); cm != nil {
+			defer cm.Stop()
+			global.App.Log.Info("RabbitMQ consumer manager started")
+		}
+	}
+
 	// 启动服务器
 	bootstrap.RunServer(app.GetControllers()...)
 }
