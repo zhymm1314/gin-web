@@ -2,6 +2,27 @@
 
 一个基于 Gin 框架的企业级 Go 语言后端 API 脚手架，采用标准的 MVC 架构模式，为 PHP 开发者提供友好的 Go 语言开发体验。
 
+---
+
+## 📚 开发文档导航
+
+> **新手入门？** 请按以下顺序阅读文档：
+
+| 文档 | 说明 | 适用场景 |
+|------|------|----------|
+| [API 接口开发指南](docs/API_DEVELOPMENT.md) | 从零开始开发一个完整的 API 接口 | 开发新功能、新接口 |
+| [中间件使用指南](docs/MIDDLEWARE_GUIDE.md) | 内置中间件使用与自定义中间件开发 | 认证、限流、日志、权限控制 |
+| [RabbitMQ 消息队列指南](docs/RABBITMQ_GUIDE.md) | 消息队列的生产者和消费者开发 | 异步任务、解耦服务 |
+| [项目优化报告](docs/OPTIMIZATION_REPORT.md) | 架构分析与优化建议 | 了解项目架构、代码审查 |
+
+**开发任务清单**（按优先级）：
+- [P0 紧急修复](todo/TODO_P0_CRITICAL.md) - 必须立即处理
+- [P1 架构优化](todo/TODO_P1_ARCHITECTURE.md) - 重要架构改进
+- [P2 代码规范](todo/TODO_P2_CODE_STYLE.md) - 代码质量提升
+- [P3 功能增强](todo/TODO_P3_ENHANCEMENT.md) - 新功能开发
+
+---
+
 ## 🎯 项目初衷
 
 本项目旨在实现 Hyperf 框架到 Gin 框架的无缝切换，为 PHP 开发者（特别是 Hyperf 用户）提供熟悉的开发体验。通过标准化的项目结构和开箱即用的功能模块，让开发者能够快速上手 Go 语言后端开发。
@@ -216,6 +237,54 @@ docker run -d \
 
 ## 📖 开发指南
 
+> **详细文档请参阅**: [API 接口开发指南](docs/API_DEVELOPMENT.md)
+
+### 快速开发速查
+
+#### 开发一个新接口的步骤
+
+```
+1. app/common/request/   → 定义请求结构体
+2. app/models/           → 定义数据模型
+3. internal/repository/  → 实现数据访问层 (可选但推荐)
+4. app/services/         → 实现业务逻辑
+5. app/controllers/      → 实现控制器
+6. routes/api.go         → 注册路由
+```
+
+#### 代码模板
+
+**请求结构体** (`app/common/request/xxx.go`):
+```go
+type CreateXxx struct {
+    Name string `json:"name" binding:"required"`
+}
+
+func (req CreateXxx) GetMessages() ValidatorMessages {
+    return ValidatorMessages{
+        "Name.required": "名称不能为空",
+    }
+}
+```
+
+**控制器方法**:
+```go
+func CreateXxx(c *gin.Context) {
+    var req request.CreateXxx
+    if err := c.ShouldBindJSON(&req); err != nil {
+        response.ValidateFail(c, request.GetErrorMsg(req, err))
+        return
+    }
+    // 调用 Service
+    result, err := services.XxxService.Create(req)
+    if err != nil {
+        response.BusinessFail(c, err.Error())
+        return
+    }
+    response.Success(c, result)
+}
+```
+
 ### API 接口
 
 #### 认证接口
@@ -228,47 +297,17 @@ docker run -d \
 - `GET /api/user` - 获取用户列表（需要认证）
 - `GET /api/user/:id` - 获取用户详情（需要认证）
 
-### 开发规范
+### 分层架构
 
-1. **分层架构**
-   - Controller：处理 HTTP 请求和响应
-   - Service：业务逻辑处理
-   - Repository：数据访问抽象
-   - Model：数据模型定义
+| 层级 | 目录 | 职责 |
+|------|------|------|
+| Controller | `app/controllers/` | 处理 HTTP 请求/响应 |
+| Service | `app/services/` | 业务逻辑处理 |
+| Repository | `internal/repository/` | 数据访问抽象 |
+| Model | `app/models/` | 数据模型定义 |
 
-2. **错误处理**
-   - 使用 `pkg/errors` 统一错误处理
-   - 标准化业务错误码
-   - 支持错误包装和链式追踪
+### 依赖注入模式 (推荐)
 
-3. **数据验证**
-   - 使用结构体标签进行参数验证
-   - 统一的验证错误处理
-   - 支持自定义验证规则
-
-### 依赖注入使用
-
-项目支持两种模式：传统全局变量模式和依赖注入模式。
-
-#### 传统模式 (兼容)
-```go
-// 使用全局变量
-err, user := services.UserServiceLegacy.Register(form)
-```
-
-#### 依赖注入模式 (推荐)
-```go
-// 创建 DI 容器
-container := container.NewContainer()
-
-// 使用依赖注入的服务
-user, err := container.UserService.Register(form)
-
-// 使用依赖注入的路由
-r := bootstrap.SetupRouterWithDI(container.GetControllers()...)
-```
-
-#### 创建新的控制器
 ```go
 // 实现 Controller 接口
 type MyController struct {
@@ -287,23 +326,85 @@ func (c *MyController) Routes() []controllers.Route {
 }
 ```
 
-#### 创建新的 Repository
+### 中间件使用
+
+> **详细文档请参阅**: [中间件使用指南](docs/MIDDLEWARE_GUIDE.md)
+
+#### 内置中间件
+
+| 中间件 | 说明 | 使用方式 |
+|--------|------|----------|
+| `middleware.JWTAuth()` | JWT 认证 | 路由组/单路由 |
+| `middleware.Cors()` | 跨域处理 | 全局 |
+| `middleware.CustomRecovery()` | 异常恢复 | 全局 |
+
+#### 快速使用
+
 ```go
-// 定义接口
-type MyRepository interface {
-    Create(entity *models.MyEntity) error
-    FindByID(id uint) (*models.MyEntity, error)
+// 路由组中间件
+authRouter := router.Group("/api").Use(middleware.JWTAuth(services.AppGuardName))
+{
+    authRouter.GET("/user/info", controllers.UserInfo)
 }
 
-// 实现接口
-type myRepository struct {
-    db *gorm.DB
-}
-
-func NewMyRepository(db *gorm.DB) MyRepository {
-    return &myRepository{db: db}
+// 控制器中定义中间件
+func (ctrl *MyController) Routes() []Route {
+    return []Route{
+        {
+            Method:      "POST",
+            Path:        "/create",
+            Handler:     ctrl.Create,
+            Middlewares: []gin.HandlerFunc{middleware.JWTAuth(services.AppGuardName)},
+        },
+    }
 }
 ```
+
+---
+
+### 消息队列使用
+
+> **详细文档请参阅**: [RabbitMQ 消息队列指南](docs/RABBITMQ_GUIDE.md)
+
+#### 快速开发消费者
+
+```
+1. app/ampq/consumer/  → 实现 ConsumerHandler 接口
+2. main.go             → 注册处理器到 handlers map
+3. config.yaml         → 配置消费者队列
+```
+
+**消费者模板** (`app/ampq/consumer/xxx_consumer.go`):
+```go
+type XxxConsumer struct{}
+
+func (c *XxxConsumer) HandleMessage(msg amqp.Delivery) error {
+    defer func() {
+        if r := recover(); r != nil {
+            log.Printf("Recovered: %v", r)
+        }
+    }()
+
+    // 解析消息
+    var data YourStruct
+    json.Unmarshal(msg.Body, &data)
+
+    // 处理业务逻辑
+    // ...
+
+    return nil // 返回 nil 确认消费
+}
+```
+
+**配置队列** (`config.yaml`):
+```yaml
+consumers:
+  - queue: "xxx_queue"
+    handler: "xxx_consumer"
+    concurrency: 2
+```
+
+---
 
 ### 配置说明
 
