@@ -2,7 +2,7 @@ package main
 
 import (
 	"gin-web/app/controllers"
-	appCron "gin-web/ap
+	appCron "gin-web/app/cron"
 	"gin-web/bootstrap"
 	"gin-web/global"
 	"gin-web/internal/container"

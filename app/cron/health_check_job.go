@@ -1,6 +1,7 @@
 package cron
 
 import (
+	"context"
 	"gin-web/global"
 )
 
@@ -31,7 +32,7 @@ func (j *HealthCheckJob) Run() {
 
 	// 检查 Redis 连接
 	if global.App.Redis != nil {
-		if err := global.App.Redis.Ping(nil).Err(); err != nil {
+		if err := global.App.Redis.Ping(context.Background()).Err(); err != nil {
 			global.App.Log.Warn("redis ping failed")
 		}
 	}
