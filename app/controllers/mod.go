@@ -37,6 +37,19 @@ func (mc *ModController) Routes() []Route {
 }
 
 // Search 搜索mod
+// @Summary      搜索 Mod
+// @Description  根据关键词、游戏、分类等条件搜索 Mod
+// @Tags         Mod
+// @Accept       json
+// @Produce      json
+// @Param        keyword query string false "搜索关键词"
+// @Param        game_id query int false "游戏ID"
+// @Param        category_id query int false "分类ID"
+// @Param        page query int false "页码" default(1)
+// @Param        page_size query int false "每页数量" default(20)
+// @Success      200 {object} response.Response "成功"
+// @Failure      400 {object} response.Response "参数错误"
+// @Router       /mods/search [get]
 func (mc *ModController) Search(c *gin.Context) {
 	var req request.ModSearchRequest
 
@@ -62,6 +75,15 @@ func (mc *ModController) Search(c *gin.Context) {
 }
 
 // Detail 获取mod详情
+// @Summary      获取 Mod 详情
+// @Description  根据 ID 获取 Mod 详细信息
+// @Tags         Mod
+// @Accept       json
+// @Produce      json
+// @Param        id path int true "Mod ID"
+// @Success      200 {object} response.Response "成功"
+// @Failure      404 {object} response.Response "未找到"
+// @Router       /mods/{id} [get]
 func (mc *ModController) Detail(c *gin.Context) {
 	var req request.ModDetailRequest
 
@@ -80,6 +102,13 @@ func (mc *ModController) Detail(c *gin.Context) {
 }
 
 // Download 下载mod
+// @Summary      下载 Mod
+// @Description  获取 Mod 下载链接并重定向
+// @Tags         Mod
+// @Param        id path int true "Mod ID"
+// @Success      302 {string} string "重定向到下载链接"
+// @Failure      404 {object} response.Response "未找到"
+// @Router       /mods/{id}/download [get]
 func (mc *ModController) Download(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 32)
@@ -103,6 +132,12 @@ func (mc *ModController) Download(c *gin.Context) {
 }
 
 // Games 获取游戏列表
+// @Summary      获取游戏列表
+// @Description  获取所有支持的游戏列表
+// @Tags         Mod
+// @Produce      json
+// @Success      200 {object} response.Response "成功"
+// @Router       /games [get]
 func (mc *ModController) Games(c *gin.Context) {
 	result, err := mc.modService.GetGames()
 	if err != nil {
@@ -114,6 +149,12 @@ func (mc *ModController) Games(c *gin.Context) {
 }
 
 // Categories 获取分类列表
+// @Summary      获取分类列表
+// @Description  获取所有 Mod 分类列表
+// @Tags         Mod
+// @Produce      json
+// @Success      200 {object} response.Response "成功"
+// @Router       /categories [get]
 func (mc *ModController) Categories(c *gin.Context) {
 	result, err := mc.modService.GetCategories()
 	if err != nil {

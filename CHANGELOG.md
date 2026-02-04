@@ -9,9 +9,48 @@
 ## [未发布]
 
 ### 计划中
-- Swagger API 文档自动生成
 - 单元测试覆盖
 - Prometheus 监控集成
+- Docker 多阶段构建优化
+
+---
+
+## [1.6.0] - 2026-02-04
+
+### 重大变更
+- **Swagger API 文档**: 集成 Swagger UI，启动后访问 `/swagger/index.html`
+- **定时任务系统**: 基于 robfig/cron 的定时任务封装
+- **WebSocket 支持**: 基于 Melody 的 WebSocket 封装
+- **多启动模式**: 支持框架集成启动和独立脚本启动
+
+### 新增
+- `docs/` - Swagger 自动生成的 API 文档
+- `pkg/cron/manager.go` - 定时任务管理器
+- `pkg/websocket/manager.go` - WebSocket 管理器 (基于 Melody)
+- `app/cron/cleanup_job.go` - 示例清理任务
+- `app/cron/health_check_job.go` - 示例健康检查任务
+- `app/controllers/websocket_controller.go` - WebSocket 控制器
+- `cmd/consumer/main.go` - RabbitMQ 消费者独立启动脚本
+- `cmd/cron/main.go` - 定时任务独立启动脚本
+- `cmd/websocket/main.go` - WebSocket 独立启动脚本
+- `config/cron.go` - 定时任务配置
+- `config/websocket.go` - WebSocket 配置
+- 控制器方法添加 Swagger 注释
+
+### 变更
+- `config/rabbitmq.go` - 添加 `Enable` 字段
+- `config/config.go` - 添加 `Cron` 和 `WebSocket` 配置
+- `config.yaml` - 添加 `cron.enable`、`websocket.enable`、`rabbitmq.enable` 配置项
+- `bootstrap/router.go` - 添加 Swagger 路由注册
+- `main.go` - 集成定时任务、WebSocket、配置开关
+
+### 依赖更新
+- 添加 `github.com/swaggo/gin-swagger` v1.6.1
+- 添加 `github.com/swaggo/files` v1.0.1
+- 添加 `github.com/swaggo/swag` v1.16.6
+- 添加 `github.com/robfig/cron/v3` v3.0.1
+- 添加 `github.com/olahol/melody` v1.4.0
+- 升级 Go 版本要求至 1.23.0
 
 ---
 

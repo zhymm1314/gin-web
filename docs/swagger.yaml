@@ -1,0 +1,357 @@
+basePath: /api
+definitions:
+  request.Login:
+    properties:
+      mobile:
+        type: string
+      password:
+        type: string
+    required:
+    - mobile
+    - password
+    type: object
+  request.Register:
+    properties:
+      email:
+        type: string
+      mobile:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - mobile
+    - name
+    - password
+    type: object
+  response.Response:
+    properties:
+      data:
+        description: 数据
+      error_code:
+        description: 自定义错误码
+        type: integer
+      message:
+        description: 信息
+        type: string
+    type: object
+  websocket.Message:
+    properties:
+      content: {}
+      from:
+        type: string
+      to:
+        type: string
+      type:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@example.com
+    name: API Support
+  description: Gin-Web 脚手架 API 文档 - 基于 Gin 框架的企业级 Go 语言后端 API 脚手架
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: http://swagger.io/terms/
+  title: Gin-Web API
+  version: 1.6.0
+paths:
+  /auth/info:
+    post:
+      consumes:
+      - application/json
+      description: 获取当前登录用户的详细信息
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: 获取用户信息
+      tags:
+      - 认证
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: 用户登录获取 JWT Token
+      parameters:
+      - description: 登录信息
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.Login'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功返回 Token
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: 参数错误
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: 认证失败
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 用户登录
+      tags:
+      - 认证
+  /auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: 用户登出，将当前 Token 加入黑名单
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: 用户登出
+      tags:
+      - 认证
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: 创建新用户账号
+      parameters:
+      - description: 注册信息
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.Register'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: 参数错误
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 用户注册
+      tags:
+      - 认证
+  /categories:
+    get:
+      description: 获取所有 Mod 分类列表
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 获取分类列表
+      tags:
+      - Mod
+  /games:
+    get:
+      description: 获取所有支持的游戏列表
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 获取游戏列表
+      tags:
+      - Mod
+  /mods/{id}:
+    get:
+      consumes:
+      - application/json
+      description: 根据 ID 获取 Mod 详细信息
+      parameters:
+      - description: Mod ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: 未找到
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 获取 Mod 详情
+      tags:
+      - Mod
+  /mods/{id}/download:
+    get:
+      description: 获取 Mod 下载链接并重定向
+      parameters:
+      - description: Mod ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "302":
+          description: 重定向到下载链接
+          schema:
+            type: string
+        "404":
+          description: 未找到
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 下载 Mod
+      tags:
+      - Mod
+  /mods/search:
+    get:
+      consumes:
+      - application/json
+      description: 根据关键词、游戏、分类等条件搜索 Mod
+      parameters:
+      - description: 搜索关键词
+        in: query
+        name: keyword
+        type: string
+      - description: 游戏ID
+        in: query
+        name: game_id
+        type: integer
+      - description: 分类ID
+        in: query
+        name: category_id
+        type: integer
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: 每页数量
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: 参数错误
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 搜索 Mod
+      tags:
+      - Mod
+  /ws/broadcast:
+    post:
+      consumes:
+      - application/json
+      description: 向所有在线用户广播消息
+      parameters:
+      - description: 消息内容
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/websocket.Message'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 广播消息
+      tags:
+      - WebSocket
+  /ws/connect:
+    get:
+      description: 建立 WebSocket 连接
+      parameters:
+      - description: 用户ID
+        in: query
+        name: user_id
+        type: string
+      responses:
+        "101":
+          description: Switching Protocols
+          schema:
+            type: string
+      summary: WebSocket 连接
+      tags:
+      - WebSocket
+  /ws/send:
+    post:
+      consumes:
+      - application/json
+      description: 向指定用户发送消息
+      parameters:
+      - description: 消息内容
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/websocket.Message'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 发送消息给用户
+      tags:
+      - WebSocket
+  /ws/status:
+    get:
+      description: 获取在线人数等状态信息
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: WebSocket 状态
+      tags:
+      - WebSocket
+securityDefinitions:
+  Bearer:
+    description: 输入 Bearer {token}
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

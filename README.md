@@ -3,11 +3,11 @@
 [![Go Version](https://img.shields.io/badge/Go-1.19+-00ADD8?style=flat&logo=go)](https://go.dev/)
 [![Gin](https://img.shields.io/badge/Gin-1.10.0-00ADD8?style=flat)](https://gin-gonic.com/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/Version-1.5.0-brightgreen.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/Version-1.6.0-brightgreen.svg)](CHANGELOG.md)
 
 一个基于 Gin 框架的企业级 Go 语言后端 API 脚手架，采用标准的 MVC 架构模式，为 PHP 开发者提供友好的 Go 语言开发体验。
 
-📋 **[查看更新日志 (CHANGELOG)](CHANGELOG.md)** | 🚀 **当前版本: v1.5.0**
+📋 **[查看更新日志 (CHANGELOG)](CHANGELOG.md)** | 🚀 **当前版本: v1.6.0**
 
 ---
 
@@ -20,6 +20,9 @@
 | [API 接口开发指南](docs/API_DEVELOPMENT.md) | 从零开始开发一个完整的 API 接口 | 开发新功能、新接口 |
 | [中间件使用指南](docs/MIDDLEWARE_GUIDE.md) | 内置中间件使用与自定义中间件开发 | 认证、限流、日志、权限控制 |
 | [RabbitMQ 消息队列指南](docs/RABBITMQ_GUIDE.md) | 消息队列的生产者和消费者开发 | 异步任务、解耦服务 |
+| [Swagger API 文档指南](docs/SWAGGER_GUIDE.md) | Swagger 文档生成与使用 | API 文档自动生成、在线调试 |
+| [定时任务指南](docs/CRON_GUIDE.md) | 定时任务开发与管理 | 计划任务、定期清理 |
+| [WebSocket 指南](docs/WEBSOCKET_GUIDE.md) | WebSocket 实时通信开发 | 实时推送、在线聊天 |
 
 ---
 
@@ -84,16 +87,30 @@
 | **密码加密** | bcrypt | - | 密码哈希算法 |
 | **参数验证** | validator | v10.23.0 | 结构体验证 |
 | **依赖注入** | Wire | v0.6.0 | Google 编译时依赖注入 |
+| **API 文档** | Swagger | v1.16.6 | Swaggo 自动生成 API 文档 |
+| **定时任务** | Cron | v3.0.1 | robfig/cron 定时任务调度 |
+| **WebSocket** | Melody | v1.4.0 | 基于 gorilla/websocket 的高层封装 |
 
 ## 📁 项目结构
 
 ```
 gin-web/
+├── cmd/                          # 独立启动脚本
+│   ├── consumer/                 # RabbitMQ 消费者
+│   │   └── main.go
+│   ├── cron/                     # 定时任务服务
+│   │   └── main.go
+│   └── websocket/                # WebSocket 服务
+│       └── main.go
 ├── app/                          # 应用核心代码
 │   ├── controllers/              # 控制器层
 │   │   ├── controller.go        # 控制器接口定义
 │   │   ├── auth_controller.go   # 认证控制器
+│   │   ├── websocket_controller.go # WebSocket 控制器
 │   │   └── mod.go               # Mod 控制器
+│   ├── cron/                    # 定时任务
+│   │   ├── cleanup_job.go       # 清理任务
+│   │   └── health_check_job.go  # 健康检查任务
 │   ├── services/                # 服务层
 │   │   ├── user.go              # 用户服务
 │   │   ├── jwt.go               # JWT 服务
@@ -121,8 +138,12 @@ gin-web/
 │       ├── repository.go        # 仓储接口定义
 │       └── user_repository.go   # 用户仓储实现
 ├── pkg/                         # 可复用的公共包
-│   └── errors/                  # 统一错误处理
-│       └── errors.go            # 业务错误定义
+│   ├── errors/                  # 统一错误处理
+│   │   └── errors.go            # 业务错误定义
+│   ├── cron/                    # 定时任务管理器
+│   │   └── manager.go           # Cron Manager
+│   └── websocket/               # WebSocket 管理器
+│       └── manager.go           # WebSocket Manager (基于 Melody)
 ├── bootstrap/                   # 引导程序
 │   ├── config.go                # 配置初始化
 │   ├── db.go                    # 数据库初始化
@@ -138,7 +159,10 @@ gin-web/
 │   ├── log.go                   # 日志配置
 │   ├── jwt.go                   # JWT 配置
 │   ├── redis.go                 # Redis 配置
-│   └── queue.go                 # 队列配置
+│   ├── queue.go                 # 队列配置
+│   ├── rabbitmq.go              # RabbitMQ 配置
+│   ├── cron.go                  # 定时任务配置
+│   └── websocket.go             # WebSocket 配置
 ├── routes/                      # 路由定义
 │   └── api.go                   # API 路由
 ├── storage/                     # 存储目录
@@ -153,7 +177,13 @@ gin-web/
 ├── docs/                        # 文档目录
 │   ├── API_DEVELOPMENT.md       # API 开发指南
 │   ├── MIDDLEWARE_GUIDE.md      # 中间件指南
-│   └── RABBITMQ_GUIDE.md        # RabbitMQ 指南
+│   ├── RABBITMQ_GUIDE.md        # RabbitMQ 指南
+│   ├── SWAGGER_GUIDE.md         # Swagger API 文档指南
+│   ├── CRON_GUIDE.md            # 定时任务指南
+│   ├── WEBSOCKET_GUIDE.md       # WebSocket 指南
+│   ├── docs.go                  # Swagger 生成的文档
+│   ├── swagger.json             # Swagger JSON
+│   └── swagger.yaml             # Swagger YAML
 ├── config.yaml                  # 配置文件
 ├── example-config.yaml          # 配置文件模板
 ├── main.go                      # 程序入口
@@ -208,7 +238,13 @@ gin-web/
    go run main.go
    ```
 
-6. **验证服务**
+6. **访问 API 文档**
+   ```bash
+   # 浏览器打开 Swagger UI
+   http://localhost:8889/swagger/index.html
+   ```
+
+7. **验证服务**
    ```bash
    # 健康检查
    curl http://localhost:8080/api/ping
@@ -233,6 +269,34 @@ docker run -d \
   -v $(pwd)/storage:/app/storage \
   gin-web-api
 ```
+
+### 独立服务部署
+
+框架支持将 RabbitMQ 消费者、定时任务、WebSocket 作为独立服务部署：
+
+```bash
+# 独立启动 RabbitMQ 消费者
+go run cmd/consumer/main.go
+
+# 独立启动定时任务服务
+go run cmd/cron/main.go
+
+# 独立启动 WebSocket 服务
+go run cmd/websocket/main.go
+```
+
+**启动模式配置**:
+
+| 服务 | 配置项 | 框架集成启动 | 独立脚本启动 |
+|------|--------|-------------|-------------|
+| HTTP API | - | `go run main.go` | - |
+| RabbitMQ 消费者 | `rabbitmq.enable` | main.go 自动启动 | `cmd/consumer/main.go` |
+| 定时任务 | `cron.enable` | main.go 自动启动 | `cmd/cron/main.go` |
+| WebSocket | `websocket.enable` | main.go 自动启动 | `cmd/websocket/main.go` |
+
+**推荐部署方式**:
+- **开发环境**: 所有 `enable: true`，一个命令启动全部服务
+- **生产环境**: 所有 `enable: false`，各服务独立启动便于扩展
 
 ## 📖 开发指南
 
@@ -445,6 +509,22 @@ redis:
   host: 127.0.0.1            # Redis 地址
   port: 6379                 # Redis 端口
   db: 0                      # 数据库编号
+
+rabbitmq:
+  enable: false              # 框架启动时是否启用消费者
+  host: localhost
+  port: 5672
+  username: guest
+  password: guest
+  vhost: /
+
+cron:
+  enable: false              # 框架启动时是否启用定时任务
+
+websocket:
+  enable: false              # 框架启动时是否启用 WebSocket
+  port: "8081"               # 独立启动时的端口
+  max_connections: 10000
 ```
 
 ## 🔧 功能特性
@@ -458,17 +538,20 @@ redis:
 | **JWT 用户认证** | 完整的认证体系，支持令牌刷新和黑名单 |
 | **MySQL + GORM** | ORM 操作，自动迁移 |
 | **Redis 缓存** | 缓存和会话存储 |
-| **RabbitMQ 消息队列** | 生产者-消费者模式 |
+| **RabbitMQ 消息队列** | 生产者-消费者模式，支持独立部署 |
 | **Zap 日志系统** | 高性能结构化日志 |
 | **参数验证** | 基于 validator 的请求验证 |
 | **统一响应格式** | 标准化 API 响应 |
 | **中间件系统** | JWT、CORS、异常恢复等 |
 | **优雅关闭** | 支持 Graceful Shutdown |
 | **Docker 支持** | 容器化部署 |
+| **Swagger API 文档** | 自动生成 API 文档，支持在线调试 |
+| **定时任务 (Cron)** | 基于 robfig/cron 的定时任务管理，支持独立部署 |
+| **WebSocket 实时通信** | 基于 Melody 的 WebSocket 管理，支持独立部署 |
+| **微服务独立部署** | Consumer/Cron/WebSocket 支持独立脚本启动 |
 
 ### 规划中功能
 
-- API 文档自动生成 (Swagger)
 - 限流中间件
 - 监控指标收集 (Prometheus)
 - 链路追踪 (OpenTelemetry)
@@ -492,6 +575,9 @@ redis:
 - [Wire](https://github.com/google/wire) - 依赖注入
 - [Viper](https://github.com/spf13/viper) - 配置管理
 - [Zap](https://github.com/uber-go/zap) - 日志库
+- [Swaggo](https://github.com/swaggo/swag) - Swagger 文档生成
+- [robfig/cron](https://github.com/robfig/cron) - 定时任务调度
+- [Melody](https://github.com/olahol/melody) - WebSocket 框架
 - [Hyperf](https://hyperf.io/) - 设计灵感来源
 
 ## 📞 联系方式

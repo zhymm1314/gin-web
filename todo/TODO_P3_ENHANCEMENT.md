@@ -1,749 +1,26 @@
-# 🟢 P3 - 功能增强 (Enhancement)
+# P3 - 核心功能增强 (Core Enhancement)
 
-> 优先级：优化
-> 预计工时：3-5 天
-> 影响范围：功能完善 & 开发体验
+> 优先级：高
+> 预计工时：3-4 天
+> 影响范围：开发体验 & 核心功能
 
 ---
 
 ## 概述
 
-这些优化将进一步完善项目功能，提升开发体验和生产可用性。
+P3 阶段专注于三个核心功能的实现：API 文档自动生成、定时任务封装、WebSocket 封装。这些功能对于生产环境的 Web 应用至关重要。
 
 ---
 
 ## TODO 列表
 
-### 1. ✅ Docker 多阶段构建
+### 1. Swagger API 文档 (最高优先级)
 
 - [ ] **任务完成**
 
-**背景**:
-当前 Dockerfile 使用完整的 golang 镜像，构建出的镜像约 800MB，生产环境部署效率低。
+**目标**: 启动项目后直接通过 URL 访问 API 文档
 
-**当前 Dockerfile**:
-```dockerfile
-FROM golang:1.22.3-bookworm  # ~800MB
-WORKDIR /app
-COPY go.mod go.sum ./
-RUN go mod download
-COPY . .
-RUN go build -o main main.go
-EXPOSE 8080
-CMD ["./main"]
-```
-
-**优化后 Dockerfile**:
-
-```dockerfile
-# ==================== 构建阶段 ====================
-FROM golang:1.22-alpine AS builder
-
-# 设置必要的环境变量
-ENV GO111MODULE=on \
-    CGO_ENABLED=0 \
-    GOOS=linux \
-    GOARCH=amd64
-
-# 设置工作目录
-WORKDIR /build
-
-# 复制依赖文件并下载依赖
-COPY go.mod go.sum ./
-RUN go mod download
-
-# 复制源代码
-COPY . .
-
-# 编译应用（使用 ldflags 减小二进制大小）
-RUN go build -ldflags="-s -w" -o main .
-
-# ==================== 运行阶段 ====================
-FROM alpine:3.19
-
-# 安装必要的运行时依赖
-RUN apk --no-cache add ca-certificates tzdata
-
-# 设置时区
-ENV TZ=Asia/Shanghai
-
-# 创建非 root 用户
-RUN adduser -D -g '' appuser
-
-# 设置工作目录
-WORKDIR /app
-
-# 从构建阶段复制二进制文件
-COPY --from=builder /build/main .
-
-# 复制配置文件目录
-COPY --from=builder /build/config ./config
-
-# 创建日志目录
-RUN mkdir -p storage/logs && chown -R appuser:appuser /app
-
-# 切换到非 root 用户
-USER appuser
-
-# 暴露端口
-EXPOSE 8080
-
-# 健康检查
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:8080/api/ping || exit 1
-
-# 启动应用
-CMD ["./main"]
-```
-
-**新增 .dockerignore**:
-
-```
-# .dockerignore
-.git
-.gitignore
-.idea
-.vscode
-*.md
-!README.md
-Dockerfile
-docker-compose*.yml
-.env*
-*.log
-storage/logs/*
-todo/
-docs/
-*.test
-*_test.go
-```
-
-**新增 docker-compose.yml**:
-
-```yaml
-# docker-compose.yml
-version: '3.8'
-
-services:
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: gin-web
-    ports:
-      - "8080:8080"
-    volumes:
-      - ./config/config.yaml:/app/config/config.yaml:ro
-      - ./storage/logs:/app/storage/logs
-    environment:
-      - GIN_MODE=release
-    depends_on:
-      - mysql
-      - redis
-      - rabbitmq
-    networks:
-      - gin-web-network
-    restart: unless-stopped
-
-  mysql:
-    image: mysql:8.0
-    container_name: gin-web-mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: root123456
-      MYSQL_DATABASE: gin-web
-    ports:
-      - "3306:3306"
-    volumes:
-      - mysql-data:/var/lib/mysql
-    networks:
-      - gin-web-network
-    restart: unless-stopped
-
-  redis:
-    image: redis:7-alpine
-    container_name: gin-web-redis
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis-data:/data
-    networks:
-      - gin-web-network
-    restart: unless-stopped
-
-  rabbitmq:
-    image: rabbitmq:3-management-alpine
-    container_name: gin-web-rabbitmq
-    environment:
-      RABBITMQ_DEFAULT_USER: admin
-      RABBITMQ_DEFAULT_PASS: admin123
-      RABBITMQ_DEFAULT_VHOST: /gin-web
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    volumes:
-      - rabbitmq-data:/var/lib/rabbitmq
-    networks:
-      - gin-web-network
-    restart: unless-stopped
-
-volumes:
-  mysql-data:
-  redis-data:
-  rabbitmq-data:
-
-networks:
-  gin-web-network:
-    driver: bridge
-```
-
-**效果对比**:
-| 项目 | 优化前 | 优化后 |
-|------|--------|--------|
-| 镜像大小 | ~800MB | ~20MB |
-| 构建时间 | 约2分钟 | 约1分钟 |
-| 安全性 | root 用户 | 非 root 用户 |
-| 健康检查 | 无 | 有 |
-
----
-
-### 2. ✅ 添加更多中间件
-
-- [ ] **任务完成**
-
-**待添加的中间件**:
-
-#### 2.1 请求日志中间件
-
-**新建文件**: `app/middleware/logger.go`
-```go
-package middleware
-
-import (
-    "gin-web/global"
-    "github.com/gin-gonic/gin"
-    "go.uber.org/zap"
-    "time"
-)
-
-// RequestLogger 请求日志中间件
-func RequestLogger() gin.HandlerFunc {
-    return func(c *gin.Context) {
-        // 开始时间
-        start := time.Now()
-        path := c.Request.URL.Path
-        query := c.Request.URL.RawQuery
-        
-        // 处理请求
-        c.Next()
-        
-        // 计算耗时
-        latency := time.Since(start)
-        
-        // 记录日志
-        global.App.Log.Info("HTTP Request",
-            zap.Int("status", c.Writer.Status()),
-            zap.String("method", c.Request.Method),
-            zap.String("path", path),
-            zap.String("query", query),
-            zap.String("ip", c.ClientIP()),
-            zap.String("user-agent", c.Request.UserAgent()),
-            zap.Duration("latency", latency),
-            zap.Int("body_size", c.Writer.Size()),
-        )
-    }
-}
-```
-
-#### 2.2 限流中间件
-
-**新建文件**: `app/middleware/ratelimit.go`
-```go
-package middleware
-
-import (
-    "gin-web/app/common/response"
-    "github.com/gin-gonic/gin"
-    "golang.org/x/time/rate"
-    "sync"
-)
-
-// IPRateLimiter IP 限流器
-type IPRateLimiter struct {
-    ips    map[string]*rate.Limiter
-    mu     *sync.RWMutex
-    rate   rate.Limit
-    burst  int
-}
-
-// NewIPRateLimiter 创建 IP 限流器
-func NewIPRateLimiter(r rate.Limit, burst int) *IPRateLimiter {
-    return &IPRateLimiter{
-        ips:   make(map[string]*rate.Limiter),
-        mu:    &sync.RWMutex{},
-        rate:  r,
-        burst: burst,
-    }
-}
-
-// GetLimiter 获取限流器
-func (i *IPRateLimiter) GetLimiter(ip string) *rate.Limiter {
-    i.mu.Lock()
-    defer i.mu.Unlock()
-    
-    limiter, exists := i.ips[ip]
-    if !exists {
-        limiter = rate.NewLimiter(i.rate, i.burst)
-        i.ips[ip] = limiter
-    }
-    
-    return limiter
-}
-
-// RateLimiter 创建限流中间件
-// r: 每秒允许的请求数
-// burst: 突发请求数
-func RateLimiter(r rate.Limit, burst int) gin.HandlerFunc {
-    limiter := NewIPRateLimiter(r, burst)
-    
-    return func(c *gin.Context) {
-        ip := c.ClientIP()
-        if !limiter.GetLimiter(ip).Allow() {
-            response.Fail(c, 429, "请求过于频繁，请稍后再试")
-            c.Abort()
-            return
-        }
-        c.Next()
-    }
-}
-```
-
-#### 2.3 超时中间件
-
-**新建文件**: `app/middleware/timeout.go`
-```go
-package middleware
-
-import (
-    "context"
-    "gin-web/app/common/response"
-    "github.com/gin-gonic/gin"
-    "net/http"
-    "time"
-)
-
-// Timeout 超时中间件
-func Timeout(timeout time.Duration) gin.HandlerFunc {
-    return func(c *gin.Context) {
-        ctx, cancel := context.WithTimeout(c.Request.Context(), timeout)
-        defer cancel()
-        
-        c.Request = c.Request.WithContext(ctx)
-        
-        finished := make(chan struct{}, 1)
-        panicChan := make(chan interface{}, 1)
-        
-        go func() {
-            defer func() {
-                if p := recover(); p != nil {
-                    panicChan <- p
-                }
-            }()
-            c.Next()
-            finished <- struct{}{}
-        }()
-        
-        select {
-        case <-panicChan:
-            response.ServerError(c, "Internal Server Error")
-        case <-finished:
-            // 正常完成
-        case <-ctx.Done():
-            c.Writer.WriteHeader(http.StatusGatewayTimeout)
-            response.Fail(c, http.StatusGatewayTimeout, "请求超时")
-            c.Abort()
-        }
-    }
-}
-```
-
-#### 2.4 链路追踪中间件
-
-**新建文件**: `app/middleware/trace.go`
-```go
-package middleware
-
-import (
-    "github.com/gin-gonic/gin"
-    "github.com/google/uuid"
-)
-
-const (
-    TraceIDHeader = "X-Trace-ID"
-    TraceIDKey    = "trace_id"
-)
-
-// Trace 链路追踪中间件
-func Trace() gin.HandlerFunc {
-    return func(c *gin.Context) {
-        // 优先从请求头获取 trace_id
-        traceID := c.GetHeader(TraceIDHeader)
-        if traceID == "" {
-            traceID = uuid.New().String()
-        }
-        
-        // 设置到上下文
-        c.Set(TraceIDKey, traceID)
-        
-        // 设置响应头
-        c.Header(TraceIDHeader, traceID)
-        
-        c.Next()
-    }
-}
-
-// GetTraceID 获取 trace_id
-func GetTraceID(c *gin.Context) string {
-    if traceID, exists := c.Get(TraceIDKey); exists {
-        return traceID.(string)
-    }
-    return ""
-}
-```
-
-#### 2.5 更新路由使用中间件
-
-```go
-// bootstrap/router.go
-func setupRouter() *gin.Engine {
-    // ...
-    router := gin.New()
-    
-    // 全局中间件
-    router.Use(
-        middleware.Trace(),                    // 链路追踪
-        middleware.RequestLogger(),            // 请求日志
-        middleware.CustomRecovery(),           // 异常恢复
-        middleware.Cors(),                     // 跨域
-        middleware.RateLimiter(100, 200),      // 限流：每秒100请求，突发200
-    )
-    
-    // 注册路由
-    apiGroup := router.Group("/api")
-    apiGroup.Use(middleware.Timeout(30 * time.Second))  // API 超时控制
-    routes.SetApiGroupRoutes(apiGroup)
-    
-    return router
-}
-```
-
----
-
-### 3. ✅ 实现 WebSocket 封装
-
-- [ ] **任务完成**
-
-**背景**:
-README 中提到 WebSocket 客户端封装是待完成功能。
-
-#### 3.1 安装依赖
-
-```bash
-go get github.com/gorilla/websocket
-```
-
-#### 3.2 实现 WebSocket Hub
-
-**新建文件**: `pkg/websocket/hub.go`
-```go
-package websocket
-
-import (
-    "sync"
-)
-
-// Hub 维护活跃客户端集合
-type Hub struct {
-    // 注册的客户端
-    clients map[*Client]bool
-    
-    // 按用户ID索引的客户端
-    userClients map[string]map[*Client]bool
-    
-    // 广播消息通道
-    broadcast chan *Message
-    
-    // 注册请求通道
-    register chan *Client
-    
-    // 注销请求通道
-    unregister chan *Client
-    
-    mu sync.RWMutex
-}
-
-// Message WebSocket 消息
-type Message struct {
-    Type    string      `json:"type"`
-    To      string      `json:"to,omitempty"`      // 目标用户ID，空表示广播
-    From    string      `json:"from,omitempty"`
-    Content interface{} `json:"content"`
-}
-
-// NewHub 创建 Hub
-func NewHub() *Hub {
-    return &Hub{
-        clients:     make(map[*Client]bool),
-        userClients: make(map[string]map[*Client]bool),
-        broadcast:   make(chan *Message, 256),
-        register:    make(chan *Client),
-        unregister:  make(chan *Client),
-    }
-}
-
-// Run 启动 Hub
-func (h *Hub) Run() {
-    for {
-        select {
-        case client := <-h.register:
-            h.mu.Lock()
-            h.clients[client] = true
-            if client.UserID != "" {
-                if h.userClients[client.UserID] == nil {
-                    h.userClients[client.UserID] = make(map[*Client]bool)
-                }
-                h.userClients[client.UserID][client] = true
-            }
-            h.mu.Unlock()
-            
-        case client := <-h.unregister:
-            h.mu.Lock()
-            if _, ok := h.clients[client]; ok {
-                delete(h.clients, client)
-                if client.UserID != "" {
-                    delete(h.userClients[client.UserID], client)
-                }
-                close(client.send)
-            }
-            h.mu.Unlock()
-            
-        case message := <-h.broadcast:
-            h.mu.RLock()
-            if message.To != "" {
-                // 发送给指定用户
-                if clients, ok := h.userClients[message.To]; ok {
-                    for client := range clients {
-                        select {
-                        case client.send <- message:
-                        default:
-                            close(client.send)
-                            delete(h.clients, client)
-                        }
-                    }
-                }
-            } else {
-                // 广播给所有客户端
-                for client := range h.clients {
-                    select {
-                    case client.send <- message:
-                    default:
-                        close(client.send)
-                        delete(h.clients, client)
-                    }
-                }
-            }
-            h.mu.RUnlock()
-        }
-    }
-}
-
-// SendToUser 发送消息给指定用户
-func (h *Hub) SendToUser(userID string, message *Message) {
-    message.To = userID
-    h.broadcast <- message
-}
-
-// Broadcast 广播消息
-func (h *Hub) Broadcast(message *Message) {
-    h.broadcast <- message
-}
-
-// OnlineCount 获取在线人数
-func (h *Hub) OnlineCount() int {
-    h.mu.RLock()
-    defer h.mu.RUnlock()
-    return len(h.clients)
-}
-```
-
-#### 3.3 实现 Client
-
-**新建文件**: `pkg/websocket/client.go`
-```go
-package websocket
-
-import (
-    "encoding/json"
-    "github.com/gorilla/websocket"
-    "log"
-    "time"
-)
-
-const (
-    writeWait      = 10 * time.Second
-    pongWait       = 60 * time.Second
-    pingPeriod     = (pongWait * 9) / 10
-    maxMessageSize = 512 * 1024  // 512KB
-)
-
-// Client WebSocket 客户端
-type Client struct {
-    Hub    *Hub
-    Conn   *websocket.Conn
-    UserID string
-    send   chan *Message
-}
-
-// NewClient 创建客户端
-func NewClient(hub *Hub, conn *websocket.Conn, userID string) *Client {
-    return &Client{
-        Hub:    hub,
-        Conn:   conn,
-        UserID: userID,
-        send:   make(chan *Message, 256),
-    }
-}
-
-// ReadPump 读取消息
-func (c *Client) ReadPump() {
-    defer func() {
-        c.Hub.unregister <- c
-        c.Conn.Close()
-    }()
-    
-    c.Conn.SetReadLimit(maxMessageSize)
-    c.Conn.SetReadDeadline(time.Now().Add(pongWait))
-    c.Conn.SetPongHandler(func(string) error {
-        c.Conn.SetReadDeadline(time.Now().Add(pongWait))
-        return nil
-    })
-    
-    for {
-        _, message, err := c.Conn.ReadMessage()
-        if err != nil {
-            if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-                log.Printf("websocket error: %v", err)
-            }
-            break
-        }
-        
-        var msg Message
-        if err := json.Unmarshal(message, &msg); err != nil {
-            log.Printf("message unmarshal error: %v", err)
-            continue
-        }
-        msg.From = c.UserID
-        c.Hub.broadcast <- &msg
-    }
-}
-
-// WritePump 写入消息
-func (c *Client) WritePump() {
-    ticker := time.NewTicker(pingPeriod)
-    defer func() {
-        ticker.Stop()
-        c.Conn.Close()
-    }()
-    
-    for {
-        select {
-        case message, ok := <-c.send:
-            c.Conn.SetWriteDeadline(time.Now().Add(writeWait))
-            if !ok {
-                c.Conn.WriteMessage(websocket.CloseMessage, []byte{})
-                return
-            }
-            
-            data, err := json.Marshal(message)
-            if err != nil {
-                log.Printf("message marshal error: %v", err)
-                continue
-            }
-            
-            if err := c.Conn.WriteMessage(websocket.TextMessage, data); err != nil {
-                return
-            }
-            
-        case <-ticker.C:
-            c.Conn.SetWriteDeadline(time.Now().Add(writeWait))
-            if err := c.Conn.WriteMessage(websocket.PingMessage, nil); err != nil {
-                return
-            }
-        }
-    }
-}
-```
-
-#### 3.4 WebSocket 控制器
-
-**新建文件**: `app/controllers/websocket.go`
-```go
-package controllers
-
-import (
-    "gin-web/pkg/websocket"
-    "github.com/gin-gonic/gin"
-    ws "github.com/gorilla/websocket"
-    "net/http"
-)
-
-var upgrader = ws.Upgrader{
-    ReadBufferSize:  1024,
-    WriteBufferSize: 1024,
-    CheckOrigin: func(r *http.Request) bool {
-        return true  // 生产环境需要严格检查
-    },
-}
-
-type WebSocketController struct {
-    hub *websocket.Hub
-}
-
-func NewWebSocketController(hub *websocket.Hub) *WebSocketController {
-    return &WebSocketController{hub: hub}
-}
-
-func (c *WebSocketController) Prefix() string {
-    return "/ws"
-}
-
-func (c *WebSocketController) Routes() []Route {
-    return []Route{
-        {Method: "GET", Path: "/connect", Handler: c.Connect},
-    }
-}
-
-func (c *WebSocketController) Connect(ctx *gin.Context) {
-    userID := ctx.GetString("id")  // 从 JWT 中间件获取
-    
-    conn, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
-    if err != nil {
-        return
-    }
-    
-    client := websocket.NewClient(c.hub, conn, userID)
-    c.hub.register <- client
-    
-    go client.WritePump()
-    go client.ReadPump()
-}
-```
-
----
-
-### 4. ✅ 添加 Swagger 文档
-
-- [ ] **任务完成**
-
-#### 4.1 安装 swag
+#### 1.1 安装依赖
 
 ```bash
 go install github.com/swaggo/swag/cmd/swag@latest
@@ -751,23 +28,21 @@ go get github.com/swaggo/gin-swagger
 go get github.com/swaggo/files
 ```
 
-#### 4.2 添加注释
+#### 1.2 main.go 添加 Swagger 注释
 
-**更新 main.go**:
 ```go
 // @title           Gin-Web API
-// @version         1.0
+// @version         1.5.0
 // @description     Gin-Web 脚手架 API 文档
 // @termsOfService  http://swagger.io/terms/
 
 // @contact.name   API Support
-// @contact.url    http://www.swagger.io/support
-// @contact.email  support@swagger.io
+// @contact.email  support@example.com
 
-// @license.name  Apache 2.0
-// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
+// @license.name  MIT
+// @license.url   https://opensource.org/licenses/MIT
 
-// @host      localhost:8889
+// @host      localhost:8080
 // @BasePath  /api
 
 // @securityDefinitions.apikey Bearer
@@ -780,7 +55,8 @@ func main() {
 }
 ```
 
-**添加 API 注释示例**:
+#### 1.3 控制器方法添加注释
+
 ```go
 // Register 用户注册
 // @Summary      用户注册
@@ -792,18 +68,14 @@ func main() {
 // @Success      200 {object} response.Response{data=models.User}
 // @Failure      400 {object} response.Response
 // @Router       /auth/register [post]
-func (c *UserController) Register(ctx *gin.Context) {
+func (c *AuthController) Register(ctx *gin.Context) {
     // ...
 }
 ```
 
-#### 4.3 生成文档
+#### 1.4 注册 Swagger 路由
 
-```bash
-swag init
-```
-
-#### 4.4 注册 Swagger 路由
+**文件**: `bootstrap/router.go`
 
 ```go
 import (
@@ -812,292 +84,1104 @@ import (
     ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-func setupRouter() *gin.Engine {
-    router := gin.New()
+func SetupRouter(ctrls ...controllers.Controller) *gin.Engine {
     // ...
-    
-    // Swagger 文档（仅非生产环境）
+
+    // Swagger 文档 (非生产环境)
     if global.App.Config.App.Env != "production" {
         router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
     }
-    
+
     return router
 }
 ```
 
----
-
-### 5. ✅ 添加单元测试框架
-
-- [ ] **任务完成**
-
-#### 5.1 测试目录结构
-
-```
-gin-web/
-├── tests/
-│   ├── setup_test.go       # 测试初始化
-│   ├── user_test.go        # 用户测试
-│   └── mocks/
-│       └── user_repository_mock.go
-```
-
-#### 5.2 测试初始化
-
-**新建文件**: `tests/setup_test.go`
-```go
-package tests
-
-import (
-    "gin-web/bootstrap"
-    "gin-web/global"
-    "os"
-    "testing"
-)
-
-func TestMain(m *testing.M) {
-    // 设置测试环境
-    os.Setenv("GIN_MODE", "test")
-    
-    // 初始化配置
-    bootstrap.InitializeConfig()
-    global.App.Log = bootstrap.InitializeLog()
-    
-    // 运行测试
-    code := m.Run()
-    
-    os.Exit(code)
-}
-```
-
-#### 5.3 Mock 工具
+#### 1.5 生成并访问文档
 
 ```bash
-go install github.com/golang/mock/mockgen@latest
+# 生成文档
+swag init
 
-# 生成 mock
-mockgen -source=internal/repository/repository.go -destination=tests/mocks/user_repository_mock.go -package=mocks
+# 启动服务后访问
+# http://localhost:8080/swagger/index.html
 ```
 
-#### 5.4 Service 测试示例
+#### 1.6 Makefile 命令
 
-**新建文件**: `tests/user_test.go`
-```go
-package tests
-
-import (
-    "gin-web/app/common/request"
-    "gin-web/app/models"
-    "gin-web/app/services"
-    "gin-web/tests/mocks"
-    "github.com/golang/mock/gomock"
-    "github.com/stretchr/testify/assert"
-    "go.uber.org/zap"
-    "testing"
-)
-
-func TestUserService_Register(t *testing.T) {
-    ctrl := gomock.NewController(t)
-    defer ctrl.Finish()
-    
-    mockRepo := mocks.NewMockUserRepository(ctrl)
-    logger := zap.NewNop()
-    userService := services.NewUserService(mockRepo, logger)
-    
-    t.Run("注册成功", func(t *testing.T) {
-        params := request.Register{
-            Name:     "test",
-            Mobile:   "13800138000",
-            Password: "123456",
-        }
-        
-        mockRepo.EXPECT().
-            FindByMobile(params.Mobile).
-            Return(nil, nil)
-        
-        mockRepo.EXPECT().
-            Create(gomock.Any()).
-            Return(nil)
-        
-        user, err := userService.Register(params)
-        
-        assert.NoError(t, err)
-        assert.NotNil(t, user)
-        assert.Equal(t, params.Name, user.Name)
-    })
-    
-    t.Run("手机号已存在", func(t *testing.T) {
-        params := request.Register{
-            Mobile: "13800138000",
-        }
-        
-        mockRepo.EXPECT().
-            FindByMobile(params.Mobile).
-            Return(&models.User{}, nil)
-        
-        _, err := userService.Register(params)
-        
-        assert.Error(t, err)
-        assert.Contains(t, err.Error(), "已存在")
-    })
-}
-```
-
----
-
-### 6. ✅ Makefile 构建脚本
-
-- [ ] **任务完成**
-
-**新建文件**: `Makefile`
 ```makefile
-.PHONY: build run test clean docker swagger lint help
-
-# 变量定义
-APP_NAME := gin-web
-BUILD_DIR := ./build
-GO := go
-GOFLAGS := -ldflags="-s -w"
-
-# 默认目标
-all: lint test build
-
-# 帮助信息
-help:
-	@echo "Usage:"
-	@echo "  make build     - 编译应用"
-	@echo "  make run       - 运行应用"
-	@echo "  make test      - 运行测试"
-	@echo "  make lint      - 代码检查"
-	@echo "  make swagger   - 生成 Swagger 文档"
-	@echo "  make docker    - 构建 Docker 镜像"
-	@echo "  make clean     - 清理构建产物"
-
-# 编译
-build:
-	@echo "Building..."
-	@mkdir -p $(BUILD_DIR)
-	$(GO) build $(GOFLAGS) -o $(BUILD_DIR)/$(APP_NAME) .
-	@echo "Build complete: $(BUILD_DIR)/$(APP_NAME)"
-
-# 运行
-run:
-	$(GO) run main.go
-
-# 热重载运行 (需要安装 air: go install github.com/cosmtrek/air@latest)
-dev:
-	air
-
-# 测试
-test:
-	$(GO) test -v -cover ./...
-
-# 测试覆盖率
-test-coverage:
-	$(GO) test -coverprofile=coverage.out ./...
-	$(GO) tool cover -html=coverage.out -o coverage.html
-	@echo "Coverage report: coverage.html"
-
-# 代码检查
-lint:
-	golangci-lint run ./...
-
-# 格式化
-fmt:
-	gofmt -s -w .
-	goimports -w .
-
-# 生成 Swagger 文档
 swagger:
 	swag init
 	@echo "Swagger docs generated"
+	@echo "Visit: http://localhost:8080/swagger/index.html"
+```
 
-# 生成 Wire 依赖注入代码
-wire:
-	cd internal/container && wire
-	@echo "Wire generated"
+**预期效果**:
+- 启动项目后访问 `http://localhost:8080/swagger/index.html`
+- 自动展示所有 API 接口文档
+- 支持在线调试 API
 
-# 构建 Docker 镜像
-docker:
-	docker build -t $(APP_NAME):latest .
+---
 
-# Docker Compose 启动
-docker-up:
-	docker-compose up -d
+### 2. 定时任务封装 (Cron Job)
 
-# Docker Compose 停止
-docker-down:
-	docker-compose down
+- [ ] **任务完成**
 
-# 清理
-clean:
-	@rm -rf $(BUILD_DIR)
-	@rm -f coverage.out coverage.html
-	@echo "Cleaned"
+**目标**: 提供简单易用的定时任务封装，支持独立启动和框架集成启动两种模式
 
-# 数据库迁移
-migrate:
-	$(GO) run main.go migrate
+#### 2.1 技术选型
 
-# 安装开发工具
-tools:
-	go install github.com/cosmtrek/air@latest
-	go install github.com/swaggo/swag/cmd/swag@latest
-	go install github.com/google/wire/cmd/wire@latest
-	go install github.com/golang/mock/mockgen@latest
-	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
-	@echo "Tools installed"
+推荐使用 [robfig/cron](https://github.com/robfig/cron) v3，这是 Go 生态中最成熟的定时任务库。
+
+```bash
+go get github.com/robfig/cron/v3
+```
+
+**选型理由**:
+- Star 数 12k+，社区活跃
+- 支持标准 cron 表达式
+- 支持秒级调度
+- 支持时区设置
+- 轻量无依赖
+
+#### 2.2 定时任务管理器
+
+**新建文件**: `pkg/cron/manager.go`
+
+```go
+package cron
+
+import (
+    "gin-web/global"
+    "github.com/robfig/cron/v3"
+    "go.uber.org/zap"
+    "sync"
+)
+
+type JobHandler interface {
+    Name() string
+    Spec() string  // cron 表达式
+    Run()
+}
+
+type Manager struct {
+    cron     *cron.Cron
+    jobs     map[string]cron.EntryID
+    handlers []JobHandler
+    mu       sync.RWMutex
+    log      *zap.Logger
+}
+
+func NewManager(log *zap.Logger) *Manager {
+    return &Manager{
+        cron: cron.New(cron.WithSeconds()),  // 支持秒级
+        jobs: make(map[string]cron.EntryID),
+        log:  log,
+    }
+}
+
+func (m *Manager) Register(handler JobHandler) {
+    m.handlers = append(m.handlers, handler)
+}
+
+func (m *Manager) Start() error {
+    for _, handler := range m.handlers {
+        entryID, err := m.cron.AddFunc(handler.Spec(), func() {
+            defer func() {
+                if r := recover(); r != nil {
+                    m.log.Error("cron job panic", zap.Any("error", r))
+                }
+            }()
+            handler.Run()
+        })
+        if err != nil {
+            m.log.Error("add cron job failed",
+                zap.String("name", handler.Name()),
+                zap.Error(err))
+            continue
+        }
+        m.mu.Lock()
+        m.jobs[handler.Name()] = entryID
+        m.mu.Unlock()
+        m.log.Info("cron job registered",
+            zap.String("name", handler.Name()),
+            zap.String("spec", handler.Spec()))
+    }
+    m.cron.Start()
+    m.log.Info("cron manager started")
+    return nil
+}
+
+func (m *Manager) Stop() {
+    m.cron.Stop()
+    m.log.Info("cron manager stopped")
+}
+```
+
+#### 2.3 定时任务示例
+
+**新建文件**: `app/cron/cleanup_job.go`
+
+```go
+package cron
+
+import (
+    "gin-web/global"
+    "go.uber.org/zap"
+)
+
+// CleanupJob 清理过期数据任务
+type CleanupJob struct{}
+
+func (j *CleanupJob) Name() string {
+    return "cleanup_expired_tokens"
+}
+
+func (j *CleanupJob) Spec() string {
+    return "0 0 2 * * *"  // 每天凌晨 2 点执行
+}
+
+func (j *CleanupJob) Run() {
+    global.App.Log.Info("running cleanup job")
+    // 清理逻辑...
+}
+```
+
+**新建文件**: `app/cron/health_check_job.go`
+
+```go
+package cron
+
+import (
+    "gin-web/global"
+)
+
+// HealthCheckJob 健康检查任务
+type HealthCheckJob struct{}
+
+func (j *HealthCheckJob) Name() string {
+    return "health_check"
+}
+
+func (j *HealthCheckJob) Spec() string {
+    return "*/30 * * * * *"  // 每 30 秒执行
+}
+
+func (j *HealthCheckJob) Run() {
+    global.App.Log.Debug("health check running")
+    // 健康检查逻辑...
+}
+```
+
+#### 2.4 启动方式一：跟随框架启动
+
+**修改 main.go**:
+
+```go
+import (
+    appCron "gin-web/app/cron"
+    "gin-web/pkg/cron"
+)
+
+func main() {
+    // ... 其他初始化 ...
+
+    // 初始化定时任务 (可选)
+    if global.App.Config.App.EnableCron {
+        cronManager := cron.NewManager(global.App.Log)
+        cronManager.Register(&appCron.CleanupJob{})
+        cronManager.Register(&appCron.HealthCheckJob{})
+        cronManager.Start()
+        defer cronManager.Stop()
+    }
+
+    // 启动服务器
+    bootstrap.RunServer(app.GetControllers()...)
+}
+```
+
+#### 2.5 启动方式二：独立脚本启动
+
+**新建文件**: `cmd/cron/main.go`
+
+```go
+package main
+
+import (
+    appCron "gin-web/app/cron"
+    "gin-web/bootstrap"
+    "gin-web/global"
+    "gin-web/pkg/cron"
+    "os"
+    "os/signal"
+    "syscall"
+)
+
+func main() {
+    // 初始化配置和日志
+    bootstrap.InitializeConfig()
+    global.App.Log = bootstrap.InitializeLog()
+    global.App.DB = bootstrap.InitializeDB()
+    global.App.Redis = bootstrap.InitializeRedis()
+
+    // 创建定时任务管理器
+    cronManager := cron.NewManager(global.App.Log)
+
+    // 注册定时任务
+    cronManager.Register(&appCron.CleanupJob{})
+    cronManager.Register(&appCron.HealthCheckJob{})
+
+    // 启动
+    cronManager.Start()
+    global.App.Log.Info("Cron service started")
+
+    // 等待退出信号
+    quit := make(chan os.Signal, 1)
+    signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+    <-quit
+
+    cronManager.Stop()
+    global.App.Log.Info("Cron service stopped")
+}
+```
+
+**运行独立脚本**:
+
+```bash
+# 独立启动定时任务服务
+go run cmd/cron/main.go
+```
+
+#### 2.6 配置文件
+
+**config.yaml 添加**:
+
+```yaml
+app:
+  # ...
+  enable_cron: true  # 是否启用定时任务 (框架集成模式)
+```
+
+---
+
+### 3. WebSocket 封装 (基于 Melody)
+
+- [ ] **任务完成**
+
+**目标**: 使用成熟的 Melody 库实现 WebSocket 封装，支持独立启动和框架集成启动
+
+#### 3.1 技术选型
+
+推荐使用 [Melody](https://github.com/olahol/melody)，这是 Go 生态中与 Gin 风格最接近的 WebSocket 库。
+
+```bash
+go get github.com/olahol/melody
+```
+
+**选型理由**:
+- Star 3.5k+，成熟稳定
+- API 风格与 Gin 一致，学习成本低
+- 基于 gorilla/websocket，性能可靠
+- 自动处理 ping/pong 心跳和超时
+- 内置广播、会话过滤、并发安全
+- 代码简洁，易于维护
+
+**备选方案**: 如需支持百万级连接或复杂 Pub/Sub，可考虑 [Centrifuge](https://github.com/centrifugal/centrifuge)
+
+#### 3.2 WebSocket 管理器封装
+
+**新建文件**: `pkg/websocket/manager.go`
+
+```go
+package websocket
+
+import (
+    "encoding/json"
+    "github.com/olahol/melody"
+    "go.uber.org/zap"
+    "net/http"
+    "sync"
+)
+
+// Message WebSocket 消息结构
+type Message struct {
+    Type    string      `json:"type"`
+    To      string      `json:"to,omitempty"`
+    From    string      `json:"from,omitempty"`
+    Content interface{} `json:"content"`
+}
+
+// Manager WebSocket 管理器
+type Manager struct {
+    melody      *melody.Melody
+    userSessions map[string]map[*melody.Session]bool
+    mu          sync.RWMutex
+    log         *zap.Logger
+}
+
+// NewManager 创建 WebSocket 管理器
+func NewManager(log *zap.Logger) *Manager {
+    m := &Manager{
+        melody:       melody.New(),
+        userSessions: make(map[string]map[*melody.Session]bool),
+        log:          log,
+    }
+
+    // 配置 Melody
+    m.melody.Config.MaxMessageSize = 512 * 1024  // 512KB
+    m.melody.Config.MessageBufferSize = 256
+
+    // 注册事件处理器
+    m.setupHandlers()
+
+    return m
+}
+
+func (m *Manager) setupHandlers() {
+    // 连接建立
+    m.melody.HandleConnect(func(s *melody.Session) {
+        userID, _ := s.Get("user_id")
+        m.log.Info("client connected", zap.Any("user_id", userID))
+
+        if uid, ok := userID.(string); ok && uid != "" {
+            m.mu.Lock()
+            if m.userSessions[uid] == nil {
+                m.userSessions[uid] = make(map[*melody.Session]bool)
+            }
+            m.userSessions[uid][s] = true
+            m.mu.Unlock()
+        }
+    })
+
+    // 连接断开
+    m.melody.HandleDisconnect(func(s *melody.Session) {
+        userID, _ := s.Get("user_id")
+        m.log.Info("client disconnected", zap.Any("user_id", userID))
+
+        if uid, ok := userID.(string); ok && uid != "" {
+            m.mu.Lock()
+            delete(m.userSessions[uid], s)
+            if len(m.userSessions[uid]) == 0 {
+                delete(m.userSessions, uid)
+            }
+            m.mu.Unlock()
+        }
+    })
+
+    // 收到消息
+    m.melody.HandleMessage(func(s *melody.Session, msg []byte) {
+        var message Message
+        if err := json.Unmarshal(msg, &message); err != nil {
+            m.log.Error("invalid message format", zap.Error(err))
+            return
+        }
+
+        userID, _ := s.Get("user_id")
+        if uid, ok := userID.(string); ok {
+            message.From = uid
+        }
+
+        // 处理消息路由
+        if message.To != "" {
+            m.SendToUser(message.To, &message)
+        } else {
+            m.Broadcast(&message)
+        }
+    })
+
+    // 错误处理
+    m.melody.HandleError(func(s *melody.Session, err error) {
+        m.log.Error("websocket error", zap.Error(err))
+    })
+}
+
+// HandleRequest 处理 WebSocket 升级请求
+func (m *Manager) HandleRequest(w http.ResponseWriter, r *http.Request, userID string) error {
+    return m.melody.HandleRequestWithKeys(w, r, map[string]interface{}{
+        "user_id": userID,
+    })
+}
+
+// Broadcast 广播消息给所有客户端
+func (m *Manager) Broadcast(message *Message) {
+    data, _ := json.Marshal(message)
+    m.melody.Broadcast(data)
+}
+
+// BroadcastFilter 按条件广播
+func (m *Manager) BroadcastFilter(message *Message, filter func(s *melody.Session) bool) {
+    data, _ := json.Marshal(message)
+    m.melody.BroadcastFilter(data, filter)
+}
+
+// SendToUser 发送消息给指定用户
+func (m *Manager) SendToUser(userID string, message *Message) {
+    m.mu.RLock()
+    sessions := m.userSessions[userID]
+    m.mu.RUnlock()
+
+    if len(sessions) == 0 {
+        return
+    }
+
+    data, _ := json.Marshal(message)
+    for session := range sessions {
+        session.Write(data)
+    }
+}
+
+// OnlineCount 获取在线人数
+func (m *Manager) OnlineCount() int {
+    return m.melody.Len()
+}
+
+// OnlineUsers 获取在线用户列表
+func (m *Manager) OnlineUsers() []string {
+    m.mu.RLock()
+    defer m.mu.RUnlock()
+
+    users := make([]string, 0, len(m.userSessions))
+    for userID := range m.userSessions {
+        users = append(users, userID)
+    }
+    return users
+}
+
+// Close 关闭管理器
+func (m *Manager) Close() {
+    m.melody.Close()
+}
+```
+
+#### 3.3 WebSocket 控制器
+
+**新建文件**: `app/controllers/websocket_controller.go`
+
+```go
+package controllers
+
+import (
+    "gin-web/pkg/websocket"
+    "github.com/gin-gonic/gin"
+    "net/http"
+)
+
+type WebSocketController struct {
+    manager *websocket.Manager
+}
+
+func NewWebSocketController(manager *websocket.Manager) *WebSocketController {
+    return &WebSocketController{manager: manager}
+}
+
+func (c *WebSocketController) Prefix() string {
+    return "/ws"
+}
+
+func (c *WebSocketController) Routes() []Route {
+    return []Route{
+        {Method: "GET", Path: "/connect", Handler: c.Connect},
+        {Method: "GET", Path: "/status", Handler: c.Status},
+        {Method: "POST", Path: "/broadcast", Handler: c.Broadcast},
+        {Method: "POST", Path: "/send", Handler: c.SendToUser},
+    }
+}
+
+// Connect WebSocket 连接
+// @Summary      WebSocket 连接
+// @Description  建立 WebSocket 连接
+// @Tags         WebSocket
+// @Param        user_id query string false "用户ID"
+// @Success      101 {string} string "Switching Protocols"
+// @Router       /ws/connect [get]
+func (c *WebSocketController) Connect(ctx *gin.Context) {
+    userID := ctx.Query("user_id")
+    // 或从 JWT 中间件获取: userID := ctx.GetString("id")
+
+    if err := c.manager.HandleRequest(ctx.Writer, ctx.Request, userID); err != nil {
+        ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+    }
+}
+
+// Status 获取 WebSocket 状态
+// @Summary      WebSocket 状态
+// @Description  获取在线人数等状态信息
+// @Tags         WebSocket
+// @Produce      json
+// @Success      200 {object} map[string]interface{}
+// @Router       /ws/status [get]
+func (c *WebSocketController) Status(ctx *gin.Context) {
+    ctx.JSON(http.StatusOK, gin.H{
+        "online_count": c.manager.OnlineCount(),
+        "online_users": c.manager.OnlineUsers(),
+    })
+}
+
+// Broadcast 广播消息
+// @Summary      广播消息
+// @Description  向所有在线用户广播消息
+// @Tags         WebSocket
+// @Accept       json
+// @Produce      json
+// @Param        message body websocket.Message true "消息内容"
+// @Success      200 {object} map[string]interface{}
+// @Router       /ws/broadcast [post]
+func (c *WebSocketController) Broadcast(ctx *gin.Context) {
+    var msg websocket.Message
+    if err := ctx.ShouldBindJSON(&msg); err != nil {
+        ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+
+    c.manager.Broadcast(&msg)
+    ctx.JSON(http.StatusOK, gin.H{"message": "broadcast sent"})
+}
+
+// SendToUser 发送消息给指定用户
+// @Summary      发送消息给用户
+// @Description  向指定用户发送消息
+// @Tags         WebSocket
+// @Accept       json
+// @Produce      json
+// @Param        message body websocket.Message true "消息内容"
+// @Success      200 {object} map[string]interface{}
+// @Router       /ws/send [post]
+func (c *WebSocketController) SendToUser(ctx *gin.Context) {
+    var msg websocket.Message
+    if err := ctx.ShouldBindJSON(&msg); err != nil {
+        ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+
+    if msg.To == "" {
+        ctx.JSON(http.StatusBadRequest, gin.H{"error": "to field is required"})
+        return
+    }
+
+    c.manager.SendToUser(msg.To, &msg)
+    ctx.JSON(http.StatusOK, gin.H{"message": "message sent"})
+}
+```
+
+#### 3.4 启动方式一：跟随框架启动
+
+**修改 main.go**:
+
+```go
+import (
+    "gin-web/pkg/websocket"
+)
+
+func main() {
+    // ... 其他初始化 ...
+
+    // 初始化 WebSocket (根据配置)
+    var wsManager *websocket.Manager
+    var wsController *controllers.WebSocketController
+    if global.App.Config.WebSocket.Enable {
+        wsManager = websocket.NewManager(global.App.Log)
+        wsController = controllers.NewWebSocketController(wsManager)
+        global.App.Log.Info("WebSocket manager started")
+    }
+
+    // 组装控制器列表
+    allControllers := app.GetControllers()
+    if wsController != nil {
+        allControllers = append(allControllers, wsController)
+    }
+
+    // 启动服务器
+    bootstrap.RunServer(allControllers...)
+
+    // 清理资源
+    if wsManager != nil {
+        wsManager.Close()
+    }
+}
+```
+
+#### 3.5 启动方式二：独立脚本启动
+
+**新建文件**: `cmd/websocket/main.go`
+
+```go
+package main
+
+import (
+    "gin-web/app/controllers"
+    "gin-web/app/middleware"
+    "gin-web/bootstrap"
+    "gin-web/global"
+    "gin-web/pkg/websocket"
+    "github.com/gin-gonic/gin"
+    "log"
+    "net/http"
+    "os"
+    "os/signal"
+    "syscall"
+)
+
+func main() {
+    // 初始化
+    bootstrap.InitializeConfig()
+    global.App.Log = bootstrap.InitializeLog()
+    global.App.Redis = bootstrap.InitializeRedis()
+
+    // 创建 WebSocket Manager
+    wsManager := websocket.NewManager(global.App.Log)
+
+    // 创建 Gin 路由
+    router := gin.New()
+    router.Use(gin.Logger(), middleware.CustomRecovery())
+    router.Use(middleware.Cors())
+
+    // 注册 WebSocket 控制器
+    wsController := controllers.NewWebSocketController(wsManager)
+    controllers.RegisterController(router.Group("/api"), wsController)
+
+    // 健康检查
+    router.GET("/health", func(c *gin.Context) {
+        c.JSON(200, gin.H{
+            "status":       "ok",
+            "online_count": wsManager.OnlineCount(),
+        })
+    })
+
+    // 获取端口
+    port := global.App.Config.WebSocket.Port
+    if port == "" {
+        port = "8081"
+    }
+
+    srv := &http.Server{
+        Addr:    ":" + port,
+        Handler: router,
+    }
+
+    go func() {
+        global.App.Log.Info("WebSocket server starting on port " + port)
+        if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+            log.Fatalf("listen: %s\n", err)
+        }
+    }()
+
+    // 等待退出信号
+    quit := make(chan os.Signal, 1)
+    signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+    <-quit
+
+    wsManager.Close()
+    global.App.Log.Info("WebSocket server stopped")
+}
+```
+
+#### 3.6 使用示例
+
+**前端连接示例**:
+
+```javascript
+// 建立连接
+const ws = new WebSocket('ws://localhost:8080/api/ws/connect?user_id=user123');
+
+// 接收消息
+ws.onmessage = (event) => {
+    const message = JSON.parse(event.data);
+    console.log('Received:', message);
+};
+
+// 发送消息
+ws.send(JSON.stringify({
+    type: 'chat',
+    to: 'user456',  // 私信，留空则广播
+    content: 'Hello!'
+}));
+```
+
+**服务端主动推送**:
+
+```go
+// 在任意 Service 或 Controller 中
+wsManager.SendToUser("user123", &websocket.Message{
+    Type:    "notification",
+    Content: "You have a new message",
+})
+
+// 广播给所有人
+wsManager.Broadcast(&websocket.Message{
+    Type:    "system",
+    Content: "Server will restart in 5 minutes",
+})
+```
+
+#### 3.7 配置文件
+
+**config.yaml 添加**:
+
+```yaml
+websocket:
+  enable: true
+  port: "8081"              # 独立启动时的端口
+  max_connections: 10000
+```
+
+---
+
+## 目录结构变更
+
+```
+gin-web/
+├── cmd/                          # 独立启动脚本
+│   ├── consumer/
+│   │   └── main.go              # RabbitMQ 消费者独立启动
+│   ├── cron/
+│   │   └── main.go              # 定时任务独立启动
+│   └── websocket/
+│       └── main.go              # WebSocket 独立启动
+├── config/
+│   ├── cron.go                  # 定时任务配置 (新增)
+│   └── websocket.go             # WebSocket 配置 (新增)
+├── pkg/                          # 公共包
+│   ├── cron/
+│   │   └── manager.go           # 定时任务管理器
+│   └── websocket/
+│       ├── hub.go               # WebSocket Hub
+│       └── client.go            # WebSocket Client
+├── app/
+│   ├── cron/                    # 定时任务实现
+│   │   ├── cleanup_job.go
+│   │   └── health_check_job.go
+│   └── controllers/
+│       └── websocket_controller.go
+└── docs/                         # Swagger 生成的文档
+    ├── docs.go
+    ├── swagger.json
+    └── swagger.yaml
 ```
 
 ---
 
 ## 完成检查清单
 
-- [ ] Docker 多阶段构建已实现
-- [ ] docker-compose.yml 已创建
-- [ ] 请求日志中间件已添加
-- [ ] 限流中间件已添加
-- [ ] 超时中间件已添加
-- [ ] 链路追踪中间件已添加
-- [ ] WebSocket Hub 已实现
-- [ ] WebSocket Client 已实现
-- [ ] Swagger 文档已集成
-- [ ] 单元测试框架已搭建
-- [ ] Makefile 已创建
-- [ ] 所有新功能已测试
-- [ ] 文档已更新
+### Swagger 文档
+- [ ] 安装 swag 工具
+- [ ] main.go 添加 Swagger 注释
+- [ ] 所有控制器方法添加 API 注释
+- [ ] 注册 Swagger 路由
+- [ ] 运行 `swag init` 生成文档
+- [ ] 验证 `http://localhost:8080/swagger/index.html` 可访问
+
+### 定时任务
+- [ ] 安装 robfig/cron
+- [ ] 实现 cron Manager
+- [ ] 创建示例定时任务
+- [ ] 创建独立启动脚本 `cmd/cron/main.go`
+- [ ] 添加配置项 `cron.enable`
+- [ ] 框架集成启动模式测试
+- [ ] 独立脚本启动模式测试
+
+### WebSocket (Melody)
+- [ ] 安装 olahol/melody
+- [ ] 实现 WebSocket Manager 封装
+- [ ] 创建 WebSocket 控制器
+- [ ] 创建独立启动脚本 `cmd/websocket/main.go`
+- [ ] 添加配置项 `websocket.enable`
+- [ ] 框架集成启动模式测试
+- [ ] 独立脚本启动模式测试
+- [ ] 前端连接测试
+
+### RabbitMQ 消费者
+- [ ] 创建独立启动脚本 `cmd/consumer/main.go`
+- [ ] 添加配置项 `rabbitmq.enable`
+- [ ] 框架集成启动模式测试
+- [ ] 独立脚本启动模式测试
+
+### 配置管理
+- [ ] 新增 `config/cron.go`
+- [ ] 新增 `config/websocket.go`
+- [ ] 更新 `config/rabbitmq.go` 添加 enable 字段
+- [ ] 更新 `config/config.go` 添加新配置结构
+- [ ] 更新 `config.yaml` 添加所有启动开关
+
+---
+
+### 4. RabbitMQ 消费者启动优化
+
+- [ ] **任务完成**
+
+**目标**: 为 RabbitMQ 消费者添加独立启动模式和配置控制
+
+#### 4.1 启动方式一：跟随框架启动 (已实现)
+
+当前 main.go 中已有实现，需添加配置开关控制：
+
+```go
+// main.go
+if global.App.Config.RabbitMQ.Enable {
+    if cm := bootstrap.InitRabbitmq(); cm != nil {
+        defer cm.Stop()
+        global.App.Log.Info("RabbitMQ consumer manager started")
+    }
+}
+```
+
+#### 4.2 启动方式二：独立脚本启动
+
+**新建文件**: `cmd/consumer/main.go`
+
+```go
+package main
+
+import (
+    "gin-web/bootstrap"
+    "gin-web/global"
+    "os"
+    "os/signal"
+    "syscall"
+)
+
+func main() {
+    // 初始化配置和日志
+    bootstrap.InitializeConfig()
+    global.App.Log = bootstrap.InitializeLog()
+    global.App.DB = bootstrap.InitializeDB()
+    global.App.Redis = bootstrap.InitializeRedis()
+
+    // 启动 RabbitMQ 消费者
+    cm := bootstrap.InitRabbitmq()
+    if cm == nil {
+        global.App.Log.Fatal("Failed to start RabbitMQ consumer manager")
+    }
+    global.App.Log.Info("RabbitMQ consumer service started")
+
+    // 等待退出信号
+    quit := make(chan os.Signal, 1)
+    signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+    <-quit
+
+    cm.Stop()
+    global.App.Log.Info("RabbitMQ consumer service stopped")
+}
+```
+
+**运行独立脚本**:
+
+```bash
+# 独立启动 RabbitMQ 消费者服务
+go run cmd/consumer/main.go
+```
+
+---
+
+## 统一配置管理
+
+所有服务的启动开关统一在 `config.yaml` 中配置：
+
+```yaml
+# config.yaml
+
+app:
+  env: local
+  port: 8080
+  app_name: gin-web
+
+# RabbitMQ 配置
+rabbitmq:
+  enable: true                    # 框架启动时是否启用消费者
+  host: localhost
+  port: 5672
+  username: guest
+  password: guest
+  vhost: /
+
+# 定时任务配置
+cron:
+  enable: true                    # 框架启动时是否启用定时任务
+
+# WebSocket 配置
+websocket:
+  enable: true                    # 框架启动时是否启用 WebSocket
+  port: 8081                      # 独立启动时的端口
+  max_connections: 10000
+```
+
+### 配置结构体更新
+
+**文件**: `config/app.go`
+
+```go
+type App struct {
+    Env     string `mapstructure:"env" json:"env" yaml:"env"`
+    Port    string `mapstructure:"port" json:"port" yaml:"port"`
+    AppName string `mapstructure:"app_name" json:"app_name" yaml:"app_name"`
+}
+```
+
+**文件**: `config/rabbitmq.go` (更新)
+
+```go
+type RabbitMQ struct {
+    Enable   bool   `mapstructure:"enable" json:"enable" yaml:"enable"`
+    Host     string `mapstructure:"host" json:"host" yaml:"host"`
+    Port     int    `mapstructure:"port" json:"port" yaml:"port"`
+    Username string `mapstructure:"username" json:"username" yaml:"username"`
+    Password string `mapstructure:"password" json:"password" yaml:"password"`
+    Vhost    string `mapstructure:"vhost" json:"vhost" yaml:"vhost"`
+}
+```
+
+**新建文件**: `config/cron.go`
+
+```go
+package config
+
+type Cron struct {
+    Enable bool `mapstructure:"enable" json:"enable" yaml:"enable"`
+}
+```
+
+**新建文件**: `config/websocket.go`
+
+```go
+package config
+
+type WebSocket struct {
+    Enable         bool   `mapstructure:"enable" json:"enable" yaml:"enable"`
+    Port           string `mapstructure:"port" json:"port" yaml:"port"`
+    MaxConnections int    `mapstructure:"max_connections" json:"max_connections" yaml:"max_connections"`
+}
+```
+
+**文件**: `config/config.go` (更新)
+
+```go
+type Configuration struct {
+    App       App       `mapstructure:"app" json:"app" yaml:"app"`
+    Log       Log       `mapstructure:"log" json:"log" yaml:"log"`
+    Database  Database  `mapstructure:"database" json:"database" yaml:"database"`
+    Jwt       Jwt       `mapstructure:"jwt" json:"jwt" yaml:"jwt"`
+    Redis     Redis     `mapstructure:"redis" json:"redis" yaml:"redis"`
+    RabbitMQ  RabbitMQ  `mapstructure:"rabbitmq" json:"rabbitMQ" yaml:"rabbitMQ"`
+    Cron      Cron      `mapstructure:"cron" json:"cron" yaml:"cron"`
+    WebSocket WebSocket `mapstructure:"websocket" json:"websocket" yaml:"websocket"`
+    ApiUrls   ApiUrls   `mapstructure:"api_url" json:"api_url" yaml:"api_url"`
+}
+```
+
+### main.go 统一启动逻辑
+
+```go
+func main() {
+    // ... 初始化代码 ...
+
+    // 使用 Wire 初始化应用
+    app, err := container.InitializeApp()
+    if err != nil {
+        global.App.Log.Fatal("Failed to initialize app: " + err.Error())
+    }
+
+    // 启动 RabbitMQ 消费者 (根据配置)
+    var consumerManager *bootstrap.ConsumerManager
+    if global.App.Config.RabbitMQ.Enable {
+        consumerManager = bootstrap.InitRabbitmq()
+        if consumerManager != nil {
+            global.App.Log.Info("RabbitMQ consumer started")
+        }
+    }
+
+    // 启动定时任务 (根据配置)
+    var cronManager *cron.Manager
+    if global.App.Config.Cron.Enable {
+        cronManager = cron.NewManager(global.App.Log)
+        cronManager.Register(&appCron.CleanupJob{})
+        cronManager.Start()
+        global.App.Log.Info("Cron manager started")
+    }
+
+    // 启动 WebSocket (根据配置)
+    var wsHub *websocket.Hub
+    var wsController *controllers.WebSocketController
+    if global.App.Config.WebSocket.Enable {
+        wsHub = websocket.NewHub(global.App.Log)
+        go wsHub.Run()
+        wsController = controllers.NewWebSocketController(wsHub)
+        global.App.Log.Info("WebSocket hub started")
+    }
+
+    // 组装控制器列表
+    allControllers := app.GetControllers()
+    if wsController != nil {
+        allControllers = append(allControllers, wsController)
+    }
+
+    // 启动 HTTP 服务器
+    bootstrap.RunServer(allControllers...)
+
+    // 清理资源 (defer 或信号处理中)
+    if consumerManager != nil {
+        consumerManager.Stop()
+    }
+    if cronManager != nil {
+        cronManager.Stop()
+    }
+}
+```
+
+---
+
+## 启动模式总结
+
+| 功能 | 配置项 | 框架集成启动 | 独立脚本启动 |
+|------|--------|-------------|-------------|
+| **HTTP API** | - | `go run main.go` | - |
+| **RabbitMQ 消费者** | `rabbitmq.enable` | `main.go` | `go run cmd/consumer/main.go` |
+| **定时任务** | `cron.enable` | `main.go` | `go run cmd/cron/main.go` |
+| **WebSocket** | `websocket.enable` | `main.go` | `go run cmd/websocket/main.go` |
+
+**配置示例**:
+
+```yaml
+# 开发环境 - 全部启用
+rabbitmq:
+  enable: true
+cron:
+  enable: true
+websocket:
+  enable: true
+
+# 生产环境 - 独立部署，关闭框架集成
+rabbitmq:
+  enable: false   # 使用 cmd/consumer/main.go 独立启动
+cron:
+  enable: false   # 使用 cmd/cron/main.go 独立启动
+websocket:
+  enable: false   # 使用 cmd/websocket/main.go 独立启动
+```
+
+**推荐使用场景**:
+- **开发环境**: 全部 enable: true，一个命令启动所有服务
+- **生产环境**: 全部 enable: false，各服务独立启动，便于扩展和部署
 
 ---
 
 ## 依赖更新
 
-需要添加到 `go.mod` 的依赖：
-
 ```bash
-# WebSocket
-go get github.com/gorilla/websocket
-
-# 限流
-go get golang.org/x/time/rate
-
-# UUID
-go get github.com/google/uuid
-
 # Swagger
 go get github.com/swaggo/gin-swagger
 go get github.com/swaggo/files
-go get github.com/swaggo/swag
+go install github.com/swaggo/swag/cmd/swag@latest
 
-# 测试
-go get github.com/stretchr/testify
-go get github.com/golang/mock/gomock
+# 定时任务
+go get github.com/robfig/cron/v3
+
+# WebSocket (Melody - 基于 gorilla/websocket 的高层封装)
+go get github.com/olahol/melody
 ```
 
 ---
 
 ## 参考资源
 
-- [Gorilla WebSocket](https://github.com/gorilla/websocket)
-- [Swaggo](https://github.com/swaggo/swag)
-- [Go Mock](https://github.com/golang/mock)
-- [Docker 多阶段构建](https://docs.docker.com/develop/develop-images/multistage-build/)
+- [Melody - Minimalist WebSocket Framework](https://github.com/olahol/melody)
+- [robfig/cron - Go Cron Library](https://github.com/robfig/cron)
+- [Swaggo - Swagger for Go](https://github.com/swaggo/swag)
+- [Centrifuge - 大规模实时应用备选](https://github.com/centrifugal/centrifuge)

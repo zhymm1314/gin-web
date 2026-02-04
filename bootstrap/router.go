@@ -6,13 +6,16 @@ import (
 	"gin-web/app/middleware"
 	"gin-web/global"
 	"gin-web/routes"
-	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 // SetupRouter 设置路由 (使用依赖注入)
@@ -23,6 +26,11 @@ func SetupRouter(ctrls ...controllers.Controller) *gin.Engine {
 	router := gin.New()
 	router.Use(gin.Logger(), middleware.CustomRecovery())
 	router.Use(middleware.Cors())
+
+	// Swagger 文档 (非生产环境)
+	if global.App.Config.App.Env != "production" {
+		router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	}
 
 	// 注册 api 分组路由
 	apiGroup := router.Group("/api")

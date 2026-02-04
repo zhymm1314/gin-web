@@ -41,6 +41,15 @@ func (c *AuthController) Routes() []Route {
 }
 
 // Register 用户注册
+// @Summary      用户注册
+// @Description  创建新用户账号
+// @Tags         认证
+// @Accept       json
+// @Produce      json
+// @Param        request body request.Register true "注册信息"
+// @Success      200 {object} response.Response "成功"
+// @Failure      400 {object} response.Response "参数错误"
+// @Router       /auth/register [post]
 func (c *AuthController) Register(ctx *gin.Context) {
 	var form request.Register
 	if err := ctx.ShouldBindJSON(&form); err != nil {
@@ -57,6 +66,16 @@ func (c *AuthController) Register(ctx *gin.Context) {
 }
 
 // Login 用户登录
+// @Summary      用户登录
+// @Description  用户登录获取 JWT Token
+// @Tags         认证
+// @Accept       json
+// @Produce      json
+// @Param        request body request.Login true "登录信息"
+// @Success      200 {object} response.Response "成功返回 Token"
+// @Failure      400 {object} response.Response "参数错误"
+// @Failure      401 {object} response.Response "认证失败"
+// @Router       /auth/login [post]
 func (c *AuthController) Login(ctx *gin.Context) {
 	var form request.Login
 	if err := ctx.ShouldBindJSON(&form); err != nil {
@@ -79,6 +98,15 @@ func (c *AuthController) Login(ctx *gin.Context) {
 }
 
 // Info 获取用户信息
+// @Summary      获取用户信息
+// @Description  获取当前登录用户的详细信息
+// @Tags         认证
+// @Accept       json
+// @Produce      json
+// @Security     Bearer
+// @Success      200 {object} response.Response "成功"
+// @Failure      401 {object} response.Response "未授权"
+// @Router       /auth/info [post]
 func (c *AuthController) Info(ctx *gin.Context) {
 	user, err := c.userService.GetUserInfo(ctx.Keys["id"].(string))
 	if err != nil {
@@ -89,6 +117,15 @@ func (c *AuthController) Info(ctx *gin.Context) {
 }
 
 // Logout 用户登出
+// @Summary      用户登出
+// @Description  用户登出，将当前 Token 加入黑名单
+// @Tags         认证
+// @Accept       json
+// @Produce      json
+// @Security     Bearer
+// @Success      200 {object} response.Response "成功"
+// @Failure      401 {object} response.Response "未授权"
+// @Router       /auth/logout [post]
 func (c *AuthController) Logout(ctx *gin.Context) {
 	err := c.jwtService.JoinBlackList(ctx.Keys["token"].(*jwt.Token))
 	if err != nil {
