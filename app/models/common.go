@@ -5,18 +5,25 @@ import (
 	"time"
 )
 
-// 自增ID主键
+// ID 主键
 type ID struct {
-	ID uint `json:"id" gorm:"primaryKey"`
+	ID uint `json:"id" gorm:"primaryKey;autoIncrement"`
 }
 
-// Timestamps 创建、更新时间
+// Timestamps 时间戳
 type Timestamps struct {
-	CreateTime time.Time `json:"create_time"`
-	UpdateTime time.Time `json:"update_time"`
+	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
+	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
 }
 
-// 软删除
+// SoftDeletes 软删除
 type SoftDeletes struct {
-	DeletedAt gorm.DeletedAt `json:"deleted_at" gorm:"index"`
+	DeletedAt gorm.DeletedAt `json:"-" gorm:"index"`
+}
+
+// BaseModel 基础模型（组合使用）
+type BaseModel struct {
+	ID
+	Timestamps
+	SoftDeletes
 }

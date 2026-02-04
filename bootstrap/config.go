@@ -41,25 +41,7 @@ func InitializeConfig() *viper.Viper {
 	if err := v.Unmarshal(&global.App.Config); err != nil {
 		fmt.Println(err)
 	}
-	//
-	global.App.Config.ApiUrls = v.GetStringMap("api_url")
 	return v
-}
-
-func GetAPIURL(serviceName string) string {
-	env := global.App.Config.App.Env
-	urlMap := global.App.Config.ApiUrls
-
-	rawInnerMap, ok := urlMap[serviceName].(map[string]any)
-	if !ok {
-		panic("配置格式错误：非 map[string]string 类型")
-	}
-	fmt.Println(rawInnerMap)
-	url := rawInnerMap[env].(string)
-	if url == "" {
-		panic("Configuration not found for path: " + serviceName)
-	}
-	return url
 }
 
 // 安全版本，带默认值

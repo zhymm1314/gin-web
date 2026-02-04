@@ -311,18 +311,19 @@ func (c *BaseClient) addQueryParams(req *http.Request, params interface{}) error
 	return nil
 }
 
+// GetApiUrl 根据服务名获取 API 地址
 func GetApiUrl(serviceName string) string {
-
 	env := global.App.Config.App.Env
-	urlMap := global.App.Config.ApiUrls
+	apiUrls := global.App.Config.ApiUrls
 
-	rawInnerMap, ok := urlMap[serviceName].(map[string]any)
-	if !ok {
-		panic("配置格式错误：非 map[string]string 类型")
+	switch serviceName {
+	case "user_service":
+		return apiUrls.UserService.GetURL(env)
+	case "order_service":
+		return apiUrls.OrderService.GetURL(env)
+	case "pay_service":
+		return apiUrls.PayService.GetURL(env)
+	default:
+		panic("未配置的服务: " + serviceName)
 	}
-	url := rawInnerMap[env].(string)
-	if url == "" {
-		panic("Configuration not found for path: " + serviceName)
-	}
-	return url
 }

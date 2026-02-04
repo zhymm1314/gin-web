@@ -15,9 +15,10 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	if err, user := services.UserServiceLegacy.Register(form); err != nil {
+	user, err := services.UserServiceLegacy.Register(form)
+	if err != nil {
 		response.BusinessFail(c, err.Error())
-	} else {
-		response.Success(c, user)
+		return
 	}
+	response.Success(c, user)
 }

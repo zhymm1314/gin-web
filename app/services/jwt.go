@@ -37,27 +37,30 @@ type TokenOutPut struct {
 }
 
 // CreateToken 生成 Token
-func (jwtService *jwtService) CreateToken(GuardName string, user JwtUser) (tokenData TokenOutPut, err error, token *jwt.Token) {
-	token = jwt.NewWithClaims(
+func (jwtService *jwtService) CreateToken(guardName string, user JwtUser) (TokenOutPut, *jwt.Token, error) {
+	token := jwt.NewWithClaims(
 		jwt.SigningMethodHS256,
 		CustomClaims{
 			RegisteredClaims: jwt.RegisteredClaims{
 				ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(global.App.Config.Jwt.JwtTtl) * time.Second)),
 				ID:        user.GetUid(),
-				Issuer:    GuardName, // 用于在中间件中区分不同客户端颁发的 token，避免 token 跨端使用
+				Issuer:    guardName, // 用于在中间件中区分不同客户端颁发的 token，避免 token 跨端使用
 				NotBefore: jwt.NewNumericDate(time.Now().Add(-1000 * time.Second)),
 			},
 		},
 	)
 
 	tokenStr, err := token.SignedString([]byte(global.App.Config.Jwt.Secret))
+	if err != nil {
+		return TokenOutPut{}, nil, err
+	}
 
-	tokenData = TokenOutPut{
+	tokenData := TokenOutPut{
 		tokenStr,
 		int(global.App.Config.Jwt.JwtTtl),
 		TokenType,
 	}
-	return
+	return tokenData, token, nil
 }
 
 // 获取黑名单缓存 key
@@ -90,14 +93,13 @@ func (jwtService *jwtService) IsInBlacklist(tokenStr string) bool {
 	return true
 }
 
-func (jwtService *jwtService) GetUserInfo(GuardName string, id string) (err error, user JwtUser) {
-	switch GuardName {
+func (jwtService *jwtService) GetUserInfo(guardName string, id string) (JwtUser, error) {
+	switch guardName {
 	case AppGuardName:
 		return UserServiceLegacy.GetUserInfo(id)
 	default:
-		err = errors.New("guard " + GuardName + " does not exist")
+		return nil, errors.New("guard " + guardName + " does not exist")
 	}
-	return
 }
 
 // ========== 依赖注入版本的 JWT Service ==========
@@ -131,27 +133,30 @@ func NewJwtServiceDI(jwtConfig JwtConfig, redisClient RedisClient) *JwtServiceDI
 }
 
 // CreateToken 生成 Token
-func (s *JwtServiceDI) CreateToken(GuardName string, user JwtUser) (tokenData TokenOutPut, err error, token *jwt.Token) {
-	token = jwt.NewWithClaims(
+func (s *JwtServiceDI) CreateToken(guardName string, user JwtUser) (TokenOutPut, *jwt.Token, error) {
+	token := jwt.NewWithClaims(
 		jwt.SigningMethodHS256,
 		CustomClaims{
 			RegisteredClaims: jwt.RegisteredClaims{
 				ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(s.jwtConfig.GetTtl()) * time.Second)),
 				ID:        user.GetUid(),
-				Issuer:    GuardName,
+				Issuer:    guardName,
 				NotBefore: jwt.NewNumericDate(time.Now().Add(-1000 * time.Second)),
 			},
 		},
 	)
 
 	tokenStr, err := token.SignedString([]byte(s.jwtConfig.GetSecret()))
+	if err != nil {
+		return TokenOutPut{}, nil, err
+	}
 
-	tokenData = TokenOutPut{
+	tokenData := TokenOutPut{
 		tokenStr,
 		int(s.jwtConfig.GetTtl()),
 		TokenType,
 	}
-	return
+	return tokenData, token, nil
 }
 
 // getBlackListKey 获取黑名单缓存 key

@@ -68,7 +68,7 @@ func (c *AuthController) Login(ctx *gin.Context) {
 		return
 	}
 
-	tokenData, err, _ := c.jwtService.CreateToken(services.AppGuardName, user)
+	tokenData, _, err := c.jwtService.CreateToken(services.AppGuardName, user)
 	if err != nil {
 		response.BusinessFail(ctx, err.Error())
 		return

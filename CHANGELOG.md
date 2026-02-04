@@ -15,6 +15,25 @@
 
 ---
 
+## [1.3.0] - 2026-02-04
+
+### 变更
+- **代码规范统一**: 函数返回值顺序统一为 `(result, error)`，符合 Go 惯例
+- **目录命名修复**: `app/ampq/` 重命名为 `app/amqp/`（修复拼写错误）
+- **Model 规范化**: 修复 JSON tag (`name1`→`name`, `mobile2`→`mobile`)，添加 GORM 类型约束
+- **类型安全配置**: `ApiUrls` 配置从 `map[string]any` 改为强类型结构体
+- **变量命名规范**: 函数参数命名统一使用小驼峰 (`GuardName`→`guardName`)
+- **统一指针返回**: Service 层统一返回指针类型 `*models.User`
+
+### 新增
+- 新增 `.golangci.yml` 代码检查配置
+- 新增 `.editorconfig` 编辑器配置
+- 新增 `config/api_url.go` 类型安全的 API 配置
+- Model 新增 `TableName()`、`MaskMobile()` 方法
+- `common.go` 新增 `BaseModel` 组合类型
+
+---
+
 ## [1.2.0] - 2026-02-04
 
 ### 新增
@@ -68,6 +87,7 @@
 
 | 版本 | 日期 | 说明 |
 |------|------|------|
+| 1.3.0 | 2026-02-04 | 代码规范统一 (P2 完成) |
 | 1.2.0 | 2026-02-04 | 开发文档体系 |
 | 1.1.0 | 2026-02-03 | DI 容器、Repository 模式、安全修复 |
 | 1.0.1 | 2025-05-16 | Mod 功能、RabbitMQ 重构 |

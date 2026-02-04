@@ -3,11 +3,11 @@
 [![Go Version](https://img.shields.io/badge/Go-1.19+-00ADD8?style=flat&logo=go)](https://go.dev/)
 [![Gin](https://img.shields.io/badge/Gin-1.10.0-00ADD8?style=flat)](https://gin-gonic.com/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/Version-1.2.0-brightgreen.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/Version-1.3.0-brightgreen.svg)](CHANGELOG.md)
 
 一个基于 Gin 框架的企业级 Go 语言后端 API 脚手架，采用标准的 MVC 架构模式，为 PHP 开发者提供友好的 Go 语言开发体验。
 
-📋 **[查看更新日志 (CHANGELOG)](CHANGELOG.md)** | 🚀 **当前版本: v1.2.0**
+📋 **[查看更新日志 (CHANGELOG)](CHANGELOG.md)** | 🚀 **当前版本: v1.3.0**
 
 ---
 
@@ -114,7 +114,7 @@ gin-web/
 │   ├── common/                  # 公共组件
 │   │   ├── request/             # 请求结构体
 │   │   └── response/            # 响应处理
-│   ├── ampq/                    # 消息队列
+│   ├── amqp/                    # 消息队列 (AMQP)
 │   │   ├── consumer/            # 消费者
 │   │   └── producer/            # 生产者
 │   └── api/                     # API 客户端
@@ -376,12 +376,12 @@ func (ctrl *MyController) Routes() []Route {
 #### 快速开发消费者
 
 ```
-1. app/ampq/consumer/  → 实现 ConsumerHandler 接口
+1. app/amqp/consumer/  → 实现 ConsumerHandler 接口
 2. main.go             → 注册处理器到 handlers map
 3. config.yaml         → 配置消费者队列
 ```
 
-**消费者模板** (`app/ampq/consumer/xxx_consumer.go`):
+**消费者模板** (`app/amqp/consumer/xxx_consumer.go`):
 ```go
 type XxxConsumer struct{}
 

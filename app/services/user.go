@@ -76,32 +76,37 @@ type userServiceLegacy struct {
 var UserServiceLegacy = new(userServiceLegacy)
 
 // Register 注册 (兼容旧代码)
-func (userService *userServiceLegacy) Register(params request.Register) (err error, user models.User) {
+func (userService *userServiceLegacy) Register(params request.Register) (*models.User, error) {
 	var result = global.App.DB.Where("mobile = ?", params.Mobile).Select("id").First(&models.User{})
 	if result.RowsAffected != 0 {
-		err = bizErr.ErrUserExists
-		return
+		return nil, bizErr.ErrUserExists
 	}
-	user = models.User{Name: params.Name, Mobile: params.Mobile, Password: utils.BcryptMake([]byte(params.Password))}
-	err = global.App.DB.Create(&user).Error
-	return
+	user := &models.User{Name: params.Name, Mobile: params.Mobile, Password: utils.BcryptMake([]byte(params.Password))}
+	if err := global.App.DB.Create(user).Error; err != nil {
+		return nil, err
+	}
+	return user, nil
 }
 
 // Login 登录 (兼容旧代码)
-func (userService *userServiceLegacy) Login(params request.Login) (err error, user *models.User) {
-	err = global.App.DB.Where("mobile = ?", params.Mobile).First(&user).Error
+func (userService *userServiceLegacy) Login(params request.Login) (*models.User, error) {
+	var user *models.User
+	err := global.App.DB.Where("mobile = ?", params.Mobile).First(&user).Error
 	if err != nil || !utils.BcryptMakeCheck([]byte(params.Password), user.Password) {
-		err = bizErr.New(bizErr.CodePasswordError, "用户名不存在或密码错误")
+		return nil, bizErr.New(bizErr.CodePasswordError, "用户名不存在或密码错误")
 	}
-	return
+	return user, nil
 }
 
 // GetUserInfo 获取用户信息 (兼容旧代码)
-func (userService *userServiceLegacy) GetUserInfo(id string) (err error, user models.User) {
+func (userService *userServiceLegacy) GetUserInfo(id string) (*models.User, error) {
 	intId, err := strconv.Atoi(id)
-	err = global.App.DB.First(&user, intId).Error
 	if err != nil {
-		err = bizErr.ErrUserNotFound
+		return nil, bizErr.ErrUserNotFound
 	}
-	return
+	var user models.User
+	if err := global.App.DB.First(&user, intId).Error; err != nil {
+		return nil, bizErr.ErrUserNotFound
+	}
+	return &user, nil
 }

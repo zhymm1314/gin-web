@@ -3,7 +3,7 @@ package bootstrap
 
 import (
 	"fmt"
-	"gin-web/app/ampq/consumer"
+	"gin-web/app/amqp/consumer"
 	"gin-web/config"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"log"

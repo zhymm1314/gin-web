@@ -15,20 +15,21 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	if err, user := services.UserServiceLegacy.Login(form); err != nil {
+	user, err := services.UserServiceLegacy.Login(form)
+	if err != nil {
 		response.BusinessFail(c, err.Error())
-	} else {
-		tokenData, err, _ := services.JwtService.CreateToken(services.AppGuardName, user)
-		if err != nil {
-			response.BusinessFail(c, err.Error())
-			return
-		}
-		response.Success(c, tokenData)
+		return
 	}
+	tokenData, _, err := services.JwtService.CreateToken(services.AppGuardName, user)
+	if err != nil {
+		response.BusinessFail(c, err.Error())
+		return
+	}
+	response.Success(c, tokenData)
 }
 
 func Info(c *gin.Context) {
-	err, user := services.UserServiceLegacy.GetUserInfo(c.Keys["id"].(string))
+	user, err := services.UserServiceLegacy.GetUserInfo(c.Keys["id"].(string))
 	if err != nil {
 		response.BusinessFail(c, err.Error())
 		return

@@ -2,7 +2,7 @@ package bootstrap
 
 import (
 	"errors"
-	"gin-web/app/ampq/consumer"
+	"gin-web/app/amqp/consumer"
 	"gin-web/config"
 	"gin-web/global"
 	amqp "github.com/rabbitmq/amqp091-go"
