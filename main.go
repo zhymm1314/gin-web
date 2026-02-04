@@ -37,6 +37,6 @@ func main() {
 		global.App.Log.Fatal("Failed to initialize app: " + err.Error())
 	}
 
-	// 使用 DI 启动服务器
-	bootstrap.RunServerWithDI(app.GetControllers()...)
+	// 启动服务器
+	bootstrap.RunServer(app.GetControllers()...)
 }

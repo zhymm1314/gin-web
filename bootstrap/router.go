@@ -15,8 +15,8 @@ import (
 	"time"
 )
 
-func setupRouter() *gin.Engine {
-
+// SetupRouter 设置路由 (使用依赖注入)
+func SetupRouter(ctrls ...controllers.Controller) *gin.Engine {
 	if global.App.Config.App.Env == "production" {
 		gin.SetMode(gin.ReleaseMode)
 	}
@@ -26,35 +26,14 @@ func setupRouter() *gin.Engine {
 
 	// 注册 api 分组路由
 	apiGroup := router.Group("/api")
-	routes.SetApiGroupRoutes(apiGroup)
+	routes.SetApiGroupRoutes(apiGroup, ctrls...)
 
 	return router
 }
 
-// SetupRouterWithDI 使用依赖注入设置路由
-func SetupRouterWithDI(ctrls ...controllers.Controller) *gin.Engine {
-	if global.App.Config.App.Env == "production" {
-		gin.SetMode(gin.ReleaseMode)
-	}
-	router := gin.New()
-	router.Use(gin.Logger(), middleware.CustomRecovery())
-	router.Use(middleware.Cors())
-
-	// 注册 api 分组路由 (使用依赖注入)
-	apiGroup := router.Group("/api")
-	routes.SetApiGroupRoutesWithDI(apiGroup, ctrls...)
-
-	return router
-}
-
-// RunServer 启动服务器 (Legacy 版本，保留兼容)
-func RunServer() {
-	runWithRouter(setupRouter())
-}
-
-// RunServerWithDI 使用依赖注入启动服务器
-func RunServerWithDI(ctrls ...controllers.Controller) {
-	runWithRouter(SetupRouterWithDI(ctrls...))
+// RunServer 启动服务器
+func RunServer(ctrls ...controllers.Controller) {
+	runWithRouter(SetupRouter(ctrls...))
 }
 
 // runWithRouter 通用服务器启动逻辑
