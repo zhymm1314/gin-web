@@ -3,15 +3,14 @@ package routes
 import (
 	"gin-web/app/common/request"
 	"gin-web/app/controllers"
-	"gin-web/app/middleware"
-	"gin-web/app/services"
 	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
-// SetApiGroupRoutes 定义 api 分组路由 (兼容旧代码)
+// SetApiGroupRoutes 定义 api 分组路由 (Legacy 版本，仅保留基础路由)
+// 注意: 此函数已弃用，请使用 SetApiGroupRoutesWithDI
 func SetApiGroupRoutes(router *gin.RouterGroup) {
 	router.GET("/ping", func(c *gin.Context) {
 		c.String(http.StatusOK, "pong")
@@ -19,7 +18,6 @@ func SetApiGroupRoutes(router *gin.RouterGroup) {
 
 	router.GET("/test", func(c *gin.Context) {
 		time.Sleep(5 * time.Second)
-
 		c.String(http.StatusOK, "success")
 	})
 
@@ -35,25 +33,6 @@ func SetApiGroupRoutes(router *gin.RouterGroup) {
 			"message": "success",
 		})
 	})
-
-	router.POST("/auth/register", controllers.Register)
-	router.POST("/auth/login", controllers.Login)
-
-	// Mod相关路由 - 无需认证
-	modController := &controllers.ModController{}
-	{
-		router.GET("/mods/search", modController.Search)         // 搜索mod
-		router.GET("/mods/:id", modController.Detail)            // 获取mod详情
-		router.GET("/mods/:id/download", modController.Download) // 下载mod
-		router.GET("/games", modController.Games)                // 获取游戏列表
-		router.GET("/categories", modController.Categories)      // 获取分类列表
-	}
-
-	authRouter := router.Group("").Use(middleware.JWTAuth(services.AppGuardName))
-	{
-		authRouter.POST("/auth/info", controllers.Info)
-		authRouter.POST("/auth/logout", controllers.Logout)
-	}
 }
 
 // SetApiGroupRoutesWithDI 使用依赖注入的路由注册

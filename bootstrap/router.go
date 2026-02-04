@@ -47,10 +47,18 @@ func SetupRouterWithDI(ctrls ...controllers.Controller) *gin.Engine {
 	return router
 }
 
-// RunServer 启动服务器
+// RunServer 启动服务器 (Legacy 版本，保留兼容)
 func RunServer() {
-	r := setupRouter()
+	runWithRouter(setupRouter())
+}
 
+// RunServerWithDI 使用依赖注入启动服务器
+func RunServerWithDI(ctrls ...controllers.Controller) {
+	runWithRouter(SetupRouterWithDI(ctrls...))
+}
+
+// runWithRouter 通用服务器启动逻辑
+func runWithRouter(r *gin.Engine) {
 	srv := &http.Server{
 		Addr:    ":" + global.App.Config.App.Port,
 		Handler: r,

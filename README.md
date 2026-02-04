@@ -3,11 +3,11 @@
 [![Go Version](https://img.shields.io/badge/Go-1.19+-00ADD8?style=flat&logo=go)](https://go.dev/)
 [![Gin](https://img.shields.io/badge/Gin-1.10.0-00ADD8?style=flat)](https://gin-gonic.com/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/Version-1.3.0-brightgreen.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/Version-1.5.0-brightgreen.svg)](CHANGELOG.md)
 
 一个基于 Gin 框架的企业级 Go 语言后端 API 脚手架，采用标准的 MVC 架构模式，为 PHP 开发者提供友好的 Go 语言开发体验。
 
-📋 **[查看更新日志 (CHANGELOG)](CHANGELOG.md)** | 🚀 **当前版本: v1.3.0**
+📋 **[查看更新日志 (CHANGELOG)](CHANGELOG.md)** | 🚀 **当前版本: v1.5.0**
 
 ---
 
@@ -33,7 +33,7 @@
 
 ### 🏗️ 架构设计
 - **MVC + Repository 架构模式**：清晰的分层设计，Controller-Service-Repository-Model 四层架构
-- **依赖注入容器**：完整的 DI 容器实现，支持接口抽象和依赖反转
+- **依赖注入容器**：基于 Google Wire 的 DI 容器，编译时依赖注入
 - **控制器自动注册**：类似 Hyperf 的控制器路由自动注册机制
 - **统一错误处理**：标准化的业务错误码和错误包装
 - **中间件支持**：JWT 认证、CORS 跨域、异常恢复等中间件
@@ -83,6 +83,7 @@
 | **消息队列** | RabbitMQ | v1.10.0 | 消息中间件 (amqp091-go) |
 | **密码加密** | bcrypt | - | 密码哈希算法 |
 | **参数验证** | validator | v10.23.0 | 结构体验证 |
+| **依赖注入** | Wire | v0.6.0 | Google 编译时依赖注入 |
 
 ## 📁 项目结构
 
@@ -91,12 +92,12 @@ gin-web/
 ├── app/                          # 应用核心代码
 │   ├── controllers/              # 控制器层
 │   │   ├── controller.go        # 控制器接口定义
-│   │   ├── auth_controller.go   # 认证控制器 (DI版本)
-│   │   ├── auth.go              # 认证控制器 (兼容版本)
-│   │   └── user.go              # 用户控制器
+│   │   ├── auth_controller.go   # 认证控制器
+│   │   └── mod.go               # Mod 控制器
 │   ├── services/                # 服务层
-│   │   ├── user.go              # 用户服务 (支持DI和兼容模式)
-│   │   └── jwt.go               # JWT 服务 (支持DI和兼容模式)
+│   │   ├── user.go              # 用户服务
+│   │   ├── jwt.go               # JWT 服务
+│   │   └── mod.go               # Mod 服务
 │   ├── models/                  # 模型层
 │   │   ├── user.go              # 用户模型
 │   │   └── common.go            # 公共模型
@@ -112,8 +113,10 @@ gin-web/
 │   │   └── producer/            # 生产者
 │   └── api/                     # API 客户端
 ├── internal/                    # 内部包 (不对外暴露)
-│   ├── container/               # 依赖注入容器
-│   │   └── container.go         # DI 容器实现
+│   ├── container/               # 依赖注入容器 (Wire)
+│   │   ├── provider.go          # Provider 函数定义
+│   │   ├── wire.go              # Wire 配置文件
+│   │   └── wire_gen.go          # Wire 生成的代码
 │   └── repository/              # 仓储层
 │       ├── repository.go        # 仓储接口定义
 │       └── user_repository.go   # 用户仓储实现
@@ -125,7 +128,7 @@ gin-web/
 │   ├── db.go                    # 数据库初始化
 │   ├── log.go                   # 日志初始化
 │   ├── redis.go                 # Redis 初始化
-│   ├── router.go                # 路由初始化 (支持DI)
+│   ├── router.go                # 路由初始化
 │   ├── rabbitmq_manager.go      # RabbitMQ 管理器
 │   └── validator.go             # 验证器初始化
 ├── config/                      # 配置结构体
@@ -137,7 +140,7 @@ gin-web/
 │   ├── redis.go                 # Redis 配置
 │   └── queue.go                 # 队列配置
 ├── routes/                      # 路由定义
-│   └── api.go                   # API 路由 (支持DI和兼容模式)
+│   └── api.go                   # API 路由
 ├── storage/                     # 存储目录
 │   └── logs/                    # 日志文件
 │       ├── app.log              # 应用日志
@@ -302,10 +305,10 @@ func CreateXxx(c *gin.Context) {
 | Repository | `internal/repository/` | 数据访问抽象 |
 | Model | `app/models/` | 数据模型定义 |
 
-### 依赖注入模式 (推荐)
+### 依赖注入模式 (Wire)
 
 ```go
-// 实现 Controller 接口
+// 1. 实现 Controller 接口
 type MyController struct {
     myService *services.MyService
 }
@@ -320,6 +323,14 @@ func (c *MyController) Routes() []controllers.Route {
         {Method: "POST", Path: "/create", Handler: c.Create},
     }
 }
+
+// 2. 在 internal/container/provider.go 添加 Provider
+func ProvideMyController(service *services.MyService) *controllers.MyController {
+    return controllers.NewMyController(service)
+}
+
+// 3. 运行 wire 命令重新生成
+// $ wire ./internal/container/
 ```
 
 ### 中间件使用
@@ -443,7 +454,7 @@ redis:
 | 功能模块 | 说明 |
 |----------|------|
 | **MVC + Repository 架构** | 清晰的四层分层设计 |
-| **依赖注入容器** | 支持接口抽象和依赖反转 |
+| **依赖注入容器 (Wire)** | 基于 Google Wire 的编译时依赖注入 |
 | **JWT 用户认证** | 完整的认证体系，支持令牌刷新和黑名单 |
 | **MySQL + GORM** | ORM 操作，自动迁移 |
 | **Redis 缓存** | 缓存和会话存储 |
@@ -478,6 +489,7 @@ redis:
 
 - [Gin](https://github.com/gin-gonic/gin) - HTTP Web 框架
 - [GORM](https://github.com/go-gorm/gorm) - ORM 库
+- [Wire](https://github.com/google/wire) - 依赖注入
 - [Viper](https://github.com/spf13/viper) - 配置管理
 - [Zap](https://github.com/uber-go/zap) - 日志库
 - [Hyperf](https://hyperf.io/) - 设计灵感来源

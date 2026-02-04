@@ -9,17 +9,19 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-// AuthController 认证控制器 (依赖注入版本)
+// AuthController 认证控制器
 type AuthController struct {
-	userService *services.UserService
-	jwtService  *services.JwtServiceDI
+	userService   *services.UserService
+	jwtService    *services.JwtService
+	jwtMiddleware *middleware.JwtMiddleware
 }
 
 // NewAuthController 创建认证控制器实例
-func NewAuthController(userService *services.UserService, jwtService *services.JwtServiceDI) *AuthController {
+func NewAuthController(userService *services.UserService, jwtService *services.JwtService, jwtMiddleware *middleware.JwtMiddleware) *AuthController {
 	return &AuthController{
-		userService: userService,
-		jwtService:  jwtService,
+		userService:   userService,
+		jwtService:    jwtService,
+		jwtMiddleware: jwtMiddleware,
 	}
 }
 
@@ -33,8 +35,8 @@ func (c *AuthController) Routes() []Route {
 	return []Route{
 		{Method: "POST", Path: "/register", Handler: c.Register},
 		{Method: "POST", Path: "/login", Handler: c.Login},
-		{Method: "POST", Path: "/info", Handler: c.Info, Middlewares: []gin.HandlerFunc{middleware.JWTAuth(services.AppGuardName)}},
-		{Method: "POST", Path: "/logout", Handler: c.Logout, Middlewares: []gin.HandlerFunc{middleware.JWTAuth(services.AppGuardName)}},
+		{Method: "POST", Path: "/info", Handler: c.Info, Middlewares: []gin.HandlerFunc{c.jwtMiddleware.JWTAuth(services.AppGuardName)}},
+		{Method: "POST", Path: "/logout", Handler: c.Logout, Middlewares: []gin.HandlerFunc{c.jwtMiddleware.JWTAuth(services.AppGuardName)}},
 	}
 }
 

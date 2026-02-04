@@ -15,6 +15,54 @@
 
 ---
 
+## [1.5.0] - 2026-02-04
+
+### 重大变更
+- **Wire 依赖注入**: 使用 Google Wire 重构依赖注入系统
+
+### 变更
+- 手动 DI 容器改为 Wire 代码生成
+- `main.go` 使用 `container.InitializeApp()` 替代 `container.NewContainer()`
+
+### 新增
+- `internal/container/provider.go` - Provider 函数定义
+- `internal/container/wire.go` - Wire 配置文件
+- `internal/container/wire_gen.go` - Wire 生成的代码
+
+### 移除
+- `internal/container/container.go` - 旧的手动 DI 容器
+
+---
+
+## [1.4.0] - 2026-02-04
+
+### 重大变更
+- **DI 系统全面激活**: 项目完全切换到依赖注入模式
+- **删除 Legacy 代码**: 移除所有全局变量版本的 Service 和 Controller
+
+### 变更
+- `main.go` 使用 `container.NewContainer()` 创建 DI 容器
+- `bootstrap.RunServerWithDI()` 替代 `RunServer()`
+- `UserService` 统一为 DI 版本，删除 `UserServiceLegacy`
+- `JwtService` 统一为 DI 版本，删除全局 `JwtService` 变量
+- `JwtMiddleware` 改造为依赖注入，接收 `*services.JwtService`
+- `ModService` 改造为 DI 版本
+- `ModController` 实现 `Controller` 接口
+
+### 新增
+- `internal/repository/mod_repository.go` - Mod 仓储层
+- `app/middleware/JwtMiddleware` 结构体
+- Container 新增 `ModRepo`、`ModService`、`ModController`
+
+### 移除
+- `app/controllers/auth.go` - Legacy 认证控制器
+- `app/controllers/user.go` - Legacy 用户控制器
+- `services.UserServiceLegacy` 全局变量
+- `services.JwtService` 全局变量
+- `middleware.JWTAuth()` 函数（改为 `JwtMiddleware.JWTAuth()` 方法）
+
+---
+
 ## [1.3.0] - 2026-02-04
 
 ### 变更
@@ -87,6 +135,8 @@
 
 | 版本 | 日期 | 说明 |
 |------|------|------|
+| 1.5.0 | 2026-02-04 | Wire 依赖注入重构 |
+| 1.4.0 | 2026-02-04 | DI 系统全面激活，删除 Legacy 代码 |
 | 1.3.0 | 2026-02-04 | 代码规范统一 (P2 完成) |
 | 1.2.0 | 2026-02-04 | 开发文档体系 |
 | 1.1.0 | 2026-02-03 | DI 容器、Repository 模式、安全修复 |

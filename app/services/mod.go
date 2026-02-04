@@ -4,21 +4,28 @@ import (
 	"gin-web/app/common/request"
 	"gin-web/app/common/response"
 	"gin-web/app/models"
-	"gin-web/global"
+	"gin-web/internal/repository"
+	"go.uber.org/zap"
+	"gorm.io/gorm"
 	"math"
 )
 
-type modService struct{}
+// ModService Mod服务
+type ModService struct {
+	repo repository.ModRepository
+	db   *gorm.DB
+	log  *zap.Logger
+}
 
-var ModService = &modService{}
+// NewModService 创建Mod服务实例
+func NewModService(repo repository.ModRepository, db *gorm.DB, log *zap.Logger) *ModService {
+	return &ModService{repo: repo, db: db, log: log}
+}
 
 // SearchMods 搜索mod
-func (s *modService) SearchMods(req request.ModSearchRequest) (*response.ModListResponse, error) {
-	var mods []models.Mod
-	var total int64
-
+func (s *ModService) SearchMods(req request.ModSearchRequest) (*response.ModListResponse, error) {
 	// 构建查询
-	db := global.App.DB.Model(&models.Mod{})
+	db := s.db.Model(&models.Mod{})
 
 	// 预加载关联数据
 	db = db.Preload("Game").Preload("Categories")
@@ -74,7 +81,10 @@ func (s *modService) SearchMods(req request.ModSearchRequest) (*response.ModList
 	db = db.Order(sortBy + " " + order)
 
 	// 获取总数
-	db.Count(&total)
+	total, err := s.repo.Count(db)
+	if err != nil {
+		return nil, err
+	}
 
 	// 分页
 	page := req.Page
@@ -90,14 +100,14 @@ func (s *modService) SearchMods(req request.ModSearchRequest) (*response.ModList
 	db = db.Offset(offset).Limit(pageSize)
 
 	// 执行查询
-	if err := db.Find(&mods).Error; err != nil {
+	mods, err := s.repo.Search(db)
+	if err != nil {
 		return nil, err
 	}
 
 	// 转换为响应格式
 	modItems := make([]response.ModItem, len(mods))
 	for i, mod := range mods {
-		// 获取分类名称
 		categoryNames := []string{}
 		for _, category := range mod.Categories {
 			categoryNames = append(categoryNames, category.Name)
@@ -118,7 +128,6 @@ func (s *modService) SearchMods(req request.ModSearchRequest) (*response.ModList
 		}
 	}
 
-	// 计算总页数
 	totalPages := int(math.Ceil(float64(total) / float64(pageSize)))
 
 	return &response.ModListResponse{
@@ -131,22 +140,18 @@ func (s *modService) SearchMods(req request.ModSearchRequest) (*response.ModList
 }
 
 // GetModDetail 获取mod详情
-func (s *modService) GetModDetail(id uint) (*response.ModDetailResponse, error) {
-	var mod models.Mod
-
-	// 查询mod详情，预加载关联数据
-	if err := global.App.DB.Preload("Game").Preload("Categories").First(&mod, id).Error; err != nil {
+func (s *ModService) GetModDetail(id uint) (*response.ModDetailResponse, error) {
+	mod, err := s.repo.FindByID(id)
+	if err != nil {
 		return nil, err
 	}
 
 	// 增加下载次数
-	global.App.DB.Model(&mod).UpdateColumn("download_count", mod.DownloadCount+1)
+	_ = s.repo.UpdateDownloadCount(mod)
 
 	// 转换分类为数组格式
-	categories := []models.Category{}
-	for _, category := range mod.Categories {
-		categories = append(categories, category)
-	}
+	categories := make([]models.Category, len(mod.Categories))
+	copy(categories, mod.Categories)
 
 	return &response.ModDetailResponse{
 		ID:            mod.ID,
@@ -156,7 +161,7 @@ func (s *modService) GetModDetail(id uint) (*response.ModDetailResponse, error) 
 		Version:       mod.Version,
 		DownloadURL:   mod.DownloadURL,
 		Rating:        mod.Rating,
-		DownloadCount: mod.DownloadCount + 1, // 返回更新后的值
+		DownloadCount: mod.DownloadCount + 1,
 		FileSize:      mod.FileSize,
 		Game:          mod.Game,
 		Categories:    categories,
@@ -166,10 +171,9 @@ func (s *modService) GetModDetail(id uint) (*response.ModDetailResponse, error) 
 }
 
 // GetGames 获取游戏列表
-func (s *modService) GetGames() (*response.GameListResponse, error) {
-	var games []models.Game
-
-	if err := global.App.DB.Find(&games).Error; err != nil {
+func (s *ModService) GetGames() (*response.GameListResponse, error) {
+	games, err := s.repo.FindAllGames()
+	if err != nil {
 		return nil, err
 	}
 
@@ -179,10 +183,9 @@ func (s *modService) GetGames() (*response.GameListResponse, error) {
 }
 
 // GetCategories 获取分类列表
-func (s *modService) GetCategories() (*response.CategoryListResponse, error) {
-	var categories []models.Category
-
-	if err := global.App.DB.Find(&categories).Error; err != nil {
+func (s *ModService) GetCategories() (*response.CategoryListResponse, error) {
+	categories, err := s.repo.FindAllCategories()
+	if err != nil {
 		return nil, err
 	}
 

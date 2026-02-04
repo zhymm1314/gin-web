@@ -11,19 +11,40 @@ import (
 )
 
 // ModController mod控制器
-type ModController struct{}
+type ModController struct {
+	modService *services.ModService
+}
+
+// NewModController 创建Mod控制器实例
+func NewModController(modService *services.ModService) *ModController {
+	return &ModController{modService: modService}
+}
+
+// Prefix 返回路由前缀
+func (mc *ModController) Prefix() string {
+	return ""
+}
+
+// Routes 返回路由列表
+func (mc *ModController) Routes() []Route {
+	return []Route{
+		{Method: "GET", Path: "/mods/search", Handler: mc.Search},
+		{Method: "GET", Path: "/mods/:id", Handler: mc.Detail},
+		{Method: "GET", Path: "/mods/:id/download", Handler: mc.Download},
+		{Method: "GET", Path: "/games", Handler: mc.Games},
+		{Method: "GET", Path: "/categories", Handler: mc.Categories},
+	}
+}
 
 // Search 搜索mod
 func (mc *ModController) Search(c *gin.Context) {
 	var req request.ModSearchRequest
 
-	// 绑定查询参数
 	if err := c.ShouldBindQuery(&req); err != nil {
 		response.ValidateFail(c, err.Error())
 		return
 	}
 
-	// 设置默认值
 	if req.Page == 0 {
 		req.Page = 1
 	}
@@ -31,8 +52,7 @@ func (mc *ModController) Search(c *gin.Context) {
 		req.PageSize = 20
 	}
 
-	// 调用服务层
-	result, err := services.ModService.SearchMods(req)
+	result, err := mc.modService.SearchMods(req)
 	if err != nil {
 		response.BusinessFail(c, err.Error())
 		return
@@ -45,14 +65,12 @@ func (mc *ModController) Search(c *gin.Context) {
 func (mc *ModController) Detail(c *gin.Context) {
 	var req request.ModDetailRequest
 
-	// 绑定URI参数
 	if err := c.ShouldBindUri(&req); err != nil {
 		response.ValidateFail(c, err.Error())
 		return
 	}
 
-	// 调用服务层
-	result, err := services.ModService.GetModDetail(req.ID)
+	result, err := mc.modService.GetModDetail(req.ID)
 	if err != nil {
 		response.BusinessFail(c, "Mod not found")
 		return
@@ -70,14 +88,12 @@ func (mc *ModController) Download(c *gin.Context) {
 		return
 	}
 
-	// 获取mod详情
-	result, err := services.ModService.GetModDetail(uint(id))
+	result, err := mc.modService.GetModDetail(uint(id))
 	if err != nil {
 		response.BusinessFail(c, "Mod not found")
 		return
 	}
 
-	// 如果有下载链接，重定向到下载地址
 	if result.DownloadURL != "" {
 		c.Redirect(http.StatusFound, result.DownloadURL)
 		return
@@ -88,7 +104,7 @@ func (mc *ModController) Download(c *gin.Context) {
 
 // Games 获取游戏列表
 func (mc *ModController) Games(c *gin.Context) {
-	result, err := services.ModService.GetGames()
+	result, err := mc.modService.GetGames()
 	if err != nil {
 		response.BusinessFail(c, err.Error())
 		return
@@ -99,7 +115,7 @@ func (mc *ModController) Games(c *gin.Context) {
 
 // Categories 获取分类列表
 func (mc *ModController) Categories(c *gin.Context) {
-	result, err := services.ModService.GetCategories()
+	result, err := mc.modService.GetCategories()
 	if err != nil {
 		response.BusinessFail(c, err.Error())
 		return

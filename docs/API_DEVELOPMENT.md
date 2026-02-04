@@ -2,6 +2,8 @@
 
 本文档详细说明如何在 Gin-Web 项目中开发一个完整的 API 接口。
 
+> **v1.5.0 更新**: 项目使用 Google Wire 进行依赖注入，Legacy 代码已移除。
+
 ---
 
 ## 目录
@@ -14,7 +16,7 @@
   - [Step 3: 实现 Repository 层](#step-3-实现-repository-层)
   - [Step 4: 实现 Service 层](#step-4-实现-service-层)
   - [Step 5: 实现 Controller 层](#step-5-实现-controller-层)
-  - [Step 6: 注册路由](#step-6-注册路由)
+  - [Step 6: 注册到 DI 容器](#step-6-注册到-di-容器)
 - [完整示例](#完整示例)
 - [常用响应方法](#常用响应方法)
 - [参数验证](#参数验证)
@@ -25,11 +27,13 @@
 
 ## 概述
 
-本项目采用 **Controller → Service → Repository → Model** 四层架构模式：
+本项目采用 **Controller → Service → Repository → Model** 四层架构模式，并通过 **依赖注入容器** 管理所有依赖关系：
 
 ```
-┌─────────────┐
-│ Controller  │  ← 处理 HTTP 请求/响应，参数验证
+┌─────────────────────────────────────┐
+│           DI Container              │  ← 依赖注入容器
+├─────────────────────────────────────┤
+│ Controller  │  ← 处理 HTTP 请求/响应
 ├─────────────┤
 │  Service    │  ← 业务逻辑处理
 ├─────────────┤
@@ -45,10 +49,10 @@
 
 1. **定义请求结构体** - `app/common/request/` 目录
 2. **定义数据模型** - `app/models/` 目录
-3. **实现 Repository** - `internal/repository/` 目录 (推荐)
+3. **实现 Repository** - `internal/repository/` 目录
 4. **实现 Service** - `app/services/` 目录
 5. **实现 Controller** - `app/controllers/` 目录
-6. **注册路由** - `routes/api.go` 或使用控制器自动注册
+6. **注册到 DI 容器** - `internal/container/container.go`
 
 ---
 
@@ -200,7 +204,7 @@ func (r *articleRepository) Delete(id uint) error {
 
 ### Step 4: 实现 Service 层
 
-Service 层处理业务逻辑。
+Service 层处理业务逻辑，通过构造函数注入依赖。
 
 **文件位置**: `app/services/article.go`
 
@@ -260,60 +264,7 @@ func (s *ArticleService) List(userID uint, page, pageSize int) ([]models.Article
 
 ### Step 5: 实现 Controller 层
 
-Controller 有两种实现方式：
-
-#### 方式一：传统函数式 (兼容模式)
-
-**文件位置**: `app/controllers/article.go`
-
-```go
-package controllers
-
-import (
-    "gin-web/app/common/request"
-    "gin-web/app/common/response"
-    "gin-web/app/services"
-    "github.com/gin-gonic/gin"
-    "strconv"
-)
-
-// CreateArticle 创建文章
-func CreateArticle(c *gin.Context) {
-    var req request.CreateArticle
-    if err := c.ShouldBindJSON(&req); err != nil {
-        response.ValidateFail(c, request.GetErrorMsg(req, err))
-        return
-    }
-
-    // 从 JWT 中间件获取用户 ID
-    userID := c.GetUint("user_id")
-
-    article, err := services.ArticleServiceInstance.Create(userID, req)
-    if err != nil {
-        response.BusinessFail(c, err.Error())
-        return
-    }
-
-    response.Success(c, article)
-}
-
-// GetArticle 获取文章详情
-func GetArticle(c *gin.Context) {
-    id, _ := strconv.Atoi(c.Param("id"))
-
-    article, err := services.ArticleServiceInstance.GetByID(uint(id))
-    if err != nil {
-        response.BusinessFail(c, err.Error())
-        return
-    }
-
-    response.Success(c, article)
-}
-```
-
-#### 方式二：依赖注入式 (推荐)
-
-实现 `Controller` 接口，支持自动路由注册。
+Controller 必须实现 `Controller` 接口，支持自动路由注册。
 
 **文件位置**: `app/controllers/article_controller.go`
 
@@ -332,11 +283,15 @@ import (
 // ArticleController 文章控制器
 type ArticleController struct {
     articleService *services.ArticleService
+    jwtMiddleware  *middleware.JwtMiddleware
 }
 
 // NewArticleController 创建文章控制器
-func NewArticleController(articleService *services.ArticleService) *ArticleController {
-    return &ArticleController{articleService: articleService}
+func NewArticleController(articleService *services.ArticleService, jwtMiddleware *middleware.JwtMiddleware) *ArticleController {
+    return &ArticleController{
+        articleService: articleService,
+        jwtMiddleware:  jwtMiddleware,
+    }
 }
 
 // Prefix 路由前缀
@@ -347,11 +302,11 @@ func (ctrl *ArticleController) Prefix() string {
 // Routes 路由列表
 func (ctrl *ArticleController) Routes() []Route {
     return []Route{
-        {Method: "POST", Path: "/create", Handler: ctrl.Create, Middlewares: []gin.HandlerFunc{middleware.JWTAuth(services.AppGuardName)}},
+        {Method: "POST", Path: "/create", Handler: ctrl.Create, Middlewares: []gin.HandlerFunc{ctrl.jwtMiddleware.JWTAuth(services.AppGuardName)}},
         {Method: "GET", Path: "/:id", Handler: ctrl.Detail},
-        {Method: "GET", Path: "/list", Handler: ctrl.List, Middlewares: []gin.HandlerFunc{middleware.JWTAuth(services.AppGuardName)}},
-        {Method: "PUT", Path: "/:id", Handler: ctrl.Update, Middlewares: []gin.HandlerFunc{middleware.JWTAuth(services.AppGuardName)}},
-        {Method: "DELETE", Path: "/:id", Handler: ctrl.Delete, Middlewares: []gin.HandlerFunc{middleware.JWTAuth(services.AppGuardName)}},
+        {Method: "GET", Path: "/list", Handler: ctrl.List, Middlewares: []gin.HandlerFunc{ctrl.jwtMiddleware.JWTAuth(services.AppGuardName)}},
+        {Method: "PUT", Path: "/:id", Handler: ctrl.Update, Middlewares: []gin.HandlerFunc{ctrl.jwtMiddleware.JWTAuth(services.AppGuardName)}},
+        {Method: "DELETE", Path: "/:id", Handler: ctrl.Delete, Middlewares: []gin.HandlerFunc{ctrl.jwtMiddleware.JWTAuth(services.AppGuardName)}},
     }
 }
 
@@ -407,46 +362,105 @@ func (ctrl *ArticleController) List(c *gin.Context) {
     })
 }
 
-// 其他方法...
-```
+// Update 更新文章
+func (ctrl *ArticleController) Update(c *gin.Context) {
+    // 实现更新逻辑
+}
 
-### Step 6: 注册路由
-
-#### 方式一：手动注册路由
-
-编辑 `routes/api.go` 文件：
-
-```go
-func SetApiGroupRoutes(router *gin.RouterGroup) {
-    // ... 其他路由
-
-    // 文章路由 - 公开接口
-    router.GET("/article/:id", controllers.GetArticle)
-
-    // 文章路由 - 需要认证
-    authRouter := router.Group("").Use(middleware.JWTAuth(services.AppGuardName))
-    {
-        authRouter.POST("/article", controllers.CreateArticle)
-        authRouter.GET("/articles", controllers.ListArticles)
-    }
+// Delete 删除文章
+func (ctrl *ArticleController) Delete(c *gin.Context) {
+    // 实现删除逻辑
 }
 ```
 
-#### 方式二：自动注册 (推荐)
+### Step 6: 注册到 Wire DI 容器
 
-在 DI 容器中注册控制器，路由会自动注册：
+项目使用 Google Wire 进行依赖注入，需要在以下文件中注册新组件：
+
+#### 6.1 添加 Provider 函数
+
+在 `internal/container/provider.go` 中添加：
 
 ```go
-// internal/container/container.go
+// ProvideArticleRepository 提供文章仓储
+func ProvideArticleRepository(db *gorm.DB) repository.ArticleRepository {
+    return repository.NewArticleRepository(db)
+}
 
-// 在容器中添加
-func (c *Container) GetControllers() []controllers.Controller {
+// ProvideArticleService 提供文章服务
+func ProvideArticleService(repo repository.ArticleRepository, log *zap.Logger) *services.ArticleService {
+    return services.NewArticleService(repo, log)
+}
+
+// ProvideArticleController 提供文章控制器
+func ProvideArticleController(articleService *services.ArticleService, jwtMiddleware *middleware.JwtMiddleware) *controllers.ArticleController {
+    return controllers.NewArticleController(articleService, jwtMiddleware)
+}
+```
+
+#### 6.2 更新 Wire 配置
+
+在 `internal/container/wire.go` 中更新 Provider Sets：
+
+```go
+// RepositorySet 中添加
+var RepositorySet = wire.NewSet(
+    ProvideUserRepository,
+    ProvideModRepository,
+    ProvideArticleRepository, // 新增
+)
+
+// ServiceSet 中添加
+var ServiceSet = wire.NewSet(
+    ProvideUserService,
+    ProvideJwtService,
+    ProvideModService,
+    ProvideArticleService, // 新增
+)
+
+// ControllerSet 中添加
+var ControllerSet = wire.NewSet(
+    ProvideAuthController,
+    ProvideModController,
+    ProvideArticleController, // 新增
+)
+
+// App 结构体中添加
+type App struct {
+    AuthController    *controllers.AuthController
+    ModController     *controllers.ModController
+    ArticleController *controllers.ArticleController // 新增
+}
+
+// ProvideApp 中添加参数
+func ProvideApp(auth *controllers.AuthController, mod *controllers.ModController, article *controllers.ArticleController) *App {
+    return &App{
+        AuthController:    auth,
+        ModController:     mod,
+        ArticleController: article,
+    }
+}
+
+// GetControllers 中添加
+func (a *App) GetControllers() []controllers.Controller {
     return []controllers.Controller{
-        c.AuthController,
-        c.ArticleController, // 新增
+        a.AuthController,
+        a.ModController,
+        a.ArticleController, // 新增
     }
 }
 ```
+
+#### 6.3 重新生成 Wire 代码
+
+```bash
+cd internal/container
+wire
+```
+
+这会自动生成 `wire_gen.go` 文件，包含完整的依赖注入代码。
+
+路由会在服务启动时自动注册，无需手动修改 `routes/api.go`。
 
 ---
 
@@ -541,5 +555,7 @@ bizErr.ErrPassword
 2. **Repository** 接口定义与实现分离，便于单元测试 mock
 3. **Service** 层不应直接依赖 `*gin.Context`，保持业务逻辑纯净
 4. **Controller** 只负责请求处理和响应，不包含业务逻辑
-5. 使用**依赖注入模式**开发新功能，避免使用全局变量
+5. **必须使用依赖注入模式**开发新功能，不再支持全局变量方式
 6. 所有对外 API 响应使用 `response` 包统一格式
+7. **中间件使用**: 通过 `jwtMiddleware.JWTAuth()` 方法而非全局函数
+8. **新增控制器必须注册到 Container** 的 `GetControllers()` 方法中
