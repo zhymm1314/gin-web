@@ -2,13 +2,10 @@ package main
 
 import (
 	"gin-web/app/controllers"
-	appCron "gin-web/app/cron"
 	"gin-web/bootstrap"
 	"gin-web/global"
 	"gin-web/internal/container"
-	"gin-web/pkg/cron"
-	"gin-web/pkg/rabbitmq"
-	"gin-web/pkg/websocket"
+	"gin-web/pkg/app"
 
 	_ "gin-web/docs" // Swagger docs
 )
@@ -33,81 +30,50 @@ import (
 // @description 输入 Bearer {token}
 
 func main() {
-	// 初始化配置
+	// 1. 初始化基础设施
 	bootstrap.InitializeConfig()
-
-	// 初始化日志
 	global.App.Log = bootstrap.InitializeLog()
 	global.App.Log.Info("log init success!")
 
-	// 初始化数据库
 	global.App.DB = bootstrap.InitializeDB()
+	defer closeDB()
 
-	// 程序关闭前，释放数据库连接
-	defer func() {
-		if global.App.DB != nil {
-			db, _ := global.App.DB.DB()
-			db.Close()
-		}
-	}()
-
-	// 初始化验证器
 	bootstrap.InitializeValidator()
-
-	// 初始化 Redis
 	global.App.Redis = bootstrap.InitializeRedis()
 
-	// 使用 Wire 初始化应用
-	app, err := container.InitializeApp()
+	// 2. 初始化 Wire 依赖注入
+	diApp, err := container.InitializeApp()
 	if err != nil {
 		global.App.Log.Fatal("Failed to initialize app: " + err.Error())
 	}
 
-	// 启动 RabbitMQ 消费者 (根据配置)
-	var consumerManager *rabbitmq.Manager
-	if global.App.Config.RabbitMQ.Enable {
-		consumerManager = bootstrap.InitRabbitmq()
-		if consumerManager != nil {
-			global.App.Log.Info("RabbitMQ consumer manager started")
-		}
-	}
+	// 3. 创建应用并注册模块
+	application := app.NewApplication(global.App.Log)
+	app.RegisterModules(application)
 
-	// 启动定时任务 (根据配置)
-	var cronManager *cron.Manager
-	if global.App.Config.Cron.Enable {
-		cronManager = cron.NewManager(global.App.Log)
-		cronManager.Register(&appCron.CleanupJob{})
-		cronManager.Register(&appCron.HealthCheckJob{})
-		cronManager.Start()
-		global.App.Log.Info("Cron manager started")
+	// 4. 初始化并启动所有模块
+	if err := application.Init(); err != nil {
+		global.App.Log.Fatal("Failed to init modules: " + err.Error())
 	}
-
-	// 启动 WebSocket (根据配置)
-	var wsManager *websocket.Manager
-	var wsController *controllers.WebSocketController
-	if global.App.Config.WebSocket.Enable {
-		wsManager = websocket.NewManager(global.App.Log)
-		wsController = controllers.NewWebSocketController(wsManager)
-		global.App.Log.Info("WebSocket manager started")
+	if err := application.Start(); err != nil {
+		global.App.Log.Fatal("Failed to start modules: " + err.Error())
 	}
+	defer application.Stop()
 
-	// 组装控制器列表
-	allControllers := app.GetControllers()
-	if wsController != nil {
+	// 5. 组装控制器
+	allControllers := diApp.GetControllers()
+	if wsModule := app.GetWebSocketModule(application); wsModule != nil {
+		wsController := controllers.NewWebSocketController(wsModule.Manager())
 		allControllers = append(allControllers, wsController)
 	}
 
-	// 启动服务器
+	// 6. 启动 HTTP 服务
 	bootstrap.RunServer(allControllers...)
+}
 
-	// 清理资源
-	if consumerManager != nil {
-		consumerManager.Stop()
-	}
-	if cronManager != nil {
-		cronManager.Stop()
-	}
-	if wsManager != nil {
-		wsManager.Close()
+func closeDB() {
+	if global.App.DB != nil {
+		db, _ := global.App.DB.DB()
+		db.Close()
 	}
 }
