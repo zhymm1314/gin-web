@@ -11,7 +11,7 @@
 
 ---
 
-## 📚 开发文档导航
+## 📚 文档导航
 
 > **新手入门？** 请按以下顺序阅读文档：
 
@@ -20,13 +20,6 @@
 | [API 接口开发指南](docs/API_DEVELOPMENT.md) | 从零开始开发一个完整的 API 接口 | 开发新功能、新接口 |
 | [中间件使用指南](docs/MIDDLEWARE_GUIDE.md) | 内置中间件使用与自定义中间件开发 | 认证、限流、日志、权限控制 |
 | [RabbitMQ 消息队列指南](docs/RABBITMQ_GUIDE.md) | 消息队列的生产者和消费者开发 | 异步任务、解耦服务 |
-| [项目优化报告](docs/OPTIMIZATION_REPORT.md) | 架构分析与优化建议 | 了解项目架构、代码审查 |
-
-**开发任务清单**（按优先级）：
-- [P0 紧急修复](todo/TODO_P0_CRITICAL.md) - 必须立即处理
-- [P1 架构优化](todo/TODO_P1_ARCHITECTURE.md) - 重要架构改进
-- [P2 代码规范](todo/TODO_P2_CODE_STYLE.md) - 代码质量提升
-- [P3 功能增强](todo/TODO_P3_ENHANCEMENT.md) - 新功能开发
 
 ---
 
@@ -154,14 +147,10 @@ gin-web/
 │   ├── error.go                 # 错误定义
 │   └── lock.go                  # 分布式锁
 ├── utils/                       # 工具函数
-├── todo/                        # 开发计划
-│   ├── README.md                # 计划说明
-│   ├── TODO_P0_CRITICAL.md      # P0 紧急修复
-│   ├── TODO_P1_ARCHITECTURE.md  # P1 架构优化
-│   ├── TODO_P2_CODE_STYLE.md    # P2 代码规范
-│   └── TODO_P3_ENHANCEMENT.md   # P3 功能增强
 ├── docs/                        # 文档目录
-│   └── OPTIMIZATION_REPORT.md   # 优化报告
+│   ├── API_DEVELOPMENT.md       # API 开发指南
+│   ├── MIDDLEWARE_GUIDE.md      # 中间件指南
+│   └── RABBITMQ_GUIDE.md        # RabbitMQ 指南
 ├── config.yaml                  # 配置文件
 ├── example-config.yaml          # 配置文件模板
 ├── main.go                      # 程序入口
@@ -447,46 +436,31 @@ redis:
   db: 0                      # 数据库编号
 ```
 
-## 🔄 开发路线图
+## 🔧 功能特性
 
-### ✅ 已完成功能
+### 已支持功能
 
-#### 基础架构
-- [x] MVC + Repository 架构设计
-- [x] 依赖注入容器 (DI Container)
-- [x] Repository 仓储层抽象
-- [x] 统一错误处理 (BizError)
-- [x] 控制器自动路由注册
+| 功能模块 | 说明 |
+|----------|------|
+| **MVC + Repository 架构** | 清晰的四层分层设计 |
+| **依赖注入容器** | 支持接口抽象和依赖反转 |
+| **JWT 用户认证** | 完整的认证体系，支持令牌刷新和黑名单 |
+| **MySQL + GORM** | ORM 操作，自动迁移 |
+| **Redis 缓存** | 缓存和会话存储 |
+| **RabbitMQ 消息队列** | 生产者-消费者模式 |
+| **Zap 日志系统** | 高性能结构化日志 |
+| **参数验证** | 基于 validator 的请求验证 |
+| **统一响应格式** | 标准化 API 响应 |
+| **中间件系统** | JWT、CORS、异常恢复等 |
+| **优雅关闭** | 支持 Graceful Shutdown |
+| **Docker 支持** | 容器化部署 |
 
-#### 核心功能
-- [x] JWT 用户认证 (已升级到 golang-jwt/jwt v5)
-- [x] MySQL 数据库集成
-- [x] Redis 缓存支持
-- [x] 结构化日志系统
-- [x] 配置文件管理
-- [x] 中间件系统
-- [x] RabbitMQ 消息队列 (已统一为 amqp091-go)
-- [x] 参数验证
-- [x] 统一响应格式
-- [x] Docker 支持
-- [x] 优雅关闭 (Graceful Shutdown)
+### 规划中功能
 
-#### 安全修复
-- [x] JWT 库升级修复 CVE-2020-26160
-- [x] RabbitMQ 库统一消除废弃依赖
-
-### 🚧 开发中功能
-- [ ] WebSocket 客户端封装
-- [ ] API 文档自动生成 (Swagger)
-- [ ] 单元测试覆盖
-
-### 📋 计划功能
-- [ ] 分布式锁
-- [ ] 限流中间件
-- [ ] 监控指标收集 (Prometheus)
-- [ ] 链路追踪 (OpenTelemetry)
-- [ ] 配置中心集成
-- [ ] 微服务支持
+- API 文档自动生成 (Swagger)
+- 限流中间件
+- 监控指标收集 (Prometheus)
+- 链路追踪 (OpenTelemetry)
 
 ## 🤝 贡献指南
 
