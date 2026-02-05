@@ -1,13 +1,14 @@
 package services
 
 import (
-	"gin-web/app/common/request"
-	"gin-web/app/common/response"
-	"gin-web/app/models"
-	"gin-web/internal/repository"
+	"math"
+
 	"go.uber.org/zap"
 	"gorm.io/gorm"
-	"math"
+
+	"gin-web/app/dto"
+	"gin-web/app/models"
+	"gin-web/internal/repository"
 )
 
 // ModService Mod服务
@@ -23,7 +24,7 @@ func NewModService(repo repository.ModRepository, db *gorm.DB, log *zap.Logger) 
 }
 
 // SearchMods 搜索mod
-func (s *ModService) SearchMods(req request.ModSearchRequest) (*response.ModListResponse, error) {
+func (s *ModService) SearchMods(req dto.ModSearchRequest) (*dto.ModListResponse, error) {
 	// 构建查询
 	db := s.db.Model(&models.Mod{})
 
@@ -106,14 +107,14 @@ func (s *ModService) SearchMods(req request.ModSearchRequest) (*response.ModList
 	}
 
 	// 转换为响应格式
-	modItems := make([]response.ModItem, len(mods))
+	modItems := make([]dto.ModItemResponse, len(mods))
 	for i, mod := range mods {
 		categoryNames := []string{}
 		for _, category := range mod.Categories {
 			categoryNames = append(categoryNames, category.Name)
 		}
 
-		modItems[i] = response.ModItem{
+		modItems[i] = dto.ModItemResponse{
 			ID:            mod.ID,
 			Name:          mod.Name,
 			Author:        mod.Author,
@@ -130,7 +131,7 @@ func (s *ModService) SearchMods(req request.ModSearchRequest) (*response.ModList
 
 	totalPages := int(math.Ceil(float64(total) / float64(pageSize)))
 
-	return &response.ModListResponse{
+	return &dto.ModListResponse{
 		List:       modItems,
 		Total:      total,
 		Page:       page,
@@ -140,7 +141,7 @@ func (s *ModService) SearchMods(req request.ModSearchRequest) (*response.ModList
 }
 
 // GetModDetail 获取mod详情
-func (s *ModService) GetModDetail(id uint) (*response.ModDetailResponse, error) {
+func (s *ModService) GetModDetail(id uint) (*dto.ModDetailResponse, error) {
 	mod, err := s.repo.FindByID(id)
 	if err != nil {
 		return nil, err
@@ -153,7 +154,7 @@ func (s *ModService) GetModDetail(id uint) (*response.ModDetailResponse, error) 
 	categories := make([]models.Category, len(mod.Categories))
 	copy(categories, mod.Categories)
 
-	return &response.ModDetailResponse{
+	return &dto.ModDetailResponse{
 		ID:            mod.ID,
 		Name:          mod.Name,
 		Description:   mod.Description,
@@ -171,25 +172,25 @@ func (s *ModService) GetModDetail(id uint) (*response.ModDetailResponse, error) 
 }
 
 // GetGames 获取游戏列表
-func (s *ModService) GetGames() (*response.GameListResponse, error) {
+func (s *ModService) GetGames() (*dto.GameListResponse, error) {
 	games, err := s.repo.FindAllGames()
 	if err != nil {
 		return nil, err
 	}
 
-	return &response.GameListResponse{
+	return &dto.GameListResponse{
 		List: games,
 	}, nil
 }
 
 // GetCategories 获取分类列表
-func (s *ModService) GetCategories() (*response.CategoryListResponse, error) {
+func (s *ModService) GetCategories() (*dto.CategoryListResponse, error) {
 	categories, err := s.repo.FindAllCategories()
 	if err != nil {
 		return nil, err
 	}
 
-	return &response.CategoryListResponse{
+	return &dto.CategoryListResponse{
 		List: categories,
 	}, nil
 }

@@ -1,16 +1,21 @@
-package request
+package dto
 
 import (
 	"github.com/go-playground/validator/v10"
 )
 
+// Validator 验证器接口
+// 实现此接口可自定义字段验证错误信息
 type Validator interface {
 	GetMessages() ValidatorMessages
 }
 
+// ValidatorMessages 验证消息映射
+// key 格式: "字段名.规则名"，如 "Mobile.required"
 type ValidatorMessages map[string]string
 
-// GetErrorMsg 获取错误信息
+// GetErrorMsg 获取验证错误信息
+// 如果 request 实现了 Validator 接口，则使用自定义错误信息
 func GetErrorMsg(request interface{}, err error) string {
 	if _, isValidatorErrors := err.(validator.ValidationErrors); isValidatorErrors {
 		_, isValidator := request.(Validator)

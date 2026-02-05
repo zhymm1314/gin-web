@@ -1,10 +1,11 @@
 package middleware
 
 import (
-	"gin-web/app/common/response"
-	"gin-web/global"
 	"github.com/gin-gonic/gin"
 	"gopkg.in/natefinch/lumberjack.v2"
+
+	"gin-web/app/dto"
+	"gin-web/global"
 )
 
 func CustomRecovery() gin.HandlerFunc {
@@ -16,5 +17,5 @@ func CustomRecovery() gin.HandlerFunc {
 			MaxAge:     global.App.Config.Log.MaxAge,
 			Compress:   global.App.Config.Log.Compress,
 		},
-		response.ServerError)
+		dto.ServerError)
 }

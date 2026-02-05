@@ -1,12 +1,14 @@
 package middleware
 
 import (
-	"gin-web/app/common/response"
-	"gin-web/app/services"
-	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v5"
 	"strconv"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
+
+	"gin-web/app/dto"
+	"gin-web/app/services"
 )
 
 // JwtMiddleware JWT中间件依赖
@@ -24,7 +26,7 @@ func (m *JwtMiddleware) JWTAuth(guardName string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenStr := c.Request.Header.Get("Authorization")
 		if tokenStr == "" {
-			response.TokenFail(c)
+			dto.TokenFail(c)
 			c.Abort()
 			return
 		}
@@ -35,7 +37,7 @@ func (m *JwtMiddleware) JWTAuth(guardName string) gin.HandlerFunc {
 			return []byte(m.jwtService.GetSecret()), nil
 		})
 		if err != nil || !token.Valid || m.jwtService.IsInBlacklist(tokenStr) {
-			response.TokenFail(c)
+			dto.TokenFail(c)
 			c.Abort()
 			return
 		}
@@ -43,7 +45,7 @@ func (m *JwtMiddleware) JWTAuth(guardName string) gin.HandlerFunc {
 		claims := token.Claims.(*services.CustomClaims)
 		// Token 发布者校验
 		if claims.Issuer != guardName {
-			response.TokenFail(c)
+			dto.TokenFail(c)
 			c.Abort()
 			return
 		}

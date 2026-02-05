@@ -1,13 +1,15 @@
 package services
 
 import (
-	"gin-web/app/common/request"
+	"strconv"
+
+	"go.uber.org/zap"
+
+	"gin-web/app/dto"
 	"gin-web/app/models"
 	"gin-web/internal/repository"
 	bizErr "gin-web/pkg/errors"
 	"gin-web/utils"
-	"go.uber.org/zap"
-	"strconv"
 )
 
 // UserService 用户服务 (依赖注入版本)
@@ -22,7 +24,7 @@ func NewUserService(repo repository.UserRepository, log *zap.Logger) *UserServic
 }
 
 // Register 注册
-func (s *UserService) Register(params request.Register) (*models.User, error) {
+func (s *UserService) Register(params dto.RegisterRequest) (*models.User, error) {
 	existUser, _ := s.repo.FindByMobile(params.Mobile)
 	if existUser != nil {
 		return nil, bizErr.ErrUserExists
@@ -43,7 +45,7 @@ func (s *UserService) Register(params request.Register) (*models.User, error) {
 }
 
 // Login 登录
-func (s *UserService) Login(params request.Login) (*models.User, error) {
+func (s *UserService) Login(params dto.LoginRequest) (*models.User, error) {
 	user, err := s.repo.FindByMobile(params.Mobile)
 	if err != nil {
 		return nil, bizErr.ErrUserNotFound

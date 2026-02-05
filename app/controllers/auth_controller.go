@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"gin-web/app/common/request"
-	"gin-web/app/common/response"
+	"gin-web/app/dto"
 	"gin-web/app/middleware"
 	"gin-web/app/services"
+
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -46,23 +46,23 @@ func (c *AuthController) Routes() []Route {
 // @Tags         认证
 // @Accept       json
 // @Produce      json
-// @Param        request body request.Register true "注册信息"
-// @Success      200 {object} response.Response "成功"
-// @Failure      400 {object} response.Response "参数错误"
+// @Param        request body dto.RegisterRequest true "注册信息"
+// @Success      200 {object} dto.Response "成功"
+// @Failure      400 {object} dto.Response "参数错误"
 // @Router       /auth/register [post]
 func (c *AuthController) Register(ctx *gin.Context) {
-	var form request.Register
+	var form dto.RegisterRequest
 	if err := ctx.ShouldBindJSON(&form); err != nil {
-		response.ValidateFail(ctx, request.GetErrorMsg(form, err))
+		dto.ValidateFail(ctx, dto.GetErrorMsg(form, err))
 		return
 	}
 
 	user, err := c.userService.Register(form)
 	if err != nil {
-		response.BusinessFail(ctx, err.Error())
+		dto.BusinessFail(ctx, err.Error())
 		return
 	}
-	response.Success(ctx, user)
+	dto.Success(ctx, user)
 }
 
 // Login 用户登录
@@ -71,30 +71,30 @@ func (c *AuthController) Register(ctx *gin.Context) {
 // @Tags         认证
 // @Accept       json
 // @Produce      json
-// @Param        request body request.Login true "登录信息"
-// @Success      200 {object} response.Response "成功返回 Token"
-// @Failure      400 {object} response.Response "参数错误"
-// @Failure      401 {object} response.Response "认证失败"
+// @Param        request body dto.LoginRequest true "登录信息"
+// @Success      200 {object} dto.Response "成功返回 Token"
+// @Failure      400 {object} dto.Response "参数错误"
+// @Failure      401 {object} dto.Response "认证失败"
 // @Router       /auth/login [post]
 func (c *AuthController) Login(ctx *gin.Context) {
-	var form request.Login
+	var form dto.LoginRequest
 	if err := ctx.ShouldBindJSON(&form); err != nil {
-		response.ValidateFail(ctx, request.GetErrorMsg(form, err))
+		dto.ValidateFail(ctx, dto.GetErrorMsg(form, err))
 		return
 	}
 
 	user, err := c.userService.Login(form)
 	if err != nil {
-		response.BusinessFail(ctx, err.Error())
+		dto.BusinessFail(ctx, err.Error())
 		return
 	}
 
 	tokenData, _, err := c.jwtService.CreateToken(services.AppGuardName, user)
 	if err != nil {
-		response.BusinessFail(ctx, err.Error())
+		dto.BusinessFail(ctx, err.Error())
 		return
 	}
-	response.Success(ctx, tokenData)
+	dto.Success(ctx, tokenData)
 }
 
 // Info 获取用户信息
@@ -104,16 +104,16 @@ func (c *AuthController) Login(ctx *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Security     Bearer
-// @Success      200 {object} response.Response "成功"
-// @Failure      401 {object} response.Response "未授权"
+// @Success      200 {object} dto.Response "成功"
+// @Failure      401 {object} dto.Response "未授权"
 // @Router       /auth/info [post]
 func (c *AuthController) Info(ctx *gin.Context) {
 	user, err := c.userService.GetUserInfo(ctx.Keys["id"].(string))
 	if err != nil {
-		response.BusinessFail(ctx, err.Error())
+		dto.BusinessFail(ctx, err.Error())
 		return
 	}
-	response.Success(ctx, user)
+	dto.Success(ctx, user)
 }
 
 // Logout 用户登出
@@ -123,14 +123,14 @@ func (c *AuthController) Info(ctx *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Security     Bearer
-// @Success      200 {object} response.Response "成功"
-// @Failure      401 {object} response.Response "未授权"
+// @Success      200 {object} dto.Response "成功"
+// @Failure      401 {object} dto.Response "未授权"
 // @Router       /auth/logout [post]
 func (c *AuthController) Logout(ctx *gin.Context) {
 	err := c.jwtService.JoinBlackList(ctx.Keys["token"].(*jwt.Token))
 	if err != nil {
-		response.BusinessFail(ctx, "登出失败")
+		dto.BusinessFail(ctx, "登出失败")
 		return
 	}
-	response.Success(ctx, nil)
+	dto.Success(ctx, nil)
 }
