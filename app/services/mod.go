@@ -1,10 +1,7 @@
 package services
 
 import (
-	"math"
-
 	"go.uber.org/zap"
-	"gorm.io/gorm"
 
 	"gin-web/app/dto"
 	"gin-web/app/models"
@@ -14,104 +11,40 @@ import (
 // ModService Mod服务
 type ModService struct {
 	repo repository.ModRepository
-	db   *gorm.DB
 	log  *zap.Logger
 }
 
 // NewModService 创建Mod服务实例
-func NewModService(repo repository.ModRepository, db *gorm.DB, log *zap.Logger) *ModService {
-	return &ModService{repo: repo, db: db, log: log}
+func NewModService(repo repository.ModRepository, log *zap.Logger) *ModService {
+	return &ModService{repo: repo, log: log}
 }
 
 // SearchMods 搜索mod
 func (s *ModService) SearchMods(req dto.ModSearchRequest) (*dto.ModListResponse, error) {
-	// 构建查询
-	db := s.db.Model(&models.Mod{})
-
-	// 预加载关联数据
-	db = db.Preload("Game").Preload("Categories")
-
-	// 关键词搜索
-	if req.Keyword != "" {
-		keyword := "%" + req.Keyword + "%"
-		db = db.Where("name LIKE ? OR description LIKE ? OR author LIKE ?", keyword, keyword, keyword)
+	// 转换 DTO 为 Repository 查询条件
+	criteria := repository.ModSearchCriteria{
+		Keyword:    req.Keyword,
+		GameID:     req.GameID,
+		CategoryID: req.CategoryID,
+		Author:     req.Author,
+		SortBy:     req.SortBy,
+		Order:      req.Order,
+		Page:       req.Page,
+		PageSize:   req.PageSize,
 	}
 
-	// 游戏筛选
-	if req.GameID > 0 {
-		db = db.Where("game_id = ?", req.GameID)
-	}
-
-	// 作者筛选
-	if req.Author != "" {
-		db = db.Where("author LIKE ?", "%"+req.Author+"%")
-	}
-
-	// 分类筛选
-	if req.CategoryID > 0 {
-		db = db.Joins("JOIN gw_mod_categories ON mods.id = gw_mod_categories.mod_id").
-			Where("gw_mod_categories.category_id = ?", req.CategoryID)
-	}
-
-	// 排序
-	sortBy := req.SortBy
-	if sortBy == "" {
-		sortBy = "created_at"
-	}
-	order := req.Order
-	if order == "" {
-		order = "desc"
-	}
-
-	// 验证排序字段
-	validSortFields := map[string]bool{
-		"rating":         true,
-		"download_count": true,
-		"created_at":     true,
-		"updated_at":     true,
-	}
-	if !validSortFields[sortBy] {
-		sortBy = "created_at"
-	}
-
-	// 验证排序方向
-	if order != "asc" && order != "desc" {
-		order = "desc"
-	}
-
-	db = db.Order(sortBy + " " + order)
-
-	// 获取总数
-	total, err := s.repo.Count(db)
-	if err != nil {
-		return nil, err
-	}
-
-	// 分页
-	page := req.Page
-	if page < 1 {
-		page = 1
-	}
-	pageSize := req.PageSize
-	if pageSize < 1 || pageSize > 100 {
-		pageSize = 20
-	}
-
-	offset := (page - 1) * pageSize
-	db = db.Offset(offset).Limit(pageSize)
-
-	// 执行查询
-	mods, err := s.repo.Search(db)
+	// 调用 Repository 执行搜索
+	result, err := s.repo.Search(criteria)
 	if err != nil {
 		return nil, err
 	}
 
 	// 转换为响应格式
-	modItems := make([]dto.ModItemResponse, len(mods))
-	for i, mod := range mods {
-		categoryNames := []string{}
-		for _, category := range mod.Categories {
-			categoryNames = append(categoryNames, category.Name)
+	modItems := make([]dto.ModItemResponse, len(result.Mods))
+	for i, mod := range result.Mods {
+		categoryNames := make([]string, len(mod.Categories))
+		for j, category := range mod.Categories {
+			categoryNames[j] = category.Name
 		}
 
 		modItems[i] = dto.ModItemResponse{
@@ -129,14 +62,12 @@ func (s *ModService) SearchMods(req dto.ModSearchRequest) (*dto.ModListResponse,
 		}
 	}
 
-	totalPages := int(math.Ceil(float64(total) / float64(pageSize)))
-
 	return &dto.ModListResponse{
 		List:       modItems,
-		Total:      total,
-		Page:       page,
-		PageSize:   pageSize,
-		TotalPages: totalPages,
+		Total:      result.Total,
+		Page:       result.Page,
+		PageSize:   result.PageSize,
+		TotalPages: result.TotalPages,
 	}, nil
 }
 

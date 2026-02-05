@@ -7,7 +7,6 @@ import (
 	"github.com/go-redis/redis/v8"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
-	"gorm.io/gorm"
 
 	"gin-web/app/services"
 	"gin-web/config"
@@ -47,10 +46,9 @@ func ProvideJwtService(
 // ProvideModService 提供 Mod 服务
 func ProvideModService(
 	repo repository.ModRepository,
-	db *gorm.DB,
 	log *zap.Logger,
 ) *services.ModService {
-	return services.NewModService(repo, db, log)
+	return services.NewModService(repo, log)
 }
 
 // ========== 适配器实现 ==========

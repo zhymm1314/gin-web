@@ -7,7 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"gin-web/config"
-	"gin-web/global"
 )
 
 // ================================
@@ -57,23 +56,23 @@ func Fail(c *gin.Context, errorCode int, msg string) {
 }
 
 // FailByError 失败响应（使用自定义错误）
-func FailByError(c *gin.Context, err global.CustomError) {
+func FailByError(c *gin.Context, err CustomError) {
 	Fail(c, err.ErrorCode, err.ErrorMsg)
 }
 
 // ValidateFail 参数验证失败响应
 func ValidateFail(c *gin.Context, msg string) {
-	Fail(c, global.Errors.ValidateError.ErrorCode, msg)
+	Fail(c, CodeValidateError, msg)
 }
 
 // BusinessFail 业务逻辑失败响应
 func BusinessFail(c *gin.Context, msg string) {
-	Fail(c, global.Errors.BusinessError.ErrorCode, msg)
+	Fail(c, CodeBusinessError, msg)
 }
 
 // TokenFail Token 验证失败响应
 func TokenFail(c *gin.Context) {
-	FailByError(c, global.Errors.TokenError)
+	FailByError(c, ErrToken)
 }
 
 // ServerError 服务器内部错误响应
@@ -86,7 +85,7 @@ func ServerError(c *gin.Context, err interface{}) {
 		}
 	}
 	c.JSON(http.StatusInternalServerError, Response{
-		ErrorCode: http.StatusInternalServerError,
+		ErrorCode: CodeServerError,
 		Data:      nil,
 		Message:   msg,
 	})
@@ -103,7 +102,7 @@ func ServerErrorWithConfig(c *gin.Context, err interface{}, cfg *config.Configur
 		}
 	}
 	c.JSON(http.StatusInternalServerError, Response{
-		ErrorCode: http.StatusInternalServerError,
+		ErrorCode: CodeServerError,
 		Data:      nil,
 		Message:   msg,
 	})

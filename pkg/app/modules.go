@@ -3,7 +3,7 @@ package app
 import (
 	appCron "gin-web/app/cron"
 	"gin-web/bootstrap"
-	"gin-web/global"
+	"gin-web/config"
 	"gin-web/pkg/cron"
 	"gin-web/pkg/rabbitmq"
 	"gin-web/pkg/websocket"
@@ -158,11 +158,8 @@ func (m *HTTPModule) Stop() error {
 
 // ==================== 模块工厂函数 ====================
 
-// RegisterModules 根据配置注册所有模块
-func RegisterModules(application *Application) *Application {
-	cfg := global.App.Config
-	log := global.App.Log
-
+// RegisterModules 根据配置注册所有模块（通过依赖注入获取 cfg 和 log）
+func RegisterModules(application *Application, cfg *config.Configuration, log *zap.Logger) *Application {
 	// 按条件注册模块
 	application.
 		RegisterIf(cfg.RabbitMQ.Enable, NewRabbitMQModule(log)).

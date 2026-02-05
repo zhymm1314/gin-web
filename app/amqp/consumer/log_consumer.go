@@ -2,21 +2,31 @@ package consumer
 
 import (
 	"encoding/json"
-	"gin-web/app/api"
-	amqp "github.com/rabbitmq/amqp091-go"
 	"log"
+
+	amqp "github.com/rabbitmq/amqp091-go"
+	"go.uber.org/zap"
+
+	"gin-web/app/api"
+	"gin-web/config"
 )
 
-type LogConsumer struct{}
+// LogConsumer 日志消费者（通过依赖注入获取 config 和 logger）
+type LogConsumer struct {
+	cfg *config.Configuration
+	log *zap.Logger
+}
+
+// NewLogConsumer 创建日志消费者实例
+func NewLogConsumer(cfg *config.Configuration, log *zap.Logger) *LogConsumer {
+	return &LogConsumer{cfg: cfg, log: log}
+}
 
 func (c *LogConsumer) HandleMessage(msg amqp.Delivery) error {
-
-	//return nil
 	// 使用 defer + recover 捕获 panic 确保一定会ack处理
 	defer func() {
 		if r := recover(); r != nil {
 			log.Printf("Recovered from panic: %v", r)
-			//msg.Ack(false)
 		}
 	}()
 
@@ -24,7 +34,6 @@ func (c *LogConsumer) HandleMessage(msg amqp.Delivery) error {
 	var raw map[string]interface{}
 	if err := json.Unmarshal(msg.Body, &raw); err != nil {
 		log.Printf("JSON解析失败: %v", err)
-		//msg.Ack(false)
 		return nil
 	}
 
@@ -32,11 +41,9 @@ func (c *LogConsumer) HandleMessage(msg amqp.Delivery) error {
 	data, ok := raw["data"].(map[string]interface{})
 	if !ok {
 		log.Println("data字段不存在或类型错误")
-		//msg.Ack(false)
 		return nil
 	}
 
-	//global.App.Log.Info(string(msg.Body))
 	params := api.LogParams{
 		Data: struct {
 			ReqID    string `json:"req_id"`
@@ -55,8 +62,7 @@ func (c *LogConsumer) HandleMessage(msg amqp.Delivery) error {
 		},
 		TableName: "eric_request_logs",
 	}
-	api.SendTableStoreLog(params)
+	api.SendTableStoreLog(c.cfg, c.log, params)
 
-	//msg.Ack(false)
 	return nil
 }

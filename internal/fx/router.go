@@ -41,7 +41,7 @@ func ProvideGinEngine(cfg *config.Configuration) *gin.Engine {
 	if cfg.App.Env != "production" {
 		r.Use(gin.Logger())
 	}
-	r.Use(middleware.CustomRecovery())
+	r.Use(middleware.CustomRecovery(cfg))
 	r.Use(middleware.Cors())
 
 	// Swagger 文档 (非生产环境)

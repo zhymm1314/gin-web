@@ -5,17 +5,16 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"gin-web/global"
-	//"go.uber.org/zap"
 	"io"
 	"net/http"
 	"net/url"
-	_ "net/url"
 	"reflect"
-	_ "reflect"
 	"strings"
-	_ "strings"
 	"time"
+
+	"go.uber.org/zap"
+
+	"gin-web/config"
 )
 
 // Method 请求方法枚举
@@ -52,18 +51,18 @@ type HttpClient interface {
 
 // BaseClient 请求基类
 type BaseClient struct {
-	client    HttpClient
-	baseURL   string
-	method    Method
-	uri       string
-	timeout   time.Duration
-	paramType ParamType
-	headers   map[string]string
-	unpacker  Unpacker
-	processor ResponseProcessor
-	//dataWrapper   DataWrapper
+	client        HttpClient
+	baseURL       string
+	method        Method
+	uri           string
+	timeout       time.Duration
+	paramType     ParamType
+	headers       map[string]string
+	unpacker      Unpacker
+	processor     ResponseProcessor
 	errorHandler  ErrorHandler
 	requestIDFunc func() string
+	logger        *zap.Logger // 可选的日志记录器
 }
 
 // Unpacker 响应解码器类型
@@ -131,10 +130,13 @@ func defaultRequestID() string {
 
 // Exec 执行请求
 func (c *BaseClient) Exec(ctx context.Context, params interface{}) (interface{}, error) {
-	//start := time.Now()
+	start := time.Now()
 	defer func() {
-		//c.logger.LogRequest(time.Since(start), c.fullURL(), start, time.Now())
-		global.App.Log.Info("Request end!!!!!:")
+		if c.logger != nil {
+			c.logger.Debug("Request completed",
+				zap.String("url", c.fullURL()),
+				zap.Duration("duration", time.Since(start)))
+		}
 	}()
 
 	req, err := c.buildRequest(ctx, params)
@@ -258,6 +260,12 @@ func (c *BaseClient) WithProcessor(fn ResponseProcessor) *BaseClient {
 	return c
 }
 
+// WithLogger 设置日志记录器
+func (c *BaseClient) WithLogger(logger *zap.Logger) *BaseClient {
+	c.logger = logger
+	return c
+}
+
 // addQueryParams 添加URL查询参数（GET请求专用）
 func (c *BaseClient) addQueryParams(req *http.Request, params interface{}) error {
 	query := req.URL.Query()
@@ -312,9 +320,9 @@ func (c *BaseClient) addQueryParams(req *http.Request, params interface{}) error
 }
 
 // GetApiUrl 根据服务名获取 API 地址
-func GetApiUrl(serviceName string) string {
-	env := global.App.Config.App.Env
-	apiUrls := global.App.Config.ApiUrls
+func GetApiUrl(cfg *config.Configuration, serviceName string) string {
+	env := cfg.App.Env
+	apiUrls := cfg.ApiUrls
 
 	switch serviceName {
 	case "user_service":

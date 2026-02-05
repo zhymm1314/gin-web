@@ -81,38 +81,50 @@ docker run -d -p 8080:8080 -v $(pwd)/config.yaml:/app/config.yaml gin-web-api
 ```
 gin-web/
 ├── app/                    # 应用核心代码
-│   ├── controllers/        # 控制器层
-│   ├── services/           # 服务层
-│   ├── models/             # 数据模型
-│   ├── middleware/         # 中间件
-│   ├── common/             # 请求/响应结构体
+│   ├── controllers/        # 控制器层（实现 Controller 接口）
+│   ├── services/           # 服务层（业务逻辑）
+│   ├── models/             # 数据模型（GORM）
+│   ├── dto/                # 数据传输对象（请求/响应/错误码）
+│   ├── middleware/         # 中间件（JWT、Recovery、Cors）
+│   ├── api/                # HTTP 客户端（外部 API 调用）
 │   ├── cron/               # 定时任务实现
-│   └── amqp/               # 消息队列生产者/消费者
-├── internal/               # 内部包
+│   └── amqp/               # 消息队列
+│       ├── producer/       # 生产者
+│       └── consumer/       # 消费者
+├── test/                   # 单元测试
+│   └── services/           # Service 层测试（testify + mock）
+├── internal/               # 内部包（不对外暴露）
 │   ├── fx/                 # fx 依赖注入模块
-│   │   ├── infrastructure.go  # 基础设施 Provider
+│   │   ├── infrastructure.go  # 基础设施 Provider（DB/Redis/Logger）
 │   │   ├── repository.go      # 仓储 Provider
 │   │   ├── service.go         # 服务 Provider
 │   │   ├── controller.go      # 控制器 Provider
+│   │   ├── middleware.go      # 中间件 Provider
 │   │   ├── router.go          # 路由 Provider
 │   │   ├── rabbitmq.go        # RabbitMQ 模块
 │   │   ├── cron.go            # Cron 模块
 │   │   ├── websocket.go       # WebSocket 模块
-│   │   └── modules.go         # 应用组装
-│   └── repository/         # 数据仓储层
+│   │   ├── banner.go          # 启动 Banner
+│   │   ├── types.go           # 类型定义
+│   │   └── modules.go         # 应用组装入口
+│   └── repository/         # 数据仓储层（封装数据库操作）
 ├── pkg/                    # 可复用公共包
+│   ├── app/                # 模块化应用管理
 │   ├── cron/               # 定时任务管理器
 │   ├── rabbitmq/           # RabbitMQ 管理器
 │   ├── websocket/          # WebSocket 管理器
 │   └── errors/             # 统一错误定义
-├── bootstrap/              # 引导初始化（验证器等）
+├── bootstrap/              # 引导初始化（数据库、Redis、验证器）
 ├── config/                 # 配置结构体定义
 ├── routes/                 # 路由定义
+├── utils/                  # 工具函数
 ├── cmd/                    # 独立服务启动入口
 │   ├── consumer/           # RabbitMQ 消费者服务
 │   ├── cron/               # 定时任务服务
 │   └── websocket/          # WebSocket 服务
 ├── docs/                   # 文档与 Swagger 生成文件
+├── storage/                # 存储目录
+│   └── logs/               # 日志文件
 ├── config.yaml             # 配置文件
 └── main.go                 # 主入口（fx.New）
 ```
@@ -139,6 +151,7 @@ go run cmd/websocket/main.go  # WebSocket
 | 消息队列 | RabbitMQ | 定时任务 | robfig/cron |
 | WebSocket | Melody | **依赖注入** | **Uber fx** |
 | 参数验证 | validator | API 文档 | Swaggo |
+| **单元测试** | **testify** | Mock | testify/mock |
 
 ## fx 依赖注入
 
@@ -164,6 +177,47 @@ var ServiceModule = fx.Module("service",
 - 自动解析依赖关系
 - 自动管理组件生命周期
 - 启动时检测循环依赖
+
+## 单元测试
+
+项目使用 [testify](https://github.com/stretchr/testify) 框架进行单元测试：
+
+```bash
+# 运行所有测试
+go test ./...
+
+# 运行带详细输出
+go test ./... -v
+
+# 运行特定包的测试
+go test ./test/services/... -v
+
+# 查看测试覆盖率
+go test ./... -cover
+```
+
+测试示例（使用 Mock）：
+
+```go
+func TestUserService_Register_Success(t *testing.T) {
+    mockRepo := new(MockUserRepository)
+    logger, _ := zap.NewDevelopment()
+    service := NewUserService(mockRepo, logger)
+
+    mockRepo.On("FindByMobile", "13800138000").Return(nil, errors.New("not found"))
+    mockRepo.On("Create", mock.AnythingOfType("*models.User")).Return(nil)
+
+    user, err := service.Register(dto.RegisterRequest{
+        Name:     "张三",
+        Mobile:   "13800138000",
+        Password: "password123",
+    })
+
+    assert.NoError(t, err)
+    assert.NotNil(t, user)
+    mockRepo.AssertExpectations(t)
+}
+```
 
 ## 贡献
 

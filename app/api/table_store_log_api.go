@@ -4,10 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"gin-web/global"
-	"go.uber.org/zap"
 	"net/http"
 	"time"
+
+	"go.uber.org/zap"
+
+	"gin-web/config"
 )
 
 // 使用示例
@@ -67,16 +69,18 @@ func logRequestID() string {
 	return fmt.Sprintf("%d", time.Now().UnixNano())
 }
 
-func SendTableStoreLog(params any) {
-	client := LogClient(GetApiUrl("log_url")).
+// SendTableStoreLog 发送日志到 TableStore（需要通过依赖注入获取 cfg 和 log）
+func SendTableStoreLog(cfg *config.Configuration, log *zap.Logger, params any) {
+	client := LogClient(GetApiUrl(cfg, "log_url")).
 		WithMethod(POST).
 		WithURI("insert").
 		WithParamType(JSON).
 		WithHeader("Content-Type", "application/json").
-		WithTimeout(5 * time.Second)
+		WithTimeout(5 * time.Second).
+		WithLogger(log)
 
 	if client == nil {
-		global.App.Log.Error("Failed to create client")
+		log.Error("Failed to create client")
 		fmt.Println("Failed to create client")
 		return
 	}
@@ -86,11 +90,11 @@ func SendTableStoreLog(params any) {
 	response, err := client.Exec(ctx, params)
 	// 处理错误
 	if err != nil {
-		global.App.Log.Error("Failed to send request:", zap.Error(err),
+		log.Error("Failed to send request", zap.Error(err),
 			zap.Any("params", params))
 	}
 	// 处理响应
 	if response != nil {
-		global.App.Log.Info("SendTableStoreLog response", zap.Any("data", response))
+		log.Info("SendTableStoreLog response", zap.Any("data", response))
 	}
 }
