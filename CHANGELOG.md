@@ -12,6 +12,55 @@
 - 单元测试覆盖
 - Prometheus 监控集成
 - Docker 多阶段构建优化
+- Cron Job 完全移除 global.App 依赖
+
+---
+
+## [2.0.0] - 2026-02-05
+
+### 重大变更 - 依赖注入框架迁移
+
+- **从 Wire 迁移到 Uber fx**: 运行时依赖注入，无需代码生成
+- **消除全局变量**: 移除对 `global.App` 的直接依赖（部分 Cron Job 保留）
+- **生命周期管理**: fx.Lifecycle 自动管理组件启动/关闭
+- **模块化架构**: 基于 fx.Module 的模块化组织
+
+### 新增
+
+- `internal/fx/` - fx 依赖注入模块目录
+  - `types.go` - 公共类型定义
+  - `infrastructure.go` - 基础设施 Provider (Config/DB/Redis/Logger)
+  - `repository.go` - Repository Provider
+  - `service.go` - Service Provider + 适配器
+  - `middleware.go` - Middleware Provider
+  - `controller.go` - Controller Provider (分组注入)
+  - `router.go` - Router Provider + HTTP Server
+  - `rabbitmq.go` - RabbitMQ 条件模块
+  - `cron.go` - Cron 条件模块
+  - `websocket.go` - WebSocket 条件模块
+  - `modules.go` - 应用组装 (NewApp/NewConsumerApp/NewCronApp/NewWebSocketApp)
+- `docs/FX_MIGRATION_PLAN.md` - 完整的迁移计划文档
+
+### 变更
+
+- `main.go` - 简化为 `fxmodule.NewApp().Run()`
+- `cmd/consumer/main.go` - 使用 `fxmodule.NewConsumerApp().Run()`
+- `cmd/cron/main.go` - 使用 `fxmodule.NewCronApp().Run()`
+- `cmd/websocket/main.go` - 使用 `fxmodule.NewWebSocketApp().Run()`
+- `README.md` - 更新技术栈和项目结构说明
+
+### 依赖更新
+
+- 添加 `go.uber.org/fx` v1.22+
+
+### 迁移指南
+
+从 v1.x 升级到 v2.0.0：
+
+1. 运行 `go get go.uber.org/fx`
+2. 新增功能使用 fx Provider 模式开发
+3. 逐步将 `global.App.XXX` 引用改为依赖注入
+4. 详见 [FX_MIGRATION_PLAN.md](docs/FX_MIGRATION_PLAN.md)
 
 ---
 
@@ -174,6 +223,8 @@
 
 | 版本 | 日期 | 说明 |
 |------|------|------|
+| 2.0.0 | 2026-02-04 | **Uber fx 依赖注入**, 生命周期管理, 模块化架构 |
+| 1.6.0 | 2026-02-04 | Swagger, Cron, WebSocket, 多启动模式 |
 | 1.5.0 | 2026-02-04 | Wire 依赖注入重构 |
 | 1.4.0 | 2026-02-04 | DI 系统全面激活，删除 Legacy 代码 |
 | 1.3.0 | 2026-02-04 | 代码规范统一 (P2 完成) |

@@ -2,6 +2,8 @@
 
 本指南介绍如何使用框架的定时任务功能。
 
+> **v2.0.0 更新**: 定时任务现在通过 fx 依赖注入管理，使用构造函数注入依赖。
+
 ## 目录
 
 - [快速开始](#快速开始)
@@ -17,18 +19,28 @@
 
 ### 1. 创建定时任务
 
-在 `app/cron/` 目录下创建任务文件：
+在 `app/cron/` 目录下创建任务文件，使用构造函数注入依赖：
 
 ```go
 // app/cron/my_job.go
 package cron
 
 import (
-    "gin-web/global"
+    "github.com/go-redis/redis/v8"
     "go.uber.org/zap"
+    "gorm.io/gorm"
 )
 
-type MyJob struct{}
+type MyJob struct {
+    db    *gorm.DB
+    redis *redis.Client
+    log   *zap.Logger
+}
+
+// NewMyJob 创建任务（通过 fx 注入依赖）
+func NewMyJob(db *gorm.DB, redis *redis.Client, log *zap.Logger) *MyJob {
+    return &MyJob{db: db, redis: redis, log: log}
+}
 
 func (j *MyJob) Name() string {
     return "my_job"
@@ -39,17 +51,33 @@ func (j *MyJob) Spec() string {
 }
 
 func (j *MyJob) Run() {
-    global.App.Log.Info("my job running")
-    // 你的业务逻辑
+    j.log.Info("my job running")
+    // 使用注入的 db 和 redis
 }
 ```
 
 ### 2. 注册任务
 
-在 `main.go` 中注册：
+在 `internal/fx/cron.go` 中注册：
 
 ```go
-cronManager.Register(&appCron.MyJob{})
+func ProvideCronManager(
+    lc fx.Lifecycle,
+    cfg *config.Configuration,
+    db *gorm.DB,
+    redis *redis.Client,
+    log *zap.Logger,
+) *cron.Manager {
+    manager := cron.NewManager(log)
+
+    // 注册任务（通过构造函数注入依赖）
+    manager.Register(appCron.NewCleanupJob(db, redis, log))
+    manager.Register(appCron.NewHealthCheckJob(db, redis, log))
+    manager.Register(appCron.NewMyJob(db, redis, log))  // 新增
+
+    // ... lifecycle hooks
+    return manager
+}
 ```
 
 ### 3. 启动
@@ -104,20 +132,36 @@ type JobHandler interface {
 }
 ```
 
-### 完整示例
+### 完整示例（依赖注入版本）
 
 ```go
 // app/cron/cleanup_job.go
 package cron
 
 import (
-    "gin-web/global"
-    "go.uber.org/zap"
+    "context"
     "time"
+
+    "github.com/go-redis/redis/v8"
+    "go.uber.org/zap"
+    "gorm.io/gorm"
 )
 
 // CleanupJob 清理过期数据任务
-type CleanupJob struct{}
+type CleanupJob struct {
+    db    *gorm.DB
+    redis *redis.Client
+    log   *zap.Logger
+}
+
+// NewCleanupJob 创建清理任务（通过 fx 注入依赖）
+func NewCleanupJob(db *gorm.DB, redis *redis.Client, log *zap.Logger) *CleanupJob {
+    return &CleanupJob{
+        db:    db,
+        redis: redis,
+        log:   log,
+    }
+}
 
 func (j *CleanupJob) Name() string {
     return "cleanup_expired_data"
@@ -129,14 +173,15 @@ func (j *CleanupJob) Spec() string {
 
 func (j *CleanupJob) Run() {
     startTime := time.Now()
-    global.App.Log.Info("cleanup job started")
+    j.log.Info("cleanup job started")
 
-    // 清理过期 Token
-    result := global.App.DB.Exec("DELETE FROM jwt_blacklist WHERE expired_at < ?", time.Now())
-
-    global.App.Log.Info("cleanup job completed",
-        zap.Int64("deleted_rows", result.RowsAffected),
-        zap.Duration("duration", time.Since(startTime)))
+    // 使用注入的 db
+    if j.db != nil {
+        result := j.db.Exec("DELETE FROM jwt_blacklist WHERE expired_at < ?", time.Now())
+        j.log.Info("cleanup job completed",
+            zap.Int64("deleted_rows", result.RowsAffected),
+            zap.Duration("duration", time.Since(startTime)))
+    }
 }
 ```
 
@@ -147,12 +192,29 @@ func (j *CleanupJob) Run() {
 package cron
 
 import (
-    "gin-web/global"
+    "context"
+    "time"
+
+    "github.com/go-redis/redis/v8"
     "go.uber.org/zap"
+    "gorm.io/gorm"
 )
 
 // HealthCheckJob 健康检查任务
-type HealthCheckJob struct{}
+type HealthCheckJob struct {
+    db    *gorm.DB
+    redis *redis.Client
+    log   *zap.Logger
+}
+
+// NewHealthCheckJob 创建健康检查任务
+func NewHealthCheckJob(db *gorm.DB, redis *redis.Client, log *zap.Logger) *HealthCheckJob {
+    return &HealthCheckJob{
+        db:    db,
+        redis: redis,
+        log:   log,
+    }
+}
 
 func (j *HealthCheckJob) Name() string {
     return "health_check"
@@ -163,25 +225,25 @@ func (j *HealthCheckJob) Spec() string {
 }
 
 func (j *HealthCheckJob) Run() {
-    // 检查数据库连接
-    sqlDB, err := global.App.DB.DB()
-    if err != nil {
-        global.App.Log.Error("database health check failed", zap.Error(err))
-        return
-    }
+    ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+    defer cancel()
 
-    if err := sqlDB.Ping(); err != nil {
-        global.App.Log.Error("database ping failed", zap.Error(err))
-        return
+    // 检查数据库连接
+    if j.db != nil {
+        sqlDB, err := j.db.DB()
+        if err == nil {
+            if err := sqlDB.PingContext(ctx); err != nil {
+                j.log.Warn("database health check failed", zap.Error(err))
+            }
+        }
     }
 
     // 检查 Redis 连接
-    if err := global.App.Redis.Ping(global.App.Redis.Context()).Err(); err != nil {
-        global.App.Log.Error("redis ping failed", zap.Error(err))
-        return
+    if j.redis != nil {
+        if err := j.redis.Ping(ctx).Err(); err != nil {
+            j.log.Warn("redis health check failed", zap.Error(err))
+        }
     }
-
-    global.App.Log.Debug("health check passed")
 }
 ```
 
@@ -266,7 +328,7 @@ type Cron struct {
 ```go
 func (j *CleanupJob) Run() {
     // 使用事务保证原子性
-    tx := global.App.DB.Begin()
+    tx := j.db.Begin()
     defer func() {
         if r := recover(); r != nil {
             tx.Rollback()
@@ -285,19 +347,16 @@ func (j *CleanupJob) Run() {
 
 ```go
 func (j *CleanupJob) Run() {
+    ctx := context.Background()
+
     // 获取分布式锁
     lockKey := "cron:cleanup_job"
-    locked, err := global.App.Redis.SetNX(
-        context.Background(),
-        lockKey,
-        "1",
-        time.Minute*5,
-    ).Result()
+    locked, err := j.redis.SetNX(ctx, lockKey, "1", time.Minute*5).Result()
 
     if err != nil || !locked {
         return  // 其他实例正在执行
     }
-    defer global.App.Redis.Del(context.Background(), lockKey)
+    defer j.redis.Del(ctx, lockKey)
 
     // 执行任务逻辑
 }
@@ -309,7 +368,7 @@ func (j *CleanupJob) Run() {
 func (j *CleanupJob) Run() {
     defer func() {
         if r := recover(); r != nil {
-            global.App.Log.Error("cron job panic",
+            j.log.Error("cron job panic",
                 zap.String("job", j.Name()),
                 zap.Any("error", r))
             // 发送告警通知
@@ -317,7 +376,7 @@ func (j *CleanupJob) Run() {
     }()
 
     if err := j.execute(); err != nil {
-        global.App.Log.Error("cron job failed",
+        j.log.Error("cron job failed",
             zap.String("job", j.Name()),
             zap.Error(err))
         // 发送告警通知
@@ -339,10 +398,10 @@ func (j *CleanupJob) Run() {
 
     select {
     case <-ctx.Done():
-        global.App.Log.Error("cron job timeout", zap.String("job", j.Name()))
+        j.log.Error("cron job timeout", zap.String("job", j.Name()))
     case err := <-done:
         if err != nil {
-            global.App.Log.Error("cron job failed", zap.Error(err))
+            j.log.Error("cron job failed", zap.Error(err))
         }
     }
 }
@@ -355,12 +414,12 @@ func (j *CleanupJob) Run() {
 ```go
 func (j *CleanupJob) Run() {
     startTime := time.Now()
-    global.App.Log.Info("cron job started", zap.String("job", j.Name()))
+    j.log.Info("cron job started", zap.String("job", j.Name()))
 
     // 执行任务
     result, err := j.execute()
 
-    global.App.Log.Info("cron job completed",
+    j.log.Info("cron job completed",
         zap.String("job", j.Name()),
         zap.Duration("duration", time.Since(startTime)),
         zap.Any("result", result),

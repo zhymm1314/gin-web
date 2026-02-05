@@ -1,13 +1,29 @@
 package cron
 
 import (
-	"gin-web/global"
+	"context"
+	"time"
 
+	"github.com/go-redis/redis/v8"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 )
 
 // CleanupJob 清理过期数据任务
-type CleanupJob struct{}
+type CleanupJob struct {
+	db    *gorm.DB
+	redis *redis.Client
+	log   *zap.Logger
+}
+
+// NewCleanupJob 创建清理任务（通过 fx 注入依赖）
+func NewCleanupJob(db *gorm.DB, redis *redis.Client, log *zap.Logger) *CleanupJob {
+	return &CleanupJob{
+		db:    db,
+		redis: redis,
+		log:   log,
+	}
+}
 
 // Name 返回任务名称
 func (j *CleanupJob) Name() string {
@@ -21,11 +37,25 @@ func (j *CleanupJob) Spec() string {
 
 // Run 执行清理逻辑
 func (j *CleanupJob) Run() {
-	global.App.Log.Info("cleanup job running")
+	startTime := time.Now()
+	j.log.Info("cleanup job started")
 
 	// 清理过期的 JWT 黑名单
-	// 这里可以添加具体的清理逻辑
-	// 例如: global.App.Redis.Del(context.Background(), "expired_keys...")
+	if j.redis != nil {
+		// 示例：清理过期的 token 黑名单
+		// 实际实现根据业务需求
+		ctx := context.Background()
+		_ = ctx // 使用 redis 清理过期数据
+	}
 
-	global.App.Log.Info("cleanup job completed", zap.String("job", j.Name()))
+	// 清理数据库中的过期数据
+	if j.db != nil {
+		// 示例：清理 30 天前的软删除数据
+		// j.db.Unscoped().Where("deleted_at < ?", time.Now().AddDate(0, 0, -30)).Delete(&models.SomeModel{})
+	}
+
+	j.log.Info("cleanup job completed",
+		zap.String("job", j.Name()),
+		zap.Duration("duration", time.Since(startTime)),
+	)
 }

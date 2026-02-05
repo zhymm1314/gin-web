@@ -2,7 +2,7 @@
 
 本文档详细说明如何在 Gin-Web 项目中开发一个完整的 API 接口。
 
-> **v1.5.0 更新**: 项目使用 Google Wire 进行依赖注入，Legacy 代码已移除。
+> **v2.0.0 更新**: 项目使用 Uber fx 进行依赖注入，类似 Spring Boot / Hyperf 的开发体验。
 
 ---
 
@@ -16,7 +16,7 @@
   - [Step 3: 实现 Repository 层](#step-3-实现-repository-层)
   - [Step 4: 实现 Service 层](#step-4-实现-service-层)
   - [Step 5: 实现 Controller 层](#step-5-实现-controller-层)
-  - [Step 6: 注册到 DI 容器](#step-6-注册到-di-容器)
+  - [Step 6: 注册到 fx 容器](#step-6-注册到-fx-容器)
 - [完整示例](#完整示例)
 - [常用响应方法](#常用响应方法)
 - [参数验证](#参数验证)
@@ -27,11 +27,11 @@
 
 ## 概述
 
-本项目采用 **Controller → Service → Repository → Model** 四层架构模式，并通过 **依赖注入容器** 管理所有依赖关系：
+本项目采用 **Controller → Service → Repository → Model** 四层架构模式，并通过 **Uber fx 依赖注入容器** 管理所有依赖关系：
 
 ```
 ┌─────────────────────────────────────┐
-│           DI Container              │  ← 依赖注入容器
+│         fx DI Container             │  ← Uber fx 依赖注入
 ├─────────────────────────────────────┤
 │ Controller  │  ← 处理 HTTP 请求/响应
 ├─────────────┤
@@ -52,7 +52,7 @@
 3. **实现 Repository** - `internal/repository/` 目录
 4. **实现 Service** - `app/services/` 目录
 5. **实现 Controller** - `app/controllers/` 目录
-6. **注册到 DI 容器** - `internal/container/container.go`
+6. **注册到 fx 容器** - `internal/fx/` 目录
 
 ---
 
@@ -373,94 +373,82 @@ func (ctrl *ArticleController) Delete(c *gin.Context) {
 }
 ```
 
-### Step 6: 注册到 Wire DI 容器
+### Step 6: 注册到 fx 容器
 
-项目使用 Google Wire 进行依赖注入，需要在以下文件中注册新组件：
+项目使用 Uber fx 进行依赖注入，只需在对应模块文件中添加 Provider：
 
-#### 6.1 添加 Provider 函数
+#### 6.1 添加 Repository Provider
 
-在 `internal/container/provider.go` 中添加：
+在 `internal/fx/repository.go` 中添加：
 
 ```go
-// ProvideArticleRepository 提供文章仓储
 func ProvideArticleRepository(db *gorm.DB) repository.ArticleRepository {
+    if db == nil {
+        return nil
+    }
     return repository.NewArticleRepository(db)
 }
 
-// ProvideArticleService 提供文章服务
-func ProvideArticleService(repo repository.ArticleRepository, log *zap.Logger) *services.ArticleService {
+// 更新 RepositoryModule
+var RepositoryModule = fx.Module("repository",
+    fx.Provide(
+        ProvideUserRepository,
+        ProvideModRepository,
+        ProvideArticleRepository, // 新增
+    ),
+)
+```
+
+#### 6.2 添加 Service Provider
+
+在 `internal/fx/service.go` 中添加：
+
+```go
+func ProvideArticleService(
+    repo repository.ArticleRepository,
+    log *zap.Logger,
+) *services.ArticleService {
     return services.NewArticleService(repo, log)
 }
 
-// ProvideArticleController 提供文章控制器
-func ProvideArticleController(articleService *services.ArticleService, jwtMiddleware *middleware.JwtMiddleware) *controllers.ArticleController {
-    return controllers.NewArticleController(articleService, jwtMiddleware)
-}
+// 更新 ServiceModule
+var ServiceModule = fx.Module("service",
+    fx.Provide(
+        ProvideUserService,
+        ProvideJwtService,
+        ProvideModService,
+        ProvideArticleService, // 新增
+    ),
+)
 ```
 
-#### 6.2 更新 Wire 配置
+#### 6.3 添加 Controller Provider（使用分组注入）
 
-在 `internal/container/wire.go` 中更新 Provider Sets：
+在 `internal/fx/controller.go` 中添加：
 
 ```go
-// RepositorySet 中添加
-var RepositorySet = wire.NewSet(
-    ProvideUserRepository,
-    ProvideModRepository,
-    ProvideArticleRepository, // 新增
-)
-
-// ServiceSet 中添加
-var ServiceSet = wire.NewSet(
-    ProvideUserService,
-    ProvideJwtService,
-    ProvideModService,
-    ProvideArticleService, // 新增
-)
-
-// ControllerSet 中添加
-var ControllerSet = wire.NewSet(
-    ProvideAuthController,
-    ProvideModController,
-    ProvideArticleController, // 新增
-)
-
-// App 结构体中添加
-type App struct {
-    AuthController    *controllers.AuthController
-    ModController     *controllers.ModController
-    ArticleController *controllers.ArticleController // 新增
+func NewArticleController(
+    articleSvc *services.ArticleService,
+    jwtMw *middleware.JwtMiddleware,
+) controllers.Controller {
+    return controllers.NewArticleController(articleSvc, jwtMw)
 }
 
-// ProvideApp 中添加参数
-func ProvideApp(auth *controllers.AuthController, mod *controllers.ModController, article *controllers.ArticleController) *App {
-    return &App{
-        AuthController:    auth,
-        ModController:     mod,
-        ArticleController: article,
-    }
-}
-
-// GetControllers 中添加
-func (a *App) GetControllers() []controllers.Controller {
-    return []controllers.Controller{
-        a.AuthController,
-        a.ModController,
-        a.ArticleController, // 新增
-    }
-}
+// 更新 ControllerModule（使用 group 自动注册）
+var ControllerModule = fx.Module("controller",
+    fx.Provide(
+        fx.Annotate(NewAuthController, fx.ResultTags(`group:"controllers"`)),
+        fx.Annotate(NewModController, fx.ResultTags(`group:"controllers"`)),
+        fx.Annotate(NewArticleController, fx.ResultTags(`group:"controllers"`)), // 新增
+    ),
+)
 ```
 
-#### 6.3 重新生成 Wire 代码
+#### 6.4 无需额外步骤
 
-```bash
-cd internal/container
-wire
-```
-
-这会自动生成 `wire_gen.go` 文件，包含完整的依赖注入代码。
-
-路由会在服务启动时自动注册，无需手动修改 `routes/api.go`。
+- **无需运行代码生成命令** - fx 运行时自动解析依赖
+- **无需修改 main.go** - 控制器通过 group 自动注册
+- **无需手动注册路由** - RegisterRoutes 自动收集所有控制器
 
 ---
 
@@ -555,7 +543,7 @@ bizErr.ErrPassword
 2. **Repository** 接口定义与实现分离，便于单元测试 mock
 3. **Service** 层不应直接依赖 `*gin.Context`，保持业务逻辑纯净
 4. **Controller** 只负责请求处理和响应，不包含业务逻辑
-5. **必须使用依赖注入模式**开发新功能，不再支持全局变量方式
+5. **必须使用 fx 依赖注入模式**开发新功能
 6. 所有对外 API 响应使用 `response` 包统一格式
-7. **中间件使用**: 通过 `jwtMiddleware.JWTAuth()` 方法而非全局函数
-8. **新增控制器必须注册到 Container** 的 `GetControllers()` 方法中
+7. **中间件使用**: 通过注入的 `jwtMiddleware.JWTAuth()` 方法
+8. **新增控制器**使用 `fx.Annotate` + `group:"controllers"` 自动注册

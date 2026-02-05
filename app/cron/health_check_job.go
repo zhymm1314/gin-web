@@ -2,11 +2,28 @@ package cron
 
 import (
 	"context"
-	"gin-web/global"
+	"time"
+
+	"github.com/go-redis/redis/v8"
+	"go.uber.org/zap"
+	"gorm.io/gorm"
 )
 
 // HealthCheckJob 健康检查任务
-type HealthCheckJob struct{}
+type HealthCheckJob struct {
+	db    *gorm.DB
+	redis *redis.Client
+	log   *zap.Logger
+}
+
+// NewHealthCheckJob 创建健康检查任务（通过 fx 注入依赖）
+func NewHealthCheckJob(db *gorm.DB, redis *redis.Client, log *zap.Logger) *HealthCheckJob {
+	return &HealthCheckJob{
+		db:    db,
+		redis: redis,
+		log:   log,
+	}
+}
 
 // Name 返回任务名称
 func (j *HealthCheckJob) Name() string {
@@ -20,20 +37,23 @@ func (j *HealthCheckJob) Spec() string {
 
 // Run 执行健康检查
 func (j *HealthCheckJob) Run() {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
 	// 检查数据库连接
-	if global.App.DB != nil {
-		db, err := global.App.DB.DB()
+	if j.db != nil {
+		sqlDB, err := j.db.DB()
 		if err == nil {
-			if err := db.Ping(); err != nil {
-				global.App.Log.Warn("database ping failed")
+			if err := sqlDB.PingContext(ctx); err != nil {
+				j.log.Warn("database health check failed", zap.Error(err))
 			}
 		}
 	}
 
 	// 检查 Redis 连接
-	if global.App.Redis != nil {
-		if err := global.App.Redis.Ping(context.Background()).Err(); err != nil {
-			global.App.Log.Warn("redis ping failed")
+	if j.redis != nil {
+		if err := j.redis.Ping(ctx).Err(); err != nil {
+			j.log.Warn("redis health check failed", zap.Error(err))
 		}
 	}
 }

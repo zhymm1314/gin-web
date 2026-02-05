@@ -3,7 +3,7 @@
 [![Go Version](https://img.shields.io/badge/Go-1.19+-00ADD8?style=flat&logo=go)](https://go.dev/)
 [![Gin](https://img.shields.io/badge/Gin-1.10.0-00ADD8?style=flat)](https://gin-gonic.com/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/Version-1.6.0-brightgreen.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/Version-2.0.0-brightgreen.svg)](CHANGELOG.md)
 
 基于 Gin 框架的 Go 语言后端 API 脚手架，采用 MVC + Repository 架构模式，为 PHP/Hyperf 开发者提供熟悉的开发体验。
 
@@ -12,12 +12,13 @@
 ## 核心特性
 
 - **MVC + Repository 架构** - Controller → Service → Repository → Model 四层分层
-- **模块化设计** - 基于 Module 接口的插件化架构，配置驱动启停
-- **依赖注入** - 基于 Google Wire 的编译时 DI 容器
+- **模块化设计** - 基于 fx.Module 的插件化架构，配置驱动启停
+- **依赖注入** - 基于 Uber fx 的运行时 DI 容器（类似 Spring Boot）
 - **JWT 认证** - 完整认证体系，支持令牌黑名单
 - **消息队列** - RabbitMQ 生产者/消费者模式
 - **定时任务** - 基于 robfig/cron 的任务调度
 - **WebSocket** - 基于 Melody 的实时通信
+- **生命周期管理** - fx.Lifecycle 自动管理组件启动/关闭
 - **统一规范** - 标准化错误码、响应格式、参数验证
 
 ## 文档导航
@@ -30,6 +31,7 @@
 | [定时任务指南](docs/CRON_GUIDE.md) | 定时任务开发与管理 |
 | [WebSocket 指南](docs/WEBSOCKET_GUIDE.md) | WebSocket 实时通信开发 |
 | [Swagger 指南](docs/SWAGGER_GUIDE.md) | API 文档自动生成 |
+| [fx 迁移计划](docs/FX_MIGRATION_PLAN.md) | 从 Wire 到 fx 的迁移指南 |
 | [更新日志](CHANGELOG.md) | 版本更新记录 |
 
 ## 快速开始
@@ -53,8 +55,15 @@ go mod tidy
 cp example-config.yaml config.yaml
 # 编辑 config.yaml 修改数据库、Redis 连接信息
 
-# 启动服务
+# 启动服务（fx 自动管理生命周期）
 go run main.go
+
+# 启动时会看到 fx 的依赖注入日志
+# [Fx] PROVIDE    *config.Configuration
+# [Fx] PROVIDE    *zap.Logger
+# [Fx] PROVIDE    *gorm.DB
+# [Fx] INVOKE     fx.RegisterRoutes()
+# [Fx] RUNNING
 
 # 访问 Swagger 文档
 # http://localhost:8889/swagger/index.html
@@ -80,25 +89,32 @@ gin-web/
 │   ├── cron/               # 定时任务实现
 │   └── amqp/               # 消息队列生产者/消费者
 ├── internal/               # 内部包
-│   ├── container/          # Wire 依赖注入容器
+│   ├── fx/                 # fx 依赖注入模块
+│   │   ├── infrastructure.go  # 基础设施 Provider
+│   │   ├── repository.go      # 仓储 Provider
+│   │   ├── service.go         # 服务 Provider
+│   │   ├── controller.go      # 控制器 Provider
+│   │   ├── router.go          # 路由 Provider
+│   │   ├── rabbitmq.go        # RabbitMQ 模块
+│   │   ├── cron.go            # Cron 模块
+│   │   ├── websocket.go       # WebSocket 模块
+│   │   └── modules.go         # 应用组装
 │   └── repository/         # 数据仓储层
 ├── pkg/                    # 可复用公共包
-│   ├── app/                # 模块化应用管理器
 │   ├── cron/               # 定时任务管理器
 │   ├── rabbitmq/           # RabbitMQ 管理器
 │   ├── websocket/          # WebSocket 管理器
 │   └── errors/             # 统一错误定义
-├── bootstrap/              # 引导初始化（配置/数据库/日志/路由等）
+├── bootstrap/              # 引导初始化（验证器等）
 ├── config/                 # 配置结构体定义
 ├── routes/                 # 路由定义
 ├── cmd/                    # 独立服务启动入口
 │   ├── consumer/           # RabbitMQ 消费者服务
 │   ├── cron/               # 定时任务服务
 │   └── websocket/          # WebSocket 服务
-├── storage/logs/           # 日志文件
 ├── docs/                   # 文档与 Swagger 生成文件
 ├── config.yaml             # 配置文件
-└── main.go                 # 主入口
+└── main.go                 # 主入口（fx.New）
 ```
 
 ## 独立服务部署
@@ -121,8 +137,33 @@ go run cmd/websocket/main.go  # WebSocket
 | 缓存 | Redis | 日志 | Zap |
 | 配置 | Viper | 认证 | golang-jwt |
 | 消息队列 | RabbitMQ | 定时任务 | robfig/cron |
-| WebSocket | Melody | 依赖注入 | Wire |
+| WebSocket | Melody | **依赖注入** | **Uber fx** |
 | 参数验证 | validator | API 文档 | Swaggo |
+
+## fx 依赖注入
+
+本项目使用 [Uber fx](https://github.com/uber-go/fx) 进行依赖注入，类似于 Java Spring Boot / PHP Hyperf 的 DI 容器：
+
+```go
+// main.go - 应用启动
+fxmodule.NewApp().Run()
+
+// 添加新服务只需在对应模块添加 Provider
+var ServiceModule = fx.Module("service",
+    fx.Provide(
+        ProvideUserService,
+        ProvideJwtService,
+        ProvideModService,
+        ProvideNewService,  // 新增服务
+    ),
+)
+```
+
+**优势：**
+- 无需手动运行代码生成命令
+- 自动解析依赖关系
+- 自动管理组件生命周期
+- 启动时检测循环依赖
 
 ## 贡献
 
