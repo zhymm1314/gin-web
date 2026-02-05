@@ -31,7 +31,6 @@
 | [定时任务指南](docs/CRON_GUIDE.md) | 定时任务开发与管理 |
 | [WebSocket 指南](docs/WEBSOCKET_GUIDE.md) | WebSocket 实时通信开发 |
 | [Swagger 指南](docs/SWAGGER_GUIDE.md) | API 文档自动生成 |
-| [fx 迁移计划](docs/FX_MIGRATION_PLAN.md) | 从 Wire 到 fx 的迁移指南 |
 | [更新日志](CHANGELOG.md) | 版本更新记录 |
 
 ## 快速开始
