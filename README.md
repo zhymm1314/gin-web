@@ -5,7 +5,11 @@
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/Version-2.0.0-brightgreen.svg)](CHANGELOG.md)
 
-基于 Gin 框架的 Go 语言后端 API 脚手架，采用 MVC + Repository 架构模式，为 PHP/Hyperf 开发者提供熟悉的开发体验。
+**「不重复造轮子，专注写业务」**
+
+每个新项目都要从零搭建目录结构、配置日志、接入数据库、写一遍 JWT 认证？太累了。这个脚手架把这些重复劳动都替你做好了，clone 下来改改配置就能直接写业务代码。
+
+基于 Gin 框架，采用 MVC + Repository 分层架构，集成 Uber fx 依赖注入，开箱即用。对 PHP/Hyperf、Java/Spring Boot 开发者友好，上手无压力。
 
 > 参考文章：[从 PHP 到 Go：Hyperf 开发者的 Gin 框架指南](https://juejin.cn/post/7016742808560074783)
 
