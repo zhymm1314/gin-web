@@ -65,7 +65,7 @@ redis:
   password:
 
 rabbitmq:
-  enable: true # 是否启用 RabbitMQ（与 kafka 二选一，同时启用时优先 Kafka）
+  enable: false # 是否在主进程启用 RabbitMQ（与 kafka 二选一，同时启用优先 Kafka）；false 时消费者由 cmd/consumer 独立进程运行
   host: 127.0.0.1 #rabbitmq地址
   port: 5672 #rabbitmq端口
   username: magento #rabbitmq用户名
@@ -82,5 +82,8 @@ kafka:
   password: # SASL 密码（无认证留空）
   group_id: gin-web-consumer # 默认消费组（可在 consumer.yaml 中按 consumer 覆盖）
   initial_offset: newest # 新消费组的起始 offset：newest(默认) / oldest
+
+cron:
+  enable: false # 是否在主进程集成定时任务；false 时仅由 cmd/cron 独立进程运行
 
 

@@ -55,9 +55,9 @@ func decideMQ(cfg *appConfig.Configuration, force bool) (enabled, useKafka bool)
 }
 
 // ProvideConsumerHandlers 提供消费者处理器
-func ProvideConsumerHandlers() map[string]mq.Handler {
+func ProvideConsumerHandlers(cfg *appConfig.Configuration, log *zap.Logger) map[string]mq.Handler {
 	return map[string]mq.Handler{
-		"LogConsumer": &consumer.LogConsumer{},
+		"LogConsumer": consumer.NewLogConsumer(cfg, log),
 		// 在这里注册更多消费者处理器
 	}
 }
