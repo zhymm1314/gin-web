@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"gin-web/app/amqp/consumer"
+	"gin-web/pkg/mq"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 	"go.uber.org/zap"
@@ -21,18 +21,11 @@ type Config struct {
 	ReconnectInterval int
 }
 
-// ConsumerConfig 消费者配置
-type ConsumerConfig struct {
-	Queue       string
-	Handler     string
-	Concurrency int
-}
-
-// Manager RabbitMQ 消费者管理器
+// Manager RabbitMQ 消费者管理器，实现 mq.Manager。
 type Manager struct {
 	cfg            *Config
-	consumers      []ConsumerConfig
-	handlers       map[string]consumer.ConsumerHandler
+	consumers      []mq.ConsumerConfig
+	handlers       map[string]mq.Handler
 	conn           *amqp.Connection
 	activeConsumer []*Consumer
 	wg             sync.WaitGroup
@@ -41,7 +34,7 @@ type Manager struct {
 }
 
 // NewManager 创建 RabbitMQ 管理器
-func NewManager(cfg *Config, consumers []ConsumerConfig, handlers map[string]consumer.ConsumerHandler, log *zap.Logger) *Manager {
+func NewManager(cfg *Config, consumers []mq.ConsumerConfig, handlers map[string]mq.Handler, log *zap.Logger) *Manager {
 	return &Manager{
 		cfg:       cfg,
 		consumers: consumers,
@@ -103,7 +96,7 @@ func (m *Manager) startConsumers() {
 		}
 
 		for i := 0; i < cfg.Concurrency; i++ {
-			c := NewConsumer(m.conn, cfg.Queue, handler, m.log)
+			c := NewConsumer(m.conn, cfg.Topic, handler, m.log)
 			m.activeConsumer = append(m.activeConsumer, c)
 			m.wg.Add(1)
 			go func(consumer *Consumer) {
@@ -112,7 +105,7 @@ func (m *Manager) startConsumers() {
 			}(c)
 
 			m.log.Info("consumer started",
-				zap.String("queue", cfg.Queue),
+				zap.String("queue", cfg.Topic),
 				zap.String("handler", cfg.Handler),
 				zap.Int("instance", i+1))
 		}
@@ -167,9 +160,9 @@ func (m *Manager) Stop() {
 }
 
 // RegisterHandler 注册消费者处理器
-func (m *Manager) RegisterHandler(name string, handler consumer.ConsumerHandler) {
+func (m *Manager) RegisterHandler(name string, handler mq.Handler) {
 	if m.handlers == nil {
-		m.handlers = make(map[string]consumer.ConsumerHandler)
+		m.handlers = make(map[string]mq.Handler)
 	}
 	m.handlers[name] = handler
 }

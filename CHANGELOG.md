@@ -14,8 +14,20 @@
 - **PostgreSQL 连接**: 新增 `initPostgresGorm`，DSN 采用 key=value 形式（兼容 lib/pq 与 pgx），支持 `ssl_mode` 配置
 - **跨数据库兼容**: Mod 搜索的关键词/作者匹配改用 `LOWER() ... LIKE LOWER(?)`，在 MySQL 与 PostgreSQL 下均为大小写不敏感
 
+### 重大变更 - 消息队列抽象与 Kafka 支持
+
+- **统一抽象**: 新增 `pkg/mq`（`Message`/`Handler`/`Manager`/`Producer`），业务 handler 面向 `*mq.Message`，与底层 MQ 解耦
+- **Kafka 支持**: 新增 `pkg/kafka`（基于 `github.com/IBM/sarama`），支持消费者组、at-least-once、SASL；后期主要维护 Kafka
+- **RabbitMQ 重构**: `pkg/rabbitmq` 改为实现 `mq.Manager`，消除 pkg→app 反向依赖；handler 签名由 `HandleMessage(msg amqp.Delivery)` 改为 `HandleMessage(msg *mq.Message)`
+- **配置选择**: 通过 `kafka.enable` / `rabbitmq.enable` 开关选择 MQ（同时启用优先 Kafka）；消费者专用进程 `cmd/consumer` 强制启用，两者都没开时回退 RabbitMQ
+- **Go 版本**: sarama 要求 Go ≥ 1.25，`go.mod` 升至 `go 1.25.0`，Dockerfile 升至 `golang:1.25-bookworm`
+
 ### 新增
 
+- `config/kafka.go`、`internal/fx/mq.go` - Kafka 配置与 fx 装配（`MQModule` 按配置选择 Kafka/RabbitMQ）
+- `docker-compose.yml` - 本地开发环境（MySQL/Redis/PostgreSQL/Kafka，Kafka 采用 KRaft 模式，无需 Zookeeper）
+- `docs/MQ_GUIDE.md` - 消息队列使用指南（Kafka/RabbitMQ）
+- `pkg/kafka/kafka_test.go` - Kafka 投递/消费集成测试（Kafka 不可达时自动跳过）
 - `config.Database.SSLMode` 字段（仅 PostgreSQL 使用）：disable / require / verify-ca / verify-full，为空时默认 disable
 - `example-config.yaml` 增加 PostgreSQL 配置示例
 - `internal/fx/validator.go` - 在 fx 应用启动时注册 `mobile`/`email` 自定义校验器（原 `bootstrap.InitializeValidator` 在 fx 重构后未被调用，导致带这些 tag 的请求 panic）

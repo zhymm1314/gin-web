@@ -5,13 +5,12 @@ import (
 	"context"
 	"fmt"
 	"gin-web/config"
+	"gin-web/pkg/mq"
 	"github.com/rabbitmq/amqp091-go"
 )
 
-type Producer interface {
-	Publish(body []byte) error
-	QueueName() string
-}
+// Producer 消息生产者接口（与底层 MQ 实现解耦，别名指向 mq.Producer）。
+type Producer = mq.Producer
 
 type BaseProducer struct {
 	conn    *amqp091.Connection
@@ -62,6 +61,11 @@ func (p *BaseProducer) Publish(body []byte) error {
 			DeliveryMode: amqp091.Persistent,
 		},
 	)
+}
+
+// Topic 返回目标队列名（实现 mq.Producer）。
+func (p *BaseProducer) Topic() string {
+	return p.queue
 }
 
 func getAMQPURI(cfg config.RabbitMQ) string {

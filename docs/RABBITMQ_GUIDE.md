@@ -1,5 +1,14 @@
 # RabbitMQ 消息队列使用指南
 
+> ⚠️ **本文档为旧版，已被 [消息队列指南](MQ_GUIDE.md) 取代。**
+>
+> 消息队列已抽象到 `pkg/mq`，支持 Kafka（主要维护）与 RabbitMQ。本文档中的示例使用的是旧 API：
+> - 消费者处理器签名已由 `HandleMessage(msg amqp.Delivery) error` 改为 `HandleMessage(msg *mq.Message) error`；
+> - 生产者接口 `QueueName()` 已更名为 `Topic()`；
+> - 消费者管理器装配由 `internal/fx/rabbitmq.go` 迁移至 `internal/fx/mq.go`。
+>
+> 新代码请参考 [MQ_GUIDE.md](MQ_GUIDE.md)。以下内容仅作历史参考。
+
 本文档详细说明如何在 Gin-Web 项目中使用 RabbitMQ 消息队列，包括生产者和消费者的完整开发流程。
 
 ---

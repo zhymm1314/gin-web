@@ -1,7 +1,10 @@
 consumers:
-  - queue: "base.log.table_store.zn.tenant"
+  - topic: "base.log.table_store.zn.tenant" # Kafka topic；RabbitMQ 下为队列名
+    # queue: "base.log.table_store.zn.tenant" # RabbitMQ 队列名（向后兼容；topic 为空时使用）
+    group: "log-consumer-group" # Kafka 消费组（为空则用 config 中的 kafka.group_id；RabbitMQ 忽略）
     concurrency: 5
     handler: "LogConsumer"
-#  - queue: "payment_queue"
+#  - topic: "payment_queue"
+#    group: "payment-consumer-group"
 #    concurrency: 2
 #    handler: "PaymentConsumer"

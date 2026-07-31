@@ -24,7 +24,9 @@ type RabbitMQConfig struct {
 }
 
 type ConsumerConfig struct {
-	Queue       string `yaml:"queue"`
+	Queue       string `yaml:"queue"`       // RabbitMQ 队列名（向后兼容）
+	Topic       string `yaml:"topic"`       // 主题：Kafka topic；RabbitMQ 下若为空则回退到 Queue
+	Group       string `yaml:"group"`       // Kafka 消费组（RabbitMQ 忽略）
 	Concurrency int    `yaml:"concurrency"`
 	Handler     string `yaml:"handler"`
 }

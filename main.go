@@ -31,7 +31,7 @@ func main() {
 	// - 数据库连接
 	// - Redis 连接
 	// - HTTP 服务器
-	// - RabbitMQ 消费者（如果启用）
+	// - 消息队列消费者（Kafka / RabbitMQ，按配置启用）
 	// - 定时任务（如果启用）
 	// - WebSocket（如果启用）
 	fxmodule.NewApp().Run()

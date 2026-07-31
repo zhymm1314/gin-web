@@ -68,6 +68,7 @@ func PrintBanner(cfg *config.Configuration, params ControllerParams) {
 		{"Database (MySQL)", true},
 		{"Redis", true},
 		{"RabbitMQ", cfg.RabbitMQ.Enable},
+		{"Kafka", cfg.Kafka.Enable},
 		{"Cron Jobs", cfg.Cron.Enable},
 		{"WebSocket", cfg.WebSocket.Enable},
 	}

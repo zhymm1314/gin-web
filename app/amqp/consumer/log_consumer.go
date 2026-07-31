@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"log"
 
-	amqp "github.com/rabbitmq/amqp091-go"
 	"go.uber.org/zap"
 
 	"gin-web/app/api"
 	"gin-web/config"
+	"gin-web/pkg/mq"
 )
 
 // LogConsumer 日志消费者（通过依赖注入获取 config 和 logger）
@@ -22,7 +22,7 @@ func NewLogConsumer(cfg *config.Configuration, log *zap.Logger) *LogConsumer {
 	return &LogConsumer{cfg: cfg, log: log}
 }
 
-func (c *LogConsumer) HandleMessage(msg amqp.Delivery) error {
+func (c *LogConsumer) HandleMessage(msg *mq.Message) error {
 	// 使用 defer + recover 捕获 panic 确保一定会ack处理
 	defer func() {
 		if r := recover(); r != nil {

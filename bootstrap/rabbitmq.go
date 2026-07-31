@@ -4,6 +4,7 @@ import (
 	"gin-web/app/amqp/consumer"
 	"gin-web/config"
 	"gin-web/global"
+	"gin-web/pkg/mq"
 	"gin-web/pkg/rabbitmq"
 	"log"
 )
@@ -18,7 +19,7 @@ func InitRabbitmq() *rabbitmq.Manager {
 	}
 
 	// 注册消费者处理器
-	handlers := map[string]consumer.ConsumerHandler{
+	handlers := map[string]mq.Handler{
 		"LogConsumer": &consumer.LogConsumer{},
 		// 添加更多消费者处理器...
 	}
@@ -33,11 +34,15 @@ func InitRabbitmq() *rabbitmq.Manager {
 		ReconnectInterval: 5,
 	}
 
-	// 转换消费者配置
-	consumers := make([]rabbitmq.ConsumerConfig, len(cfgConsumer.Consumers))
+	// 转换消费者配置（Topic 为空时回退到 Queue，向后兼容）
+	consumers := make([]mq.ConsumerConfig, len(cfgConsumer.Consumers))
 	for i, c := range cfgConsumer.Consumers {
-		consumers[i] = rabbitmq.ConsumerConfig{
-			Queue:       c.Queue,
+		topic := c.Topic
+		if topic == "" {
+			topic = c.Queue
+		}
+		consumers[i] = mq.ConsumerConfig{
+			Topic:       topic,
 			Handler:     c.Handler,
 			Concurrency: c.Concurrency,
 		}

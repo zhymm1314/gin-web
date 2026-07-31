@@ -1,5 +1,5 @@
-# 使用Go 1.22官方镜像作为基础镜像
-FROM golang:1.22.3-bookworm
+# 使用 Go 1.25 官方镜像作为基础镜像（需与 go.mod 的 go 指令版本匹配）
+FROM golang:1.25-bookworm
 
 # 设置工作目录
 WORKDIR /app

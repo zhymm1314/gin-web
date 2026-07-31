@@ -3,7 +3,7 @@ package rabbitmq
 import (
 	"errors"
 
-	"gin-web/app/amqp/consumer"
+	"gin-web/pkg/mq"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 	"go.uber.org/zap"
@@ -12,14 +12,14 @@ import (
 // Consumer RabbitMQ 消费者
 type Consumer struct {
 	queueName string
-	handler   consumer.ConsumerHandler
+	handler   mq.Handler
 	conn      *amqp.Connection
 	done      chan struct{}
 	log       *zap.Logger
 }
 
 // NewConsumer 创建消费者
-func NewConsumer(conn *amqp.Connection, queueName string, handler consumer.ConsumerHandler, log *zap.Logger) *Consumer {
+func NewConsumer(conn *amqp.Connection, queueName string, handler mq.Handler, log *zap.Logger) *Consumer {
 	return &Consumer{
 		queueName: queueName,
 		handler:   handler,
@@ -97,11 +97,18 @@ func (c *Consumer) consume() error {
 			if !ok {
 				return errors.New("message channel closed")
 			}
-			if err := c.handler.HandleMessage(msg); err != nil {
+			// 将 RabbitMQ 投递转换为统一消息抽象，交给业务 handler
+			mqMsg := &mq.Message{
+				Body:      msg.Body,
+				Topic:     c.queueName,
+				MessageID: msg.MessageId,
+				Headers:   toMQHeaders(msg.Headers),
+			}
+			if err := c.handler.HandleMessage(mqMsg); err != nil {
 				c.log.Error("handle message error",
 					zap.String("queue", c.queueName),
 					zap.Error(err))
-				msg.Nack(false, true)
+				msg.Nack(false, true) // requeue
 			} else {
 				msg.Ack(false)
 			}
@@ -114,4 +121,26 @@ func (c *Consumer) consume() error {
 // Stop 停止消费者
 func (c *Consumer) Stop() {
 	close(c.done)
+}
+
+// toMQHeaders 将 amqp.Table 转换为 mq.Message.Headers（仅保留 []byte / string 值）。
+func toMQHeaders(table amqp.Table) map[string][]byte {
+	if len(table) == 0 {
+		return nil
+	}
+	out := make(map[string][]byte, len(table))
+	for k, v := range table {
+		switch val := v.(type) {
+		case []byte:
+			out[k] = val
+		case string:
+			out[k] = []byte(val)
+		default:
+			// 其它类型忽略，保持抽象简洁
+		}
+	}
+	if len(out) == 0 {
+		return nil
+	}
+	return out
 }

@@ -32,7 +32,7 @@ func NewApp() *fx.App {
 		BannerModule,
 
 		// 可选模块（根据配置动态加载）
-		RabbitMQModule(cfg.RabbitMQ.Enable),
+		MQModule(cfg, false),
 		CronModule(cfg.Cron.Enable),
 		WebSocketModule(cfg.WebSocket.Enable),
 
@@ -45,12 +45,18 @@ func NewApp() *fx.App {
 
 // NewConsumerApp 创建消费者应用
 func NewConsumerApp() *fx.App {
+	// 预加载配置以决定消息队列类型
+	cfg, err := ProvideConfig()
+	if err != nil {
+		panic(err)
+	}
+
 	return fx.New(
 		// 基础设施
 		InfrastructureModule,
 
-		// RabbitMQ 消费者（强制启用）
-		RabbitMQModule(true),
+		// 消息队列消费者（按配置选择 Kafka / RabbitMQ，强制启用）
+		MQModule(cfg, true),
 
 		// 禁用 fx 的 verbose 日志
 		fx.WithLogger(func() fxevent.Logger {
