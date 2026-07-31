@@ -1,6 +1,7 @@
 package bootstrap
 
 import (
+	"fmt"
 	"gin-web/app/models"
 	"gin-web/global"
 	"io"
@@ -14,6 +15,7 @@ import (
 	"go.uber.org/zap"
 	"gopkg.in/natefinch/lumberjack.v2"
 	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
@@ -66,9 +68,10 @@ func getGormLogger() logger.Interface {
 func InitializeDB() *gorm.DB {
 	// 根据驱动配置进行初始化
 	switch global.App.Config.Database.Driver {
-	case "mysql":
-		return initMySqlGorm()
+	case "postgres", "pgsql", "postgresql":
+		return initPostgresGorm()
 	default:
+		// 未指定驱动或 mysql 时，默认使用 MySQL
 		return initMySqlGorm()
 	}
 }
@@ -120,6 +123,43 @@ func initMySqlGorm() *gorm.DB {
 	// 	sqlDB.SetMaxIdleConns(dbConfig.MaxIdleConns)
 	// 	sqlDB.SetMaxOpenConns(dbConfig.MaxOpenConns)
 	// 	return db
+}
+
+// 初始化 postgres gorm.DB
+func initPostgresGorm() *gorm.DB {
+	dbConfig := global.App.Config.Database
+
+	if dbConfig.Database == "" {
+		return nil
+	}
+
+	// sslmode 默认 disable
+	sslMode := dbConfig.SSLMode
+	if sslMode == "" {
+		sslMode = "disable"
+	}
+
+	// 构建 DSN（key=value 形式，兼容 lib/pq 与 pgx）
+	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
+		dbConfig.Host, dbConfig.Port, dbConfig.UserName, dbConfig.Password, dbConfig.Database, sslMode)
+
+	if db, err := gorm.Open(postgres.New(postgres.Config{
+		DSN: dsn,
+	}), &gorm.Config{
+		DisableForeignKeyConstraintWhenMigrating: true,            // 禁用自动创建外键约束
+		Logger:                                   getGormLogger(), // 使用自定义 Logger
+		NamingStrategy: schema.NamingStrategy{
+			TablePrefix: dbConfig.Prefix,
+		},
+	}); err != nil {
+		return nil
+	} else {
+		sqlDB, _ := db.DB()
+		sqlDB.SetMaxIdleConns(dbConfig.MaxIdleConns)
+		sqlDB.SetMaxOpenConns(dbConfig.MaxOpenConns)
+		initMySqlTables(db)
+		return db
+	}
 }
 
 // 数据库表初始化

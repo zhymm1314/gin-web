@@ -8,6 +8,8 @@ type Database struct {
 	UserName            string `mapstructure:"username" json:"username" yaml:"username"`
 	Password            string `mapstructure:"password" json:"password" yaml:"password"`
 	Charset             string `mapstructure:"charset" json:"charset" yaml:"charset"`
+	// SSLMode 仅 PostgreSQL 使用，可选值：disable、require、verify-ca、verify-full；为空时默认 disable
+	SSLMode             string `mapstructure:"ssl_mode" json:"ssl_mode" yaml:"ssl_mode"`
 	MaxIdleConns        int    `mapstructure:"max_idle_conns" json:"max_idle_conns" yaml:"max_idle_conns"`
 	MaxOpenConns        int    `mapstructure:"max_open_conns" json:"max_open_conns" yaml:"max_open_conns"`
 	LogMode             string `mapstructure:"log_mode" json:"log_mode" yaml:"log_mode"`

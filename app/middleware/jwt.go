@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -30,7 +31,14 @@ func (m *JwtMiddleware) JWTAuth(guardName string) gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		tokenStr = tokenStr[len(services.TokenType)+1:]
+		// 校验 "Bearer " 前缀并提取 token，避免畸形/过短头部导致切片越界 panic
+		prefix := services.TokenType + " "
+		if !strings.HasPrefix(strings.ToLower(tokenStr), prefix) {
+			dto.TokenFail(c)
+			c.Abort()
+			return
+		}
+		tokenStr = tokenStr[len(prefix):]
 
 		// Token 解析校验
 		token, err := jwt.ParseWithClaims(tokenStr, &services.CustomClaims{}, func(token *jwt.Token) (interface{}, error) {

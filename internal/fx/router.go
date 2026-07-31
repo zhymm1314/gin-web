@@ -33,6 +33,9 @@ type ControllerParams struct {
 
 // ProvideGinEngine 提供 Gin 引擎
 func ProvideGinEngine(cfg *config.Configuration) *gin.Engine {
+	// 注册自定义校验器（mobile/email 等），否则带这些 tag 的请求会 panic
+	initValidator()
+
 	// 禁用 Gin 的 debug 日志输出
 	gin.SetMode(gin.ReleaseMode)
 

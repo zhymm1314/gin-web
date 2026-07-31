@@ -14,11 +14,6 @@ type User struct {
 	SoftDeletes
 }
 
-// TableName 指定表名
-func (User) TableName() string {
-	return "users"
-}
-
 // GetUid 获取用户ID字符串（实现 JwtUser 接口）
 func (u User) GetUid() string {
 	return strconv.FormatUint(uint64(u.ID.ID), 10)

@@ -17,19 +17,39 @@ log:
   compress: true # 是否压缩
 
 database:
+  # 数据库驱动：mysql 或 postgres（也可写 pgsql / postgresql）
+  # 切换到 PostgreSQL 时，需将 port 改为 5432，并按需配置 ssl_mode
   driver: mysql # 数据库驱动
   host: 127.0.0.1 # 域名
-  port: 3306 # 端口号
+  port: 3306 # 端口号（MySQL 默认 3306，PostgreSQL 默认 5432）
   database: gin-web # 数据库名称
   username: root # 用户名
   password: 123456 # 密码
-  charset: utf8mb4 # 编码格式sss
+  charset: utf8mb4 # 编码格式（仅 MySQL 使用）
+  ssl_mode: disable # SSL 模式（仅 PostgreSQL 使用）：disable / require / verify-ca / verify-full
   max_idle_conns: 10 # 空闲连接池中连接的最大数量
   max_open_conns: 100 # 打开数据库连接的最大数量
   log_mode: info # 日志级别
   enable_file_log_writer: true # 是否启用日志文件
   log_filename: sql.log # 日志文件名称
   prefix: gw_ #表前缀
+
+# PostgreSQL 配置示例：
+# database:
+#   driver: postgres
+#   host: 127.0.0.1
+#   port: 5432
+#   database: gin-web
+#   username: postgres
+#   password: 123456
+#   charset: utf8 # PostgreSQL 下忽略
+#   ssl_mode: disable
+#   max_idle_conns: 10
+#   max_open_conns: 100
+#   log_mode: info
+#   enable_file_log_writer: true
+#   log_filename: sql.log
+#   prefix: gw_
 
 jwt:
   secret: 3Bde3BGEbYqtqyEUzW3ry8jKFcaPH17fRmTmqE7MDr05Lwj95uruRKrrkb44TJ4s
@@ -45,12 +65,22 @@ redis:
   password:
 
 rabbitmq:
-  consumer_enable_start: true # 是否开启消费者
+  enable: true # 是否启用 RabbitMQ（与 kafka 二选一，同时启用时优先 Kafka）
   host: 127.0.0.1 #rabbitmq地址
   port: 5672 #rabbitmq端口
   username: magento #rabbitmq用户名
   password: 123456 #rabbitmq密码
   vhost: /saas-tenant
   concurrent_limit: 0 # 并发限制（未实现）
+
+kafka:
+  enable: false # 是否启用 Kafka（与 rabbitmq 二选一，同时启用时优先 Kafka）
+  brokers: # Kafka broker 地址列表
+    - 127.0.0.1:9092
+  version: # Kafka 版本，如 "3.6.0.0"；留空则由客户端自动协商
+  username: # SASL 用户名（无认证留空）
+  password: # SASL 密码（无认证留空）
+  group_id: gin-web-consumer # 默认消费组（可在 consumer.yaml 中按 consumer 覆盖）
+  initial_offset: newest # 新消费组的起始 offset：newest(默认) / oldest
 
 

@@ -8,6 +8,29 @@
 
 ## [未发布]
 
+### 重大变更 - PostgreSQL 支持
+
+- **多数据库驱动**: `database.driver` 支持 `mysql` / `postgres`（亦写 `pgsql` / `postgresql`），按驱动自动选择 GORM Dialector，切换仅需改配置无需改代码
+- **PostgreSQL 连接**: 新增 `initPostgresGorm`，DSN 采用 key=value 形式（兼容 lib/pq 与 pgx），支持 `ssl_mode` 配置
+- **跨数据库兼容**: Mod 搜索的关键词/作者匹配改用 `LOWER() ... LIKE LOWER(?)`，在 MySQL 与 PostgreSQL 下均为大小写不敏感
+
+### 新增
+
+- `config.Database.SSLMode` 字段（仅 PostgreSQL 使用）：disable / require / verify-ca / verify-full，为空时默认 disable
+- `example-config.yaml` 增加 PostgreSQL 配置示例
+- `internal/fx/validator.go` - 在 fx 应用启动时注册 `mobile`/`email` 自定义校验器（原 `bootstrap.InitializeValidator` 在 fx 重构后未被调用，导致带这些 tag 的请求 panic）
+
+### 变更
+
+- `bootstrap/db.go`、`internal/fx/infrastructure.go` - 数据库初始化按 `driver` 配置选择 MySQL/PostgreSQL
+- `app/models/*` - 移除各模型的 `TableName()`，让配置的表前缀 `gw_` 统一生效；`Mod.Categories` 的 `many2many` 改为 `mod_categories`，前缀由 NamingStrategy 统一添加，避免 `gw_gw_mod_categories` 双前缀
+- `internal/repository/mod_repository.go` - 分类筛选 JOIN 改用带前缀表名 `gw_mods` / `gw_mod_categories`，修复关联表名不匹配导致的查询失败
+
+### 修复
+
+- 自定义校验器未注册导致注册/登录接口 panic（`Undefined validation function 'mobile'`）
+- JWT 中间件对畸形 `Authorization` 头切片越界 panic（`slice bounds out of range [7:6]`），改为校验 `Bearer ` 前缀后再提取 token
+
 ### 计划中
 - 单元测试覆盖
 - Prometheus 监控集成

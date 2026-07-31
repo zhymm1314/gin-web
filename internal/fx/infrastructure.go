@@ -17,6 +17,7 @@ import (
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
 	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
@@ -150,29 +151,26 @@ func ProvideDatabase(lc fx.Lifecycle, cfg *config.Configuration, log *zap.Logger
 		return nil, nil
 	}
 
-	// 构建 DSN
-	dsn := dbConfig.UserName + ":" + dbConfig.Password + "@tcp(" + dbConfig.Host + ":" + strconv.Itoa(dbConfig.Port) + ")/" +
-		dbConfig.Database + "?charset=" + dbConfig.Charset + "&parseTime=True&loc=Local"
-
-	// GORM 日志配置
+	// GORM 通用配置（两种驱动共享）
 	gormLogger := newGormLogger(cfg)
-
-	mysqlConfig := mysql.Config{
-		DSN:                       dsn,
-		DefaultStringSize:         191,
-		DisableDatetimePrecision:  true,
-		DontSupportRenameIndex:    true,
-		DontSupportRenameColumn:   true,
-		SkipInitializeWithVersion: false,
-	}
-
-	db, err := gorm.Open(mysql.New(mysqlConfig), &gorm.Config{
+	gormConfig := &gorm.Config{
 		DisableForeignKeyConstraintWhenMigrating: true,
-		Logger:                                   gormLogger,
+		Logger: gormLogger,
 		NamingStrategy: schema.NamingStrategy{
 			TablePrefix: dbConfig.Prefix,
 		},
-	})
+	}
+
+	// 根据驱动配置选择对应的 Dialector
+	var db *gorm.DB
+	var err error
+	switch dbConfig.Driver {
+	case "postgres", "pgsql", "postgresql":
+		db, err = initPostgresGorm(dbConfig, gormConfig)
+	default:
+		// 未指定驱动或 mysql 时，默认使用 MySQL
+		db, err = initMysqlGorm(dbConfig, gormConfig)
+	}
 	if err != nil {
 		return nil, fmt.Errorf("connect database failed: %w", err)
 	}
@@ -199,6 +197,7 @@ func ProvideDatabase(lc fx.Lifecycle, cfg *config.Configuration, log *zap.Logger
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
 			log.Info("database connection established",
+				zap.String("driver", dbConfig.Driver),
 				zap.String("host", dbConfig.Host),
 				zap.Int("port", dbConfig.Port),
 				zap.String("database", dbConfig.Database),
@@ -212,6 +211,43 @@ func ProvideDatabase(lc fx.Lifecycle, cfg *config.Configuration, log *zap.Logger
 	})
 
 	return db, nil
+}
+
+// initMysqlGorm 初始化 MySQL 连接
+func initMysqlGorm(dbConfig config.Database, gormConfig *gorm.Config) (*gorm.DB, error) {
+	// 构建 DSN
+	dsn := dbConfig.UserName + ":" + dbConfig.Password + "@tcp(" + dbConfig.Host + ":" + strconv.Itoa(dbConfig.Port) + ")/" +
+		dbConfig.Database + "?charset=" + dbConfig.Charset + "&parseTime=True&loc=Local"
+
+	mysqlConfig := mysql.Config{
+		DSN:                       dsn,   // DSN data source name
+		DefaultStringSize:         191,   // string 类型字段的默认长度
+		DisableDatetimePrecision:  true,  // 禁用 datetime 精度，MySQL 5.6 之前的数据库不支持
+		DontSupportRenameIndex:    true,  // 重命名索引时采用删除并新建的方式，MySQL 5.7 之前的数据库和 MariaDB 不支持重命名索引
+		DontSupportRenameColumn:   true,  // 用 `change` 重命名列，MySQL 8 之前的数据库和 MariaDB 不支持重命名列
+		SkipInitializeWithVersion: false, // 根据版本自动配置
+	}
+
+	return gorm.Open(mysql.New(mysqlConfig), gormConfig)
+}
+
+// initPostgresGorm 初始化 PostgreSQL 连接
+func initPostgresGorm(dbConfig config.Database, gormConfig *gorm.Config) (*gorm.DB, error) {
+	// sslmode 默认 disable
+	sslMode := dbConfig.SSLMode
+	if sslMode == "" {
+		sslMode = "disable"
+	}
+
+	// 构建 DSN（key=value 形式，兼容 lib/pq 与 pgx）
+	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
+		dbConfig.Host, dbConfig.Port, dbConfig.UserName, dbConfig.Password, dbConfig.Database, sslMode)
+
+	pgConfig := postgres.Config{
+		DSN: dsn,
+	}
+
+	return gorm.Open(postgres.New(pgConfig), gormConfig)
 }
 
 // ProvideRedis 提供 Redis 连接

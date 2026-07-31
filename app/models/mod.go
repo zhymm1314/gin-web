@@ -20,13 +20,8 @@ type Mod struct {
 	// 外键关联
 	GameID     uint       `json:"game_id" gorm:"not null;index"`
 	Game       Game       `json:"game" gorm:"foreignKey:GameID"`
-	Categories []Category `json:"categories" gorm:"many2many:gw_mod_categories;"`
+	Categories []Category `json:"categories" gorm:"many2many:mod_categories;"`
 
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
-}
-
-// TableName 指定表名
-func (Mod) TableName() string {
-	return "mods"
 }

@@ -51,10 +51,10 @@ func (r *modRepository) Search(criteria ModSearchCriteria) (*ModSearchResult, er
 	// 预加载关联数据
 	db = db.Preload("Game").Preload("Categories")
 
-	// 关键词搜索
+	// 关键词搜索（使用 LOWER() 实现跨 MySQL/PostgreSQL 的大小写不敏感匹配）
 	if criteria.Keyword != "" {
 		keyword := "%" + criteria.Keyword + "%"
-		db = db.Where("name LIKE ? OR description LIKE ? OR author LIKE ?", keyword, keyword, keyword)
+		db = db.Where("LOWER(name) LIKE LOWER(?) OR LOWER(description) LIKE LOWER(?) OR LOWER(author) LIKE LOWER(?)", keyword, keyword, keyword)
 	}
 
 	// 游戏筛选
@@ -62,14 +62,14 @@ func (r *modRepository) Search(criteria ModSearchCriteria) (*ModSearchResult, er
 		db = db.Where("game_id = ?", criteria.GameID)
 	}
 
-	// 作者筛选
+	// 作者筛选（大小写不敏感，兼容 MySQL/PostgreSQL）
 	if criteria.Author != "" {
-		db = db.Where("author LIKE ?", "%"+criteria.Author+"%")
+		db = db.Where("LOWER(author) LIKE LOWER(?)", "%"+criteria.Author+"%")
 	}
 
 	// 分类筛选
 	if criteria.CategoryID > 0 {
-		db = db.Joins("JOIN gw_mod_categories ON mods.id = gw_mod_categories.mod_id").
+		db = db.Joins("JOIN gw_mod_categories ON gw_mods.id = gw_mod_categories.mod_id").
 			Where("gw_mod_categories.category_id = ?", criteria.CategoryID)
 	}
 
