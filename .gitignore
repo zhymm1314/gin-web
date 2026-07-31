@@ -13,3 +13,5 @@ storage/logs
 password.txt
 config.yaml
 ./storage/logs/*
+gin-web
+.claude/plans/
